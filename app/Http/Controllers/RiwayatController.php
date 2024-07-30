@@ -16,7 +16,7 @@ class RiwayatController extends Controller
     {
         if ($request->dates) {
             $mulai = Carbon::createFromDate($request->dates[0])->toIso8601String();
-            $sampai = Carbon::createFromDate($request->dates[1])->endOfDay()->toIso8601String();
+            $sampai = Carbon::createFromDate($request->dates[1])->endOfDay()->addHour(1)->toIso8601String();
         }
 
         $riwayat = Histori::with('scanner.ruangan', 'user')->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3)->toIso8601String(), Carbon::now('GMT+8')->toIso8601String()])->get()->map(function ($data) {
