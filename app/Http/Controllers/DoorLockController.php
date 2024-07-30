@@ -37,7 +37,7 @@ class DoorLockController extends Controller
         $histori = Histori::create([
             'id_tag' => $request->id,
             'kode' => $request->kode,
-            'waktu' => Carbon::now(),
+            'waktu' => Carbon::now('GMT+8'),
             'status' => $status,
         ]);
 
