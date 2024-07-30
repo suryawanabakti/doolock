@@ -42,8 +42,8 @@ class RiwayatController extends Controller
 
         return inertia("Admin/Riwayat/Index", [
             "riwayat" => $riwayat,
-            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
-            "sampai" => $sampai ?? Carbon::now('GMT+8')->toIso8601String(),
+            "mulai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
+            "sampai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
         ]);
     }
 
@@ -83,8 +83,8 @@ class RiwayatController extends Controller
 
         return inertia("Admin/Riwayat/DetailRuangan", [
             "riwayat" => $riwayat,
-            "mulai" => Carbon::createFromDate($request->dates[1])->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
-            "sampai" => Carbon::createFromDate($request->dates[1])->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
+            "mulai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
+            "sampai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
             "ruangan" => Ruangan::where('id', $request->ruangan_id)->first()
         ]);
     }
@@ -124,8 +124,8 @@ class RiwayatController extends Controller
 
         return inertia("Admin/Riwayat/DetailMahasiswa", [
             "riwayat" => $riwayat,
-            "mulai" => Carbon::createFromDate($request->dates[1])->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
-            "sampai" => Carbon::createFromDate($request->dates[1])->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
+            "mulai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
+            "sampai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
             "mahasiswa" => $mahasiswa
         ]);
     }
