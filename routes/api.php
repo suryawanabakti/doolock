@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\DoorLockController;
+use App\Http\Controllers\ReferenceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/v1/get-data-dosen', [ReferenceController::class, 'getDosen']);
+Route::get('/v1/ambilpost', [DoorLockController::class, 'index']);
+Route::get('/v1/get-data-mahasiswa-by-kelas', [ReferenceController::class, 'getMahasiswaByKelas']);
