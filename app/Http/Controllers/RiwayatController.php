@@ -16,7 +16,7 @@ class RiwayatController extends Controller
     {
         if ($request->dates) {
             $mulai = Carbon::createFromDate($request->dates[0])->toIso8601String();
-            $sampai = Carbon::createFromDate($request->dates[1])->toIso8601String();
+            $sampai = Carbon::createFromDate($request->dates[1])->endOfDay()->toIso8601String();
         }
 
         $riwayat = Histori::with('scanner.ruangan', 'user')->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3)->toIso8601String(), Carbon::now('GMT+8')->toIso8601String()])->get()->map(function ($data) {
@@ -51,7 +51,7 @@ class RiwayatController extends Controller
     {
         if ($request->dates) {
             $mulai = Carbon::createFromDate($request->dates[0])->toIso8601String();
-            $sampai = Carbon::createFromDate($request->dates[1])->toIso8601String();
+            $sampai = Carbon::createFromDate($request->dates[1])->endOfDay()->toIso8601String();
         }
 
         $riwayat = Histori::with('scanner.ruangan', 'user')
@@ -83,8 +83,8 @@ class RiwayatController extends Controller
 
         return inertia("Admin/Riwayat/DetailRuangan", [
             "riwayat" => $riwayat,
-            "mulai" => $mulai ?? Carbon::now('GMT+8')->addMonth(-1)->toIso8601String(),
-            "sampai" => $sampai ?? Carbon::now('GMT+8')->toIso8601String(),
+            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
+            "sampai" => $sampai ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
             "ruangan" => Ruangan::where('id', $request->ruangan_id)->first()
         ]);
     }
@@ -93,7 +93,7 @@ class RiwayatController extends Controller
     {
         if ($request->dates) {
             $mulai = Carbon::createFromDate($request->dates[0])->toIso8601String();
-            $sampai = Carbon::createFromDate($request->dates[1])->toIso8601String();
+            $sampai = Carbon::createFromDate($request->dates[1])->endOfDay()->toIso8601String();
         }
 
         $mahasiswa = Mahasiswa::where('id_tag', $request->id_tag)->first();
@@ -124,8 +124,8 @@ class RiwayatController extends Controller
 
         return inertia("Admin/Riwayat/DetailMahasiswa", [
             "riwayat" => $riwayat,
-            "mulai" => $mulai ?? Carbon::now('GMT+8')->addMonth(-1)->toIso8601String(),
-            "sampai" => $sampai ?? Carbon::now('GMT+8')->toIso8601String(),
+            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
+            "sampai" => $sampai ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
             "mahasiswa" => $mahasiswa
         ]);
     }
