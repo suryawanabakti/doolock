@@ -14,12 +14,13 @@ class RiwayatController extends Controller
 {
     public function index(Request $request)
     {
+        $sampai = null;
         if ($request->dates) {
-            $mulai = Carbon::createFromDate($request->dates[0])->toIso8601String();
-            $sampai = Carbon::createFromDate($request->dates[1])->endOfDay()->addHour(1)->toIso8601String();
+            $mulai = Carbon::createFromDate($request->dates[0]);
+            $sampai = Carbon::createFromDate($request->dates[1])->addDay(1);
         }
 
-        $riwayat = Histori::with('scanner.ruangan', 'user')->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3)->toIso8601String(), Carbon::now('GMT+8')->toIso8601String()])->get()->map(function ($data) {
+        $riwayat = Histori::with('scanner.ruangan', 'user')->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3), Carbon::now('GMT+8')])->get()->map(function ($data) {
             if ($data->status == 0) {
                 $status = "Blok";
             }
@@ -42,23 +43,24 @@ class RiwayatController extends Controller
 
         return inertia("Admin/Riwayat/Index", [
             "riwayat" => $riwayat,
-            "mulai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
-            "sampai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
+            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3),
+            "sampai" => $sampai ? $sampai->addDay(-1) : Carbon::now('GMT+8'),
         ]);
     }
 
     public function ruangan(Request $request)
     {
+        $sampai = null;
         if ($request->dates) {
-            $mulai = Carbon::createFromDate($request->dates[0])->toIso8601String();
-            $sampai = Carbon::createFromDate($request->dates[1])->endOfDay()->addHour(1)->toIso8601String();
+            $mulai = Carbon::createFromDate($request->dates[0]);
+            $sampai = Carbon::createFromDate($request->dates[1])->addDay(1);
         }
 
         $riwayat = Histori::with('scanner.ruangan', 'user')
             ->whereHas('scanner.ruangan', function ($query) use ($request) {
                 $query->where('id', $request->ruangan_id);
             })
-            ->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addMonth(-1)->toIso8601String(), Carbon::now('GMT+8')->toIso8601String()])->get()->map(function ($data) {
+            ->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3), Carbon::now('GMT+8')])->get()->map(function ($data) {
                 if ($data->status == 0) {
                     $status = "Blok";
                 }
@@ -83,17 +85,18 @@ class RiwayatController extends Controller
 
         return inertia("Admin/Riwayat/DetailRuangan", [
             "riwayat" => $riwayat,
-            "mulai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
-            "sampai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
+            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3),
+            "sampai" => $sampai ? $sampai->addDay(-1) : Carbon::now('GMT+8')->endOfDay(),
             "ruangan" => Ruangan::where('id', $request->ruangan_id)->first()
         ]);
     }
 
     public function mahasiswa(Request $request)
     {
+        $sampai = null;
         if ($request->dates) {
-            $mulai = Carbon::createFromDate($request->dates[0])->toIso8601String();
-            $sampai = Carbon::createFromDate($request->dates[1])->endOfDay()->addHour(1)->toIso8601String();
+            $mulai = Carbon::createFromDate($request->dates[0]);
+            $sampai = Carbon::createFromDate($request->dates[1])->addDay(1);
         }
 
         $mahasiswa = Mahasiswa::where('id_tag', $request->id_tag)->first();
@@ -101,7 +104,7 @@ class RiwayatController extends Controller
             abort(404);
         }
         $riwayat = Histori::with('scanner.ruangan', 'user')->where('id_tag', $request->id_tag)
-            ->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addMonth(-1)->toIso8601String(), Carbon::now('GMT+8')->toIso8601String()])->get()->map(function ($data) {
+            ->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3), Carbon::now('GMT+8')])->get()->map(function ($data) {
                 if ($data->status == 0) {
                     $status = "Blok";
                 }
@@ -124,8 +127,8 @@ class RiwayatController extends Controller
 
         return inertia("Admin/Riwayat/DetailMahasiswa", [
             "riwayat" => $riwayat,
-            "mulai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
-            "sampai" => Carbon::createFromDate($request->dates[1] ?? null)->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
+            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3),
+            "sampai" => $sampai ? $sampai->addDay(-1) : Carbon::now('GMT+8')->endOfDay(),
             "mahasiswa" => $mahasiswa
         ]);
     }
