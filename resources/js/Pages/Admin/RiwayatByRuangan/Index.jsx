@@ -121,7 +121,7 @@ const RiwayatByRuangan = ({
     const filterByDate = (e) => {
         e.preventDefault();
         router.get(
-            route("admin.riwayat.ruangan"),
+            route("admin.riwayat-by-ruangan"),
             { dates, ruangan_id: ruangan.id },
             {
                 onSuccess: () => {},
