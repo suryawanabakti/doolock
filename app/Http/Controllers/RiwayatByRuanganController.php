@@ -15,7 +15,7 @@ class RiwayatByRuanganController extends Controller
 
         if ($request->dates) {
             $mulai = Carbon::createFromDate($request->dates[0])->toIso8601String();
-            $sampai = Carbon::createFromDate($request->dates[1])->toIso8601String();
+            $sampai = Carbon::createFromDate($request->dates[1])->addHour(1)->toIso8601String();
         }
 
         $riwayat = Histori::with('scanner.ruangan', 'user')
@@ -56,8 +56,8 @@ class RiwayatByRuanganController extends Controller
             "ruangans" => Ruangan::query()->get()->map(fn ($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
             "riwayat" => $riwayat,
             "dataKosong" => $dataKosong ?? false,
-            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
-            "sampai" => $sampai ?? Carbon::now('GMT+8')->toIso8601String(),
+            "mulai" => Carbon::createFromDate($request->dates[1])->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->addDay(-3)->toIso8601String(),
+            "sampai" => Carbon::createFromDate($request->dates[1])->endOfDay()->toIso8601String() ?? Carbon::now('GMT+8')->endOfDay()->toIso8601String(),
         ]);
     }
 }
