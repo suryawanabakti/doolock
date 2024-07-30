@@ -597,7 +597,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                                 name="status"
                                 value="1"
                                 checked={data.status == 1}
-                                onClick={() => alert("ok")}
+                                onClick={() => setData("status", 0)}
                             />
                             <label htmlFor="active">Active</label>
                         </div>
