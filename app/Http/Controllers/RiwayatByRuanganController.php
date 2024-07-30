@@ -15,7 +15,7 @@ class RiwayatByRuanganController extends Controller
 
         if ($request->dates) {
             $mulai = Carbon::createFromDate($request->dates[0])->toIso8601String();
-            $sampai = Carbon::createFromDate($request->dates[1])->addHour(1)->toIso8601String();
+            $sampai = Carbon::createFromDate($request->dates[1])->endOfDay()->addHour(1)->toIso8601String();
         }
 
         $riwayat = Histori::with('scanner.ruangan', 'user')
