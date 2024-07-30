@@ -311,20 +311,6 @@ const Scanner = ({ scanner, ruangans }) => {
                     severity="success"
                     onClick={openNew}
                 />
-                <Button
-                    label={`Active`}
-                    icon="pi pi-check"
-                    severity="success"
-                    disabled={selectedCustomers.length <= 0}
-                    onClick={activeUser}
-                />
-                <Button
-                    label="Block"
-                    icon="pi pi-times"
-                    severity="danger"
-                    disabled={selectedCustomers.length <= 0}
-                    onClick={blockUser}
-                />
             </div>
         );
     };
@@ -393,7 +379,7 @@ const Scanner = ({ scanner, ruangans }) => {
                         <Toolbar
                             className="mb-4"
                             left={leftToolbarTemplate}
-                            right={rightToolbarTemplate}
+                            // right={rightToolbarTemplate}
                         ></Toolbar>
                         {selectedCustomers.length > 0 && (
                             <div className="mb-3">

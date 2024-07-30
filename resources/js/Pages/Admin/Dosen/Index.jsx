@@ -314,7 +314,7 @@ const Dosen = ({ mahasiswa }) => {
         return (
             <Button
                 label="Import"
-                icon="pi pi-download"
+                icon="pi pi-upload"
                 className="p-button-help"
             />
         );

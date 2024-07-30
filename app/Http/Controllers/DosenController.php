@@ -29,7 +29,7 @@ class DosenController extends Controller
     public function active(Request $request)
     {
         Mahasiswa::whereKey($request->selectedCustomers)->update(['status' => 1]);
-        return    $mahasiswa = Mahasiswa::where('ket', 'dsn')->get()->map(fn ($data) =>  [
+        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'dsn')->get()->map(fn ($data) =>  [
             "id" => $data->id,
             "id_tag" => $data->id_tag,
             "nama" => $data->nama,
@@ -42,7 +42,7 @@ class DosenController extends Controller
     public function block(Request $request)
     {
         Mahasiswa::whereKey($request->selectedCustomers)->update(['status' => 0]);
-        return    $mahasiswa = Mahasiswa::where('ket', 'dsn')->get()->map(fn ($data) =>  [
+        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'dsn')->get()->map(fn ($data) =>  [
             "id" => $data->id,
             "id_tag" => $data->id_tag,
             "nama" => $data->nama,
