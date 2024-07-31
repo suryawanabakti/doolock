@@ -1,6 +1,7 @@
 import Layout from "@/Layouts/layout/layout.jsx";
 import { Link, router } from "@inertiajs/react";
 import axios from "axios";
+import moment from "moment-timezone";
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Column } from "primereact/column";
@@ -95,12 +96,25 @@ const DetailRuangan = ({ mulai, sampai, ruangan, riwayat }) => {
         );
     };
 
+    const [dateRange, setDateRange] = useState([
+        new Date(mulai),
+        new Date(sampai),
+    ]);
+
+    const handleChangeDate = (e) => {
+        setDateRange(e.value);
+        setDates([
+            moment(e.value[0]).tz("Asia/Makassar").format("YYYY-MM-DD"),
+            moment(e.value[1]).tz("Asia/Makassar").format("YYYY-MM-DD"),
+        ]);
+    };
+
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
                 <Calendar
-                    value={dates}
-                    onChange={(e) => setDates(e.value)}
+                    value={dateRange}
+                    onChange={(e) => handleChangeDate(e)}
                     selectionMode="range"
                     readOnlyInput
                     hideOnRangeSelection

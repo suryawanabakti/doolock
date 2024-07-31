@@ -1,5 +1,6 @@
 import Layout from "@/Layouts/layout/layout.jsx";
 import { router } from "@inertiajs/react";
+import moment from "moment-timezone";
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Column } from "primereact/column";
@@ -74,12 +75,24 @@ const RiwayatByRuangan = ({
         return <span> {customer.user ? customer.user.nama : "-"}</span>;
     };
 
+    const [dateRange, setDateRange] = useState([
+        new Date(mulai),
+        new Date(sampai),
+    ]);
+    const handleChangeDate = (e) => {
+        setDateRange(e.value);
+        setDates([
+            moment(e.value[0]).tz("Asia/Makassar").format("YYYY-MM-DD"),
+            moment(e.value[1]).tz("Asia/Makassar").format("YYYY-MM-DD"),
+        ]);
+    };
+
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
                 <Calendar
-                    value={dates}
-                    onChange={(e) => setDates(e.value)}
+                    value={dateRange}
+                    onChange={(e) => handleChangeDate(e)}
                     selectionMode="range"
                     readOnlyInput
                     hideOnRangeSelection
@@ -91,11 +104,19 @@ const RiwayatByRuangan = ({
     const rightToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button
-                    label="Export"
-                    icon="pi pi-download"
-                    className="p-button-help mr-2"
-                />
+                <a
+                    href={`/admin/riwayat-by-ruangan/export?mulai=${dateRange[0]}&sampai=${dateRange[1]}&ruangan_id=${ruangan.id}`}
+                    rel="noopener noreferrer"
+                    className="p-button font-bold p-component"
+                >
+                    <span
+                        class="p-button-icon p-c p-button-icon-left pi pi-download"
+                        data-pc-section="icon"
+                    ></span>
+                    <span class="p-button-label p-c" data-pc-section="label">
+                        Export
+                    </span>
+                </a>
             </React.Fragment>
         );
     };
@@ -136,7 +157,11 @@ const RiwayatByRuangan = ({
                 toast.current.show({
                     severity: "warn",
                     summary: "Warning",
-                    detail: `Ruangan ${ruangan.nama_ruangan} tidak mempunyai riwayat 3 hari terakhir`,
+                    detail: `Tidak ditemukan riwayat di ruangan ${
+                        ruangan.nama_ruangan
+                    } mulai tanggal ${moment(dates[0]).format(
+                        "DD-MM-YYYY"
+                    )} sampai ${moment(dates[1]).format("DD-MM-YYYY")}`,
                     life: 3000,
                 });
             }

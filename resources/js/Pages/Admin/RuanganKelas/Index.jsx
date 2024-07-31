@@ -221,7 +221,7 @@ export default function Ruangan({ ruangans }) {
                 <Button
                     label="New"
                     icon="pi pi-plus"
-                    severity="success"
+                    severity="primary"
                     onClick={openNew}
                 />
             </div>

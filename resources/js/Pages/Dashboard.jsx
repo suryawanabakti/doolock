@@ -73,7 +73,7 @@ const Dashboard = ({
                     title="Mahasiswa"
                     value={mahasiswaCount}
                     icon="users"
-                    iconColor="blue"
+                    iconColor="teal"
                     descriptionValue="2 new"
                     descriptionText="since last year"
                 ></DashboardInfoCard>
@@ -81,7 +81,7 @@ const Dashboard = ({
                     title="Dosen"
                     value={dosenCount}
                     icon="users"
-                    iconColor="blue"
+                    iconColor="teal"
                     descriptionValue="2 new"
                     descriptionText="since last year"
                 ></DashboardInfoCard>
@@ -89,7 +89,7 @@ const Dashboard = ({
                     title="Ruangan & Kelas"
                     value={ruanganCount}
                     icon="home"
-                    iconColor="blue"
+                    iconColor="teal"
                     descriptionValue="2 new"
                     descriptionText="since last year"
                 ></DashboardInfoCard>
@@ -97,7 +97,7 @@ const Dashboard = ({
                     title="Scanner"
                     value={scannerCount}
                     icon="qrcode"
-                    iconColor="blue"
+                    iconColor="teal"
                     descriptionValue="2 new"
                     descriptionText="since last year"
                 ></DashboardInfoCard>

@@ -12,6 +12,7 @@ import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
 import { Tooltip } from "primereact/tooltip";
 import React, { useEffect, useRef, useState } from "react";
+import moment from "moment-timezone";
 
 const DetailMahasiswa = ({ mulai, sampai, mahasiswa, riwayat }) => {
     const [customers, setCustomers] = useState(riwayat);
@@ -94,13 +95,23 @@ const DetailMahasiswa = ({ mulai, sampai, mahasiswa, riwayat }) => {
             }
         );
     };
-
+    const [dateRange, setDateRange] = useState([
+        new Date(mulai),
+        new Date(sampai),
+    ]);
+    const handleChangeDate = (e) => {
+        setDateRange(e.value);
+        setDates([
+            moment(e.value[0]).tz("Asia/Makassar").format("YYYY-MM-DD"),
+            moment(e.value[1]).tz("Asia/Makassar").format("YYYY-MM-DD"),
+        ]);
+    };
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
                 <Calendar
-                    value={dates}
-                    onChange={(e) => setDates(e.value)}
+                    value={dateRange}
+                    onChange={(e) => handleChangeDate(e)}
                     selectionMode="range"
                     readOnlyInput
                     hideOnRangeSelection

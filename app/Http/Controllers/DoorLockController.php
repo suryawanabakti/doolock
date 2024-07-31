@@ -47,21 +47,19 @@ class DoorLockController extends Controller
             if ($mahasiswa->status == 0) {
                 ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
                 $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
-                broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
             }
             if ($mahasiswa->status == 1) {
                 ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
                 $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
-                broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
                 echo  json_encode([$mahasiswa->id_tag], JSON_UNESCAPED_UNICODE);
             }
         } else {
             ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
             $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
-            broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
         }
+        broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
     }
 
     public function getRiwayat(Request $request)

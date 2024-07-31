@@ -290,7 +290,7 @@ const Dosen = ({ mahasiswa }) => {
                 <Button
                     label="New"
                     icon="pi pi-plus"
-                    severity="success"
+                    severity="primary"
                     onClick={openNew}
                 />
                 <Button
@@ -315,7 +315,7 @@ const Dosen = ({ mahasiswa }) => {
             <Button
                 label="Import"
                 icon="pi pi-upload"
-                className="p-button-help"
+                className="p-button-primary"
             />
         );
     };

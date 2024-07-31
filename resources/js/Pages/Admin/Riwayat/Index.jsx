@@ -12,11 +12,14 @@ import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
 import { Tooltip } from "primereact/tooltip";
 import React, { useEffect, useRef, useState } from "react";
-
+import moment from "moment-timezone";
 const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     const [customers, setCustomers] = useState(riwayat);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
     const toast = useRef(null);
+    console.log(moment().tz("Asia/Makassar").format("YYYY-MM-DD"));
+    console.log("SAMPAI", sampai);
+    console.log("DATEEE", new Date(sampai));
     const [dates, setDates] = useState([new Date(mulai), new Date(sampai)]);
     useEffect(() => {
         window.Echo.private(`management.${auth.user.id}`).listen(
@@ -145,19 +148,30 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
         e.preventDefault();
         router.get(
             route("admin.riwayat.index"),
-            { dates },
+            { dates: dates },
             {
                 onSuccess: () => {},
             }
         );
+    };
+    const [dateRange, setDateRange] = useState([
+        new Date(mulai),
+        new Date(sampai),
+    ]);
+    const handleChangeDate = (e) => {
+        setDateRange(e.value);
+        setDates([
+            moment(e.value[0]).tz("Asia/Makassar").format("YYYY-MM-DD"),
+            moment(e.value[1]).tz("Asia/Makassar").format("YYYY-MM-DD"),
+        ]);
     };
 
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
                 <Calendar
-                    value={dates}
-                    onChange={(e) => setDates(e.value)}
+                    value={dateRange}
+                    onChange={(e) => handleChangeDate(e)}
                     selectionMode="range"
                     readOnlyInput
                     hideOnRangeSelection
@@ -168,11 +182,19 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     };
     const rightToolbarTemplate = () => {
         return (
-            <Button
-                label="Export"
-                icon="pi pi-download"
-                className="p-button-help"
-            />
+            <a
+                href={`/admin/riwayat/export?mulai=${dateRange[0]}&sampai=${dateRange[1]}`}
+                rel="noopener noreferrer"
+                className="p-button font-bold p-component"
+            >
+                <span
+                    class="p-button-icon p-c p-button-icon-left pi pi-download"
+                    data-pc-section="icon"
+                ></span>
+                <span class="p-button-label p-c" data-pc-section="label">
+                    Export
+                </span>
+            </a>
         );
     };
 

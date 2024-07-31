@@ -315,7 +315,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 <Button
                     label="New"
                     icon="pi pi-plus"
-                    severity="success"
+                    severity="primary"
                     onClick={openNew}
                 />
                 <Button
@@ -340,7 +340,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
             <Button
                 label="Import"
                 icon="pi pi-upload"
-                className="p-button-help"
+                className="p-button-primary"
                 onClick={() => setImportDialog(true)}
             />
         );

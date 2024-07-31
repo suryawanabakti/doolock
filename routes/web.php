@@ -94,7 +94,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/riwayat', [RiwayatController::class, 'index'])->name('admin.riwayat.index');
     Route::get('/admin/riwayat/ruangan', [RiwayatController::class, 'ruangan'])->name('admin.riwayat.ruangan');
     Route::get('/admin/riwayat/mahasiswa', [RiwayatController::class, 'mahasiswa'])->name('admin.riwayat.mahasiswa');
+    Route::get('/admin/riwayat/export', [RiwayatController::class, 'export'])->name('admin.riwayat.export');
+
     Route::get('/admin/riwayat-by-ruangan', [RiwayatByRuanganController::class, 'index'])->name('admin.riwayat-by-ruangan.index');
+    Route::get('/admin/riwayat-by-ruangan/export', [RiwayatByRuanganController::class, 'export'])->name('admin.riwayat-by-ruangan.export');
 
     Route::get('/admin/scaner', [ScanerController::class, 'index'])->name('admin.scaner.index');
     Route::patch('/admin/scaner/{scanerStatus}', [ScanerController::class, 'update'])->name('admin.scanner.update');
