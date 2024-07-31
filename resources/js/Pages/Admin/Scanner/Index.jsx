@@ -65,11 +65,13 @@ const Scanner = ({ scanner, ruangans }) => {
                     detail: "You have success create scanner " + data.ruangan,
                     life: 3000,
                 });
+                setSelectedCountry([]);
+                setErrors([]);
                 reset();
             })
             .catch((err) => {
                 console.log("ERRROR", err);
-                setErrors(err.response?.data?.errors);
+                setErrors(err.response?.data?.errors ?? []);
                 toast.current.show({
                     severity: "error",
                     summary: "Error",
@@ -108,10 +110,12 @@ const Scanner = ({ scanner, ruangans }) => {
                     detail: "You have success updated scanner " + res.data.nama,
                     life: 3000,
                 });
+                setSelectedCountry([]);
                 reset();
+                setErrors([]);
             })
             .catch((err) => {
-                setErrors(err.response.data.errors);
+                setErrors(err.response?.data?.errors ?? []);
                 toast.current.show({
                     severity: "error",
                     summary: "Error",
@@ -229,10 +233,10 @@ const Scanner = ({ scanner, ruangans }) => {
     const [productDialog, setProductDialog] = useState(false);
     const [productDialog2, setProductDialog2] = useState(false);
     const openNew = () => {
+        setSelectedCountry([]);
         setProductDialog(true);
     };
     const openEdit = (data) => {
-        console.log(data);
         setData({
             id: data.id,
             kode: data.kode,

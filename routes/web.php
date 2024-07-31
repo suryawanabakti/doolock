@@ -101,7 +101,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/admin/scaner/{scanerStatus}', [ScanerController::class, 'destroy'])->name('admin.scanner.destroy');
     Route::post('/admin/scaner', [ScanerController::class, 'store'])->name('admin.scanner.store');
 
-    Route::get('/admin/setting', [SettingController::class, 'index'])->name('admin.setting.index');
+    Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

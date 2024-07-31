@@ -49,7 +49,18 @@ const AppMenu = () => {
         },
         {
             label: "Laporan",
-            items: [],
+            items: [
+                {
+                    label: "Riwayat",
+                    icon: "pi pi-history",
+                    to: route("admin.riwayat.index"),
+                },
+                {
+                    label: "Riwayat Per Ruangan",
+                    icon: "pi pi-history",
+                    to: route("admin.riwayat-by-ruangan.index"),
+                },
+            ],
         },
     ];
 
@@ -68,75 +79,6 @@ const AppMenu = () => {
                         <li className="menu-separator"></li>
                     );
                 })}
-                <ul>
-                    <li
-                        className={`${
-                            route().current("admin.riwayat.*")
-                                ? "active-menuitem"
-                                : ""
-                        }`}
-                    >
-                        <a
-                            className={`p-ripple ${
-                                route().current("admin.riwayat.*")
-                                    ? "active-route"
-                                    : ""
-                            } `}
-                            tabIndex="0"
-                            href="/admin/riwayat"
-                        >
-                            <i className="layout-menuitem-icon pi pi-history"></i>
-                            <span className="layout-menuitem-text">
-                                Riwayat
-                            </span>
-                        </a>
-                    </li>
-                    <li
-                        className={`${
-                            route().current("admin.riwayat-by-ruangan.*")
-                                ? "active-menuitem"
-                                : ""
-                        }`}
-                    >
-                        <a
-                            className={`p-ripple ${
-                                route().current("admin.riwayat-by-ruangan*")
-                                    ? "active-route"
-                                    : ""
-                            } `}
-                            tabIndex="0"
-                            href="/admin/riwayat-by-ruangan"
-                        >
-                            <i className="layout-menuitem-icon pi pi-history"></i>
-                            <span className="layout-menuitem-text">
-                                Riwayat Per Ruangan
-                            </span>
-                        </a>
-                    </li>
-                    <li
-                        hidden
-                        className={`${
-                            route().current("admin.riwayat.mahasiswa")
-                                ? "active-menuitem"
-                                : ""
-                        }`}
-                    >
-                        <a
-                            className={`p-ripple ${
-                                route().current("admin.riwayat.mahasiswa")
-                                    ? "active-route"
-                                    : ""
-                            } `}
-                            tabIndex="0"
-                            href="/admin/riwayat/mahasiswa"
-                        >
-                            <i className="layout-menuitem-icon pi pi-history"></i>
-                            <span className="layout-menuitem-text">
-                                Riwayat Per Mahasiswa
-                            </span>
-                        </a>
-                    </li>
-                </ul>
             </ul>
         </MenuProvider>
     );

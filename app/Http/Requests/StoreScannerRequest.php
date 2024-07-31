@@ -22,7 +22,7 @@ class StoreScannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "kode" => ['required'],
+            "kode" => ['required', 'unique:scaner_status,kode'],
             "ruangan_id" => ['required'],
             "type" => ['required'],
             "status" => ['required']

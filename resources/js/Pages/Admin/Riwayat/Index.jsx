@@ -19,17 +19,6 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     const toast = useRef(null);
     const [dates, setDates] = useState([new Date(mulai), new Date(sampai)]);
     useEffect(() => {
-        // const intervalId = setInterval(async () => {
-        //     try {
-        //         const res = await axios.get("/ref/riwayat", { data: dates });
-        //         setCustomers(res.data);
-        //     } catch (e) {
-        //         alert("ERROR");
-        //         location.reload();
-        //     }
-        // }, 3000); // 1000ms = 1 second
-        // Clean up the interval on component unmount
-        // return () => clearInterval(intervalId);
         window.Echo.private(`management.${auth.user.id}`).listen(
             "StoreHistoryEvent",
             (event) => {
@@ -40,9 +29,11 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                 if (event.histori?.status == 1) {
                     var status = "Terbuka";
                 }
+
                 if (event.histori?.status == 2) {
                     var status = "Tidak Terdaftar";
                 }
+
                 var data = {
                     id: event.histori.id,
                     id_tag: event.histori.id_tag,
@@ -52,11 +43,13 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                     kode: event.histori.kode,
                     waktu: event.histori.waktu,
                 };
+
                 const updatedUsers = [data, ...customers];
                 setCustomers(updatedUsers);
             }
         );
     }, [customers]);
+
     const [globalFilter, setGlobalFilter] = useState("");
     const renderHeader = () => {
         return (
@@ -107,7 +100,21 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                 }}
             >
                 {" "}
-                {customer.user ? customer.user.nama : "-"}
+                {customer.user ? `${customer.user.nama}` : "-"}
+            </Link>
+        );
+    };
+
+    const nimBodyTemplate = (customer) => {
+        return (
+            <Link
+                href={route("admin.riwayat.mahasiswa")}
+                data={{
+                    id_tag: customer.id_tag,
+                }}
+            >
+                {" "}
+                {customer.user ? `${customer.user.nim}` : "-"}
             </Link>
         );
     };
@@ -169,22 +176,6 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
         );
     };
 
-    const actionBodyTemplate = (rowData) => {
-        return (
-            <React.Fragment>
-                <Button icon="pi pi-pencil" rounded outlined className="mr-2" />
-                <Button
-                    icon="pi pi-trash"
-                    rounded
-                    outlined
-                    severity="danger"
-                    onClick={(event) => confirm2(event, rowData)}
-                />
-            </React.Fragment>
-        );
-    };
-
-    useEffect(() => {}, []);
     return (
         <Layout>
             <Toast ref={toast} />
@@ -241,7 +232,16 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                                 filterPlaceholder="Search by user"
                                 headerStyle={{ width: "8rem" }}
                             />
-
+                            <Column
+                                headerClassName="fw-bold"
+                                field="user"
+                                header="NIM"
+                                filter
+                                sortable
+                                body={nimBodyTemplate}
+                                filterPlaceholder="Search by user"
+                                headerStyle={{ width: "12rem" }}
+                            />
                             <Column
                                 headerClassName="fw-bold"
                                 field="user"
@@ -252,6 +252,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                                 filterPlaceholder="Search by user"
                                 headerStyle={{ width: "12rem" }}
                             />
+
                             <Column
                                 headerClassName="fw-bold"
                                 field="status"

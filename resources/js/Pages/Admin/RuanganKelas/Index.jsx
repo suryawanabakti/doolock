@@ -14,11 +14,9 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 export default function Ruangan({ ruangans }) {
-    const [dataRuangan, setDataRuangan] = useState([]);
+    const [dataRuangan, setDataRuangan] = useState(ruangans);
     const [globalFilter, setGlobalFilter] = useState("");
-    useEffect(() => {
-        setDataRuangan(ruangans);
-    }, []);
+
     const onInputSearch = (e) => {
         var val = e.target.value;
         setGlobalFilter(val ? val : []);
@@ -27,6 +25,8 @@ export default function Ruangan({ ruangans }) {
     let emptyRuangan = {
         id: "",
         nama_ruangan: "",
+        jam_buka: "00:00:00",
+        jam_tutup: "00:00:00",
     };
     const [ruangan, setRuangan] = useState(emptyRuangan);
     const onInputChange = (e, name) => {
@@ -86,11 +86,11 @@ export default function Ruangan({ ruangans }) {
                         detail: "You have deleted " + rowData.nama_ruangan,
                         life: 3000,
                     });
-                    const updatedRuangan = ruangans.filter(
-                        (user) => user.id !== rowData.id
-                    );
+
                     // Update the state with the new array
-                    setDataRuangan(updatedRuangan);
+                    setDataRuangan((prevItems) =>
+                        prevItems.filter((item) => item.id !== rowData.id)
+                    );
                 } catch (e) {
                     toast.current.show({
                         severity: "error",
@@ -126,8 +126,16 @@ export default function Ruangan({ ruangans }) {
                 life: 3000,
             });
             setRuangan(emptyRuangan);
-        } catch (error) {
-            console.log(error);
+        } catch (err) {
+            setErrors(err.response.data.errors);
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail:
+                    "You have error create mahasiswa " +
+                    err.response.data.message,
+                life: 3000,
+            });
         }
     };
     const footerDialogTambah = (e) => {
@@ -174,6 +182,8 @@ export default function Ruangan({ ruangans }) {
                         ? {
                               ...item,
                               nama_ruangan: res.data.nama_ruangan,
+                              jam_buka: res.data.jam_buka,
+                              jam_tutup: res.data.jam_tutup,
                           }
                         : item
                 )
@@ -182,7 +192,7 @@ export default function Ruangan({ ruangans }) {
                 severity: "success",
                 summary: "Success",
                 detail:
-                    "You have success updated kelas " + res.data.nama_ruangan,
+                    "You have success updated ruangan " + res.data.nama_ruangan,
                 life: 3000,
             });
             setRuangan(emptyRuangan);
@@ -233,6 +243,7 @@ export default function Ruangan({ ruangans }) {
         );
     };
     const header = renderHeader();
+
     return (
         <Layout>
             <Toast ref={toast} />
@@ -259,21 +270,28 @@ export default function Ruangan({ ruangans }) {
                         >
                             <Column
                                 headerClassName="fw-bold"
-                                field="id"
-                                header="ID"
-                                sortable
-                                filterPlaceholder="id"
-                                style={{ minWidth: "5rem" }}
-                                headerStyle={{ width: "5rem" }}
-                            />
-                            <Column
-                                headerClassName="fw-bold"
                                 field="nama_ruangan"
                                 header="Nama Kelas"
                                 sortable
                                 filterPlaceholder="id"
                                 style={{ minWidth: "20rem" }}
                                 headerStyle={{ width: "20rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="jam_buka"
+                                header="Jam Buka"
+                                filterPlaceholder="jam buka"
+                                style={{ minWidth: "15rem" }}
+                                headerStyle={{ width: "15rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="jam_tutup"
+                                header="Jam Tutup"
+                                filterPlaceholder="jam tutup"
+                                style={{ minWidth: "15rem" }}
+                                headerStyle={{ width: "15rem" }}
                             />
 
                             <Column
@@ -311,6 +329,40 @@ export default function Ruangan({ ruangans }) {
                         <small className="p-error">{errors.nama_ruangan}</small>
                     )}
                 </div>
+                <div className="field">
+                    <label htmlFor="jam_buka" className="font-bold">
+                        Jam Buka
+                    </label>
+                    <InputText
+                        id="jam_buka"
+                        required
+                        autoFocus
+                        type="time"
+                        value={ruangan.jam_buka}
+                        onChange={(e) => onInputChange(e, "jam_buka")}
+                        placeholder="Masukkan Jam Buka"
+                    />
+                    {errors.jam_buka && (
+                        <small className="p-error">{errors.jam_buka}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="jam_tutup" className="font-bold">
+                        Jam Tutup
+                    </label>
+                    <InputText
+                        id="jam_tutup"
+                        required
+                        autoFocus
+                        type="time"
+                        value={ruangan.jam_tutup}
+                        onChange={(e) => onInputChange(e, "jam_tutup")}
+                        placeholder="Masukkan Jam Tutup"
+                    />
+                    {errors.jam_tutup && (
+                        <small className="p-error">{errors.jam_tutup}</small>
+                    )}
+                </div>
             </Dialog>
 
             <Dialog
@@ -337,6 +389,40 @@ export default function Ruangan({ ruangans }) {
                     />
                     {errors.nama_ruangan && (
                         <small className="p-error">{errors.nama_ruangan}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="jam_buka" className="font-bold">
+                        Jam Buka
+                    </label>
+                    <InputText
+                        id="jam_buka"
+                        required
+                        autoFocus
+                        type="time"
+                        value={ruangan.jam_buka}
+                        onChange={(e) => onInputChange(e, "jam_buka")}
+                        placeholder="Masukkan Jam Buka"
+                    />
+                    {errors.jam_buka && (
+                        <small className="p-error">{errors.jam_buka}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="jam_tutup" className="font-bold">
+                        Jam Tutup
+                    </label>
+                    <InputText
+                        id="jam_tutup"
+                        required
+                        autoFocus
+                        type="time"
+                        value={ruangan.jam_tutup}
+                        onChange={(e) => onInputChange(e, "jam_tutup")}
+                        placeholder="Masukkan Jam Tutup"
+                    />
+                    {errors.jam_tutup && (
+                        <small className="p-error">{errors.jam_tutup}</small>
                     )}
                 </div>
             </Dialog>

@@ -61,6 +61,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                     detail: "You have success create mahasiswa " + data.nama,
                     life: 3000,
                 });
+                setSelectedCountry([]);
                 reset();
             })
             .catch((err) => {
@@ -103,6 +104,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                     life: 3000,
                 });
                 reset();
+                setSelectedCountry([]);
             })
             .catch((err) => {
                 console.log("ERROR", err);
