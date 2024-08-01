@@ -23,7 +23,7 @@ class RiwayatByRuanganController extends Controller
         }
 
         $riwayat = Histori::with('scanner.ruangan', 'user')->whereHas('scanner.ruangan', function ($query) use ($request) {
-            $query->where('id', $request->ruangan_id);
+            $query->where('id', $request->ruangan_id ?? null);
         })->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->mulai ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'), Carbon::now('GMT+8')->format('Y-m-d')])->get()->map(function ($data) {
             if ($data->status == 0) {
                 $status = "Blok";

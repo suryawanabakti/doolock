@@ -105,7 +105,7 @@ const RiwayatByRuangan = ({
         return (
             <React.Fragment>
                 <a
-                    href={`/admin/riwayat-by-ruangan/export?mulai=${dateRange[0]}&sampai=${dateRange[1]}&ruangan_id=${ruangan.id}`}
+                    href={`/admin/riwayat-by-ruangan/export?mulai=${dateRange[0]}&sampai=${dateRange[1]}&ruangan_id=${ruangan?.id}`}
                     rel="noopener noreferrer"
                     className="p-button font-bold p-component"
                 >

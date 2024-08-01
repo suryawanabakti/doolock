@@ -18,5 +18,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@fkuh',
             'password' => bcrypt('Qw12@erty')
         ]);
+
+        $this->call([
+            MahasiswaSeeder::class,
+            DosenSeeder::class
+        ]);
     }
 }
