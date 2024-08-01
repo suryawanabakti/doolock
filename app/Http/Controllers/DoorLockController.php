@@ -42,7 +42,11 @@ class DoorLockController extends Controller
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
                 return;
             }
+        } else {
+            echo json_encode(["ruangan dengan ID Scanner $request->kode Tidak ada"], JSON_UNESCAPED_UNICODE);
+            return;
         }
+
         $histori = Histori::create([
             'id_tag' => $request->id,
             'kode' => $request->kode,
