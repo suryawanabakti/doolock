@@ -11,6 +11,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use PhpParser\Node\Stmt\TryCatch;
 
 class DoorLockController extends Controller
 {
@@ -59,7 +60,10 @@ class DoorLockController extends Controller
             $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
         }
-        broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+        try {
+            broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+        } catch (\Throwable $th) {
+        }
     }
 
     public function getRiwayat(Request $request)
