@@ -35,14 +35,20 @@ class DoorLockController extends Controller
             $status = 2;
         }
 
+        $ruangan = Ruangan::whereHas('scanner', fn ($query) => $query->where('kode', $request->kode))->first();
+        if (!empty($ruangan)) {
+            $waktuSekarang = Carbon::now('GMT+8')->format('H:i:s') > $ruangan->jam_buka && Carbon::now('GMT+8')->format('H:i:s') < $ruangan->jam_tutup;
+            if (!$waktuSekarang) {
+                echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+                return;
+            }
+        }
         $histori = Histori::create([
             'id_tag' => $request->id,
             'kode' => $request->kode,
             'waktu' => Carbon::now('GMT+8'),
             'status' => $status,
         ]);
-
-        $ruangan = Ruangan::whereHas('scanner', fn ($query) => $query->where('kode', $request->kode))->first();
 
         if (!empty($mahasiswa)) {
             if ($mahasiswa->status == 0) {
@@ -51,6 +57,8 @@ class DoorLockController extends Controller
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
             }
             if ($mahasiswa->status == 1) {
+
+
                 ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
                 $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
                 echo  json_encode([$mahasiswa->id_tag], JSON_UNESCAPED_UNICODE);
