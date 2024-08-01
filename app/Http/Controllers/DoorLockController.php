@@ -18,8 +18,6 @@ class DoorLockController extends Controller
 
     public function index(Request $request)
     {
-        // list($jam, $menit, $detik) = explode('-', $request->jam);
-        // $tanggalDanWaktu =  date('Y-m-d H:i:s', strtotime("$request->tanggal $jam:$menit:$detik"));
 
         $status = 0;
         $mahasiswa = Mahasiswa::where('id_tag', $request->id)->first();
@@ -38,12 +36,13 @@ class DoorLockController extends Controller
         $ruangan = Ruangan::whereHas('scanner', fn ($query) => $query->where('kode', $request->kode))->first();
         if (!empty($ruangan)) {
             $waktuSekarang = Carbon::now('GMT+8')->format('H:i:s') > $ruangan->jam_buka && Carbon::now('GMT+8')->format('H:i:s') < $ruangan->jam_tutup;
+
             if (!$waktuSekarang) {
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
                 return;
             }
         } else {
-            echo json_encode(["ruangan dengan ID Scanner $request->kode Tidak ada"], JSON_UNESCAPED_UNICODE);
+            echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
             return;
         }
 
@@ -61,8 +60,6 @@ class DoorLockController extends Controller
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
             }
             if ($mahasiswa->status == 1) {
-
-
                 ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
                 $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
                 echo  json_encode([$mahasiswa->id_tag], JSON_UNESCAPED_UNICODE);
@@ -72,10 +69,7 @@ class DoorLockController extends Controller
             $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
         }
-        try {
-            broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
-        } catch (\Throwable $th) {
-        }
+        // broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
     }
 
     public function getRiwayat(Request $request)
