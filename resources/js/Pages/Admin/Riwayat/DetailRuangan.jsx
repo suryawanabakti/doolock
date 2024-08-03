@@ -2,6 +2,7 @@ import Layout from "@/Layouts/layout/layout.jsx";
 import { Link, router } from "@inertiajs/react";
 import axios from "axios";
 import moment from "moment-timezone";
+import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Column } from "primereact/column";
@@ -19,7 +20,9 @@ const DetailRuangan = ({ mulai, sampai, ruangan, riwayat }) => {
     const [selectedCustomers, setSelectedCustomers] = useState([]);
     const toast = useRef(null);
     const [dates, setDates] = useState([new Date(mulai), new Date(sampai)]);
-
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
     const [globalFilter, setGlobalFilter] = useState("");
     const renderHeader = () => {
         return (
@@ -193,6 +196,7 @@ const DetailRuangan = ({ mulai, sampai, ruangan, riwayat }) => {
                             right={rightToolbarTemplate}
                         ></Toolbar>
                         <DataTable
+                            filters={filters}
                             value={customers}
                             selection={selectedCustomers}
                             onSelectionChange={(e) =>
@@ -248,10 +252,9 @@ const DetailRuangan = ({ mulai, sampai, ruangan, riwayat }) => {
 
                             <Column
                                 headerClassName="fw-bold"
-                                field="user"
+                                field="user.nama"
                                 header="Nama"
                                 sortable
-                                body={userBodyTemplate}
                                 filterPlaceholder="Search by user"
                                 headerStyle={{ width: "12rem" }}
                             />

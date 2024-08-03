@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\StoreHistoryEvent;
+use App\Models\Absensi;
 use App\Models\Histori;
 use App\Models\Mahasiswa;
 use App\Models\Ruangan;
@@ -34,9 +35,9 @@ class DoorLockController extends Controller
         }
 
         $ruangan = Ruangan::whereHas('scanner', fn ($query) => $query->where('kode', $request->kode))->first();
+
         if (!empty($ruangan)) {
             $waktuSekarang = Carbon::now('GMT+8')->format('H:i:s') > $ruangan->jam_buka && Carbon::now('GMT+8')->format('H:i:s') < $ruangan->jam_tutup;
-
             if (!$waktuSekarang) {
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
                 return;
@@ -61,6 +62,19 @@ class DoorLockController extends Controller
             }
             if ($mahasiswa->status == 1) {
                 ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
+                $absenToday = Absensi::where('id_tag', $request->id)->where('ruangan_id', $ruangan->id)->whereDate('waktu_masuk', Carbon::now('GMT+8'))->first();
+                if (empty($absenToday)) {
+                    Absensi::create([
+                        'id_tag' => $request->id,
+                        'ruangan_id' => $ruangan->id,
+                        'waktu_masuk' => Carbon::now('GMT+8'),
+                    ]);
+                } else {
+                    $scannerStatus = ScanerStatus::where('kode', $request->kode)->first();
+                    if ($scannerStatus->type == 'dalam') {
+                        $absenToday->update(['waktu_keluar' => Carbon::now('GMT+8')]);
+                    }
+                }
                 $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
                 echo  json_encode([$mahasiswa->id_tag], JSON_UNESCAPED_UNICODE);
             }
@@ -69,7 +83,10 @@ class DoorLockController extends Controller
             $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
         }
-        // broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+
+        if (env("APP_REALTIME") == "true") {
+            broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+        }
     }
 
     public function getRiwayat(Request $request)

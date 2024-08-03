@@ -13,6 +13,7 @@ import { Toolbar } from "primereact/toolbar";
 import { Tooltip } from "primereact/tooltip";
 import React, { useEffect, useRef, useState } from "react";
 import moment from "moment-timezone";
+import { FilterMatchMode } from "primereact/api";
 const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     const [customers, setCustomers] = useState(riwayat);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
@@ -93,7 +94,11 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
             <Tag value={customer.status} severity={getSeverity(customer)}></Tag>
         );
     };
-
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        "user.nim": { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    });
     const userBodyTemplate = (customer) => {
         return (
             <Link
@@ -133,8 +138,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                         }}
                         href={route("admin.riwayat.ruangan")}
                     >
-                        {customer.scanner.ruangan.nama_ruangan} /{" "}
-                        {customer.scanner?.type}
+                        {customer.scanner.ruangan.nama_ruangan}
                     </Link>
                 ) : (
                     customer.kode
@@ -223,6 +227,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                             globalFilter={globalFilter}
+                            filters={filters}
                             header={header}
                         >
                             <Column
@@ -236,13 +241,20 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
 
                             <Column
                                 headerClassName="fw-bold"
-                                field="scanner"
+                                field="scanner.ruangan.nama_ruangan"
                                 header="Ruangan"
                                 sortable
                                 filterPlaceholder="Type"
                                 body={ruanganBodyTemplate}
                                 filter
-                                headerStyle={{ width: "12rem" }}
+                                headerStyle={{ width: "10rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="scanner.type"
+                                header="Type Scanner"
+                                filterPlaceholder="Type"
+                                headerStyle={{ width: "6rem" }}
                             />
 
                             <Column
@@ -256,17 +268,16 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                             />
                             <Column
                                 headerClassName="fw-bold"
-                                field="user"
+                                field="user.nim"
                                 header="NIM"
                                 filter
                                 sortable
-                                body={nimBodyTemplate}
                                 filterPlaceholder="Search by user"
                                 headerStyle={{ width: "12rem" }}
                             />
                             <Column
                                 headerClassName="fw-bold"
-                                field="user"
+                                field="user.nama"
                                 header="Nama"
                                 filter
                                 sortable

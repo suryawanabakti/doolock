@@ -1,5 +1,6 @@
 import Layout from "@/Layouts/layout/layout";
 import axios from "axios";
+import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
@@ -19,6 +20,11 @@ export default function Ruangan({ ruangans }) {
     useEffect(() => {
         setDataRuangan(ruangans);
     }, []);
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        kelas: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    });
     const onInputSearch = (e) => {
         var val = e.target.value;
         setGlobalFilter(val ? val : []);
@@ -245,6 +251,7 @@ export default function Ruangan({ ruangans }) {
                             left={leftToolbarTemplate}
                         ></Toolbar>
                         <DataTable
+                            filters={filters}
                             value={dataRuangan}
                             paginator
                             dataKey="id"
@@ -254,7 +261,6 @@ export default function Ruangan({ ruangans }) {
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                             globalFilter={globalFilter}
                             emptyMessage="Tidak ada ruangan"
-                            globalFilterFields={["nama_ruangan"]}
                             header={header}
                         >
                             <Column

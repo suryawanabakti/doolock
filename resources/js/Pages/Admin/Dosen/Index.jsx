@@ -104,9 +104,15 @@ const Dosen = ({ mahasiswa }) => {
             });
     };
 
-    const [customers, setCustomers] = useState(mahasiswa);
+    const [customers, setCustomers] = useState(mahasiswa || []);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
     const toast = useRef(null);
+
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        nama: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    });
 
     const reject = () => {
         toast.current.show({
@@ -163,11 +169,8 @@ const Dosen = ({ mahasiswa }) => {
                     <i className="pi pi-search" />
                     <InputText
                         type="search"
-                        onInput={(e) =>
-                            setGlobalFilter(
-                                e.target.value ? e.target.value : []
-                            )
-                        }
+                        value={globalFilter}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
                         placeholder="Global Search"
                     />
                 </span>
@@ -375,13 +378,14 @@ const Dosen = ({ mahasiswa }) => {
                         )}
 
                         <DataTable
-                            value={customers}
+                            value={customers || []}
                             selection={selectedCustomers}
                             onSelectionChange={(e) =>
                                 setSelectedCustomers(e.value)
                             }
                             dataKey="id"
                             paginator
+                            filters={filters}
                             rows={10}
                             rowsPerPageOptions={[5, 10, 25]}
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -411,9 +415,9 @@ const Dosen = ({ mahasiswa }) => {
                             <Column
                                 field="nama"
                                 header="Name"
-                                filter
                                 filterPlaceholder="Search by name"
                                 style={{ minWidth: "14rem" }}
+                                sortable
                             />
 
                             <Column
@@ -423,7 +427,6 @@ const Dosen = ({ mahasiswa }) => {
                                 style={{ minWidth: "5rem" }}
                                 body={statusBodyTemplate}
                                 filter
-                                filterElement={statusFilterTemplate}
                             />
                             <Column
                                 body={actionBodyTemplate}

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\DoorLockController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\MahasiswaController;
@@ -98,6 +99,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/riwayat-by-ruangan', [RiwayatByRuanganController::class, 'index'])->name('admin.riwayat-by-ruangan.index');
     Route::get('/admin/riwayat-by-ruangan/export', [RiwayatByRuanganController::class, 'export'])->name('admin.riwayat-by-ruangan.export');
+
+    Route::get('/admin/absensi', [AbsensiController::class, 'index'])->name('admin.absensi.index');
 
     Route::get('/admin/scaner', [ScanerController::class, 'index'])->name('admin.scaner.index');
     Route::patch('/admin/scaner/{scanerStatus}', [ScanerController::class, 'update'])->name('admin.scanner.update');

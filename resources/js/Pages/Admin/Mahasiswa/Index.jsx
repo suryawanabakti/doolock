@@ -1,6 +1,7 @@
 import Layout from "@/Layouts/layout/layout.jsx";
 import { useForm } from "@inertiajs/react";
 import axios from "axios";
+import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
@@ -168,11 +169,15 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
         });
     };
     const [ingredient, setIngredient] = useState("");
-
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        kelas: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    });
     const [globalFilter, setGlobalFilter] = useState("");
     const onInputSearch = (e) => {
         var value = e.target.value;
-        setGlobalFilter(value ? value : []);
+        setGlobalFilter(value);
     };
     const renderHeader = () => {
         return (
@@ -409,6 +414,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                             }
                             dataKey="id"
                             paginator
+                            filters={filters}
                             rows={10}
                             rowsPerPageOptions={[5, 10, 25]}
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -438,14 +444,13 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                             <Column
                                 field="nama"
                                 header="Name"
-                                filter
+                                sortable
                                 filterPlaceholder="Search by name"
                                 style={{ minWidth: "14rem" }}
                             />
                             <Column
                                 field="kelas"
                                 header="Kelas"
-                                filter
                                 body={(rowData) => {
                                     return (
                                         <span>
@@ -454,7 +459,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                                     );
                                 }}
                                 filterPlaceholder="Search by kelas"
-                                style={{ minWidth: "5rem" }}
+                                style={{ minWidth: "7rem" }}
                             />
 
                             <Column

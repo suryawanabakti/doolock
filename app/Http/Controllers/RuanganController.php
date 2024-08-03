@@ -18,8 +18,8 @@ class RuanganController extends Controller
     {
         $request->validate([
             'nama_ruangan' => ['required', 'max:100'],
-            'jam_buka' => ['required', 'before_or_equal:jam_tutup'],
-            'jam_tutup' => ['required', 'after_or_equal:jam_buka']
+            'jam_buka' => ['required', 'before:jam_tutup'],
+            'jam_tutup' => ['required', 'after:jam_buka']
         ]);
         return Ruangan::create(["nama_ruangan" => $request->nama_ruangan, "jam_buka" => $request->jam_buka, "jam_tutup" => $request->jam_tutup, "type" => "umum"]);
     }
@@ -28,8 +28,8 @@ class RuanganController extends Controller
     {
         $request->validate([
             'nama_ruangan' => ['required', 'max:100'],
-            'jam_buka' => ['required', 'before_or_equal:jam_tutup'],
-            'jam_tutup' => ['required', 'after_or_equal:jam_buka']
+            'jam_buka' => ['required', 'before_equal:jam_tutup'],
+            'jam_tutup' => ['required', 'after:jam_buka']
         ]);
 
         $ruangan->update(["nama_ruangan" => $request->nama_ruangan, "jam_buka" => $request->jam_buka, "jam_tutup" => $request->jam_tutup]);

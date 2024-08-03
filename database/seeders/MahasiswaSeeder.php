@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Mahasiswa;
 use App\Models\Ruangan;
+use App\Models\ScanerStatus;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -14,14 +15,28 @@ class MahasiswaSeeder extends Seeder
      */
     public function run(): void
     {
-        Ruangan::create([
+        $perpustakaan = Ruangan::create([
             'nama_ruangan' => 'Perpustakaan',
-            'type' => 'umum'
+            'type' => 'umum',
         ]);
 
         $kelasA = Ruangan::create([
             'nama_ruangan' => 'Kelas A',
             'type' => 'kelas'
+        ]);
+
+        $scanner = ScanerStatus::create([
+            'kode' => 'RFID-A1',
+            'ruangan_id' => $perpustakaan->id,
+            'type' => 'dalam',
+            'status' => 1
+        ]);
+
+        $scanner = ScanerStatus::create([
+            'kode' => 'RFID-A2',
+            'ruangan_id' => $perpustakaan->id,
+            'type' => 'luar',
+            'status' => 1
         ]);
 
         Mahasiswa::create([

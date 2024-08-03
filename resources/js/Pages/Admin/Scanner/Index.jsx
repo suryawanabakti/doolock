@@ -306,6 +306,11 @@ const Scanner = ({ scanner, ruangans }) => {
                 console.log(err);
             });
     };
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        kelas: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    });
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
@@ -389,11 +394,12 @@ const Scanner = ({ scanner, ruangans }) => {
                             <div className="mb-3">
                                 You have selected :{" "}
                                 <b>{selectedCustomers.length} </b>
-                                people.
+                                scanner.
                             </div>
                         )}
 
                         <DataTable
+                            filters={filters}
                             value={customers}
                             selection={selectedCustomers}
                             onSelectionChange={(e) =>

@@ -13,6 +13,7 @@ import { Toolbar } from "primereact/toolbar";
 import { Tooltip } from "primereact/tooltip";
 import React, { useEffect, useRef, useState } from "react";
 import moment from "moment-timezone";
+import { FilterMatchMode } from "primereact/api";
 
 const DetailMahasiswa = ({ mulai, sampai, mahasiswa, riwayat }) => {
     const [customers, setCustomers] = useState(riwayat);
@@ -21,6 +22,9 @@ const DetailMahasiswa = ({ mulai, sampai, mahasiswa, riwayat }) => {
     const [dates, setDates] = useState([new Date(mulai), new Date(sampai)]);
 
     const [globalFilter, setGlobalFilter] = useState("");
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
     const renderHeader = () => {
         return (
             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
@@ -166,6 +170,7 @@ const DetailMahasiswa = ({ mulai, sampai, mahasiswa, riwayat }) => {
                             right={rightToolbarTemplate}
                         ></Toolbar>
                         <DataTable
+                            filters={filters}
                             value={customers}
                             selection={selectedCustomers}
                             onSelectionChange={(e) =>

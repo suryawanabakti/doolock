@@ -1,5 +1,6 @@
 import Layout from "@/Layouts/layout/layout";
 import axios from "axios";
+import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
@@ -16,10 +17,14 @@ import { useState } from "react";
 export default function Ruangan({ ruangans }) {
     const [dataRuangan, setDataRuangan] = useState(ruangans);
     const [globalFilter, setGlobalFilter] = useState("");
-
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        kelas: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    });
     const onInputSearch = (e) => {
         var val = e.target.value;
-        setGlobalFilter(val ? val : []);
+        setGlobalFilter(val);
     };
 
     let emptyRuangan = {
@@ -256,6 +261,7 @@ export default function Ruangan({ ruangans }) {
                             left={leftToolbarTemplate}
                         ></Toolbar>
                         <DataTable
+                            filters={filters}
                             value={dataRuangan}
                             paginator
                             dataKey="id"

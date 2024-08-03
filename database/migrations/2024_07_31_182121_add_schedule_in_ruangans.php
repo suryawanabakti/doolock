@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ruangans', function (Blueprint $table) {
-            $table->time('jam_buka')->default("00:00");
-            $table->time('jam_tutup')->default("00:00");
+            $table->time('jam_buka')->default("0:01");
+            $table->time('jam_tutup')->default("23:59");
         });
     }
 

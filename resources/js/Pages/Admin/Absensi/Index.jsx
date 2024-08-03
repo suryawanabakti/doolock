@@ -14,7 +14,7 @@ import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
 import React, { useEffect, useRef, useState } from "react";
 
-const RiwayatByRuangan = ({
+const Absensi = ({
     auth,
     mulai,
     sampai,
@@ -147,7 +147,7 @@ const RiwayatByRuangan = ({
     const filterByDate = (e) => {
         e.preventDefault();
         router.get(
-            route("admin.riwayat-by-ruangan.index"),
+            route("admin.absensi.index"),
             { dates, ruangan_id: ruangan.id },
             {
                 onSuccess: () => {},
@@ -161,7 +161,7 @@ const RiwayatByRuangan = ({
                 toast.current.show({
                     severity: "warn",
                     summary: "Warning",
-                    detail: `Tidak ditemukan riwayat di ruangan ${
+                    detail: `Tidak ditemukan absensi di ruangan ${
                         ruangan.nama_ruangan
                     } mulai tanggal ${moment(dates[0]).format(
                         "DD-MM-YYYY"
@@ -169,34 +169,6 @@ const RiwayatByRuangan = ({
                     life: 3000,
                 });
             }
-
-            window.Echo.private(`management.${auth.user.id}`).listen(
-                "StoreHistoryEvent",
-                (event) => {
-                    if (event.histori?.status == 0) {
-                        var status = "Blok";
-                    }
-                    if (event.histori?.status == 1) {
-                        var status = "Terbuka";
-                    }
-                    if (event.histori?.status == 2) {
-                        var status = "Tidak Terdaftar";
-                    }
-                    var data = {
-                        id: event.histori.id,
-                        id_tag: event.histori.id_tag,
-                        user: event.histori.user,
-                        status: status,
-                        scanner: event.histori.scanner,
-                        kode: event.histori.kode,
-                        waktu: event.histori.waktu,
-                    };
-                    if (event.ruangan.id == ruangan.id) {
-                        const updatedUsers = [data, ...customers];
-                        setCustomers(updatedUsers);
-                    }
-                }
-            );
         }
     }, [customers]);
     return (
@@ -215,7 +187,7 @@ const RiwayatByRuangan = ({
                                 onChange={(e) => {
                                     setSelectedCountry(e.value);
                                     router.get(
-                                        `/admin/riwayat-by-ruangan?ruangan_id=${e.value.code}`,
+                                        `/admin/absensi?ruangan_id=${e.value.code}`,
                                         {}
                                     );
                                 }}
@@ -252,47 +224,30 @@ const RiwayatByRuangan = ({
                             >
                                 <Column
                                     headerClassName="fw-bold"
-                                    field="waktu"
-                                    header="Waktu"
+                                    field="tanggal"
+                                    header="Tanggal"
                                     sortable
-                                    filterPlaceholder="Waktu"
-                                    headerStyle={{ width: "12rem" }}
+                                    filterPlaceholder="Search by user"
+                                    headerStyle={{ width: "10rem" }}
                                 />
-
-                                <Column
-                                    headerClassName="fw-bold"
-                                    field="kode"
-                                    header="Kode Scanner"
-                                    sortable
-                                    filter
-                                    filterPlaceholder="Type"
-                                    headerStyle={{ width: "12rem" }}
-                                />
-
-                                <Column
-                                    headerClassName="fw-bold"
-                                    field="type"
-                                    filter
-                                    header="Type"
-                                    sortable
-                                    filterPlaceholder="Type"
-                                    body={(rowData) => {
-                                        return (
-                                            <span>{rowData.scanner?.type}</span>
-                                        );
-                                    }}
-                                    headerStyle={{ width: "8rem" }}
-                                />
-
                                 <Column
                                     headerClassName="fw-bold"
                                     field="id_tag"
                                     header="ID TAG"
                                     sortable
                                     filterPlaceholder="Search by user"
-                                    headerStyle={{ width: "8rem" }}
+                                    headerStyle={{ width: "6rem" }}
                                 />
 
+                                <Column
+                                    headerClassName="fw-bold"
+                                    field="user.nim"
+                                    header="NIM"
+                                    filter
+                                    sortable
+                                    filterPlaceholder="Search by nim"
+                                    headerStyle={{ width: "8rem" }}
+                                />
                                 <Column
                                     headerClassName="fw-bold"
                                     field="user.nama"
@@ -304,13 +259,19 @@ const RiwayatByRuangan = ({
                                 />
                                 <Column
                                     headerClassName="fw-bold"
-                                    field="status"
-                                    header="Status"
+                                    field="jam_masuk"
+                                    header="Jam Masuk"
                                     sortable
-                                    filter
-                                    filterPlaceholder="Search by status"
-                                    body={statusBodyTemplate}
-                                    headerStyle={{ width: "10rem" }}
+                                    filterPlaceholder="Jam Masuk"
+                                    headerStyle={{ width: "12rem" }}
+                                />
+                                <Column
+                                    headerClassName="fw-bold"
+                                    field="jam_keluar"
+                                    header="Jam Keluar"
+                                    sortable
+                                    filterPlaceholder="Jam Keluar"
+                                    headerStyle={{ width: "12rem" }}
                                 />
                             </DataTable>
                         )}
@@ -321,4 +282,4 @@ const RiwayatByRuangan = ({
     );
 };
 
-export default RiwayatByRuangan;
+export default Absensi;

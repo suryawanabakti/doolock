@@ -60,6 +60,11 @@ const AppMenu = () => {
                     icon: "pi pi-history",
                     to: route("admin.riwayat-by-ruangan.index"),
                 },
+                {
+                    label: "Absensi",
+                    icon: "pi pi-history",
+                    to: route("admin.absensi.index"),
+                },
             ],
         },
     ];
