@@ -28,7 +28,7 @@ class RuanganController extends Controller
     {
         $request->validate([
             'nama_ruangan' => ['required', 'max:100'],
-            'jam_buka' => ['required', 'before_equal:jam_tutup'],
+            'jam_buka' => ['required', 'before:jam_tutup'],
             'jam_tutup' => ['required', 'after:jam_buka']
         ]);
 
