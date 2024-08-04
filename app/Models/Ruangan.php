@@ -14,4 +14,9 @@ class Ruangan extends Model
     {
         return $this->hasMany(ScanerStatus::class, 'ruangan_id', 'id');
     }
+
+    public function absensi()
+    {
+        return $this->hasMany(Absensi::class);
+    }
 }

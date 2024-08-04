@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoorLockController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\MahasiswaController;
@@ -20,6 +21,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,28 +44,7 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    $mahasiswaCount = Mahasiswa::where('ket', 'mhs')->count();
-    $dosenCount = Mahasiswa::where('ket', 'dsn')->count();
-    $ruanganCount = Ruangan::count();
-    $scannerCount = ScanerStatus::count();
-
-    $dataRuangan = Ruangan::with('scanner.histories')->whereHas('scanner.histories', function ($query) {
-        $query->whereDate('waktu', Carbon::now());
-    })->get()->map(function ($data) {
-        return [
-            "nama_ruangan" => $data->nama_ruangan,
-            "jumlahKeluar" =>  Histori::where('kode', $data->scanner->where('type', 'dalam')->first()->kode)->whereDate('waktu', Carbon::now())->count(),
-            "jumlahMasuk" =>  Histori::where('kode', $data->scanner->where('type', 'luar')->first()->kode ?? 0)->whereDate('waktu', Carbon::now())->count(),
-        ];
-    });
-    return Inertia::render('Dashboard', [
-        "mahasiswaCount" => $mahasiswaCount,
-        "dosenCount" => $dosenCount,
-        "ruanganCount" => $ruanganCount,
-        "scannerCount" => $scannerCount,
-    ]);
-})
+Route::get('/dashboard', DashboardController::class)
     ->name('dashboard');
 //    ->middleware(['auth', 'verified'])->name('dashboard');
 
