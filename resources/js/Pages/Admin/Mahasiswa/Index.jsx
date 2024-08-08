@@ -168,8 +168,8 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
             reject,
         });
     };
-    const [ingredient, setIngredient] = useState("");
-    const [filters, setFilters] = useState({
+
+    const [filters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         kelas: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },

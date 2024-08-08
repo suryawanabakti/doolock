@@ -19,9 +19,10 @@
 
     <link id="theme-css" href={{ asset('/themes/lara-light-teal/theme.css') }} rel="stylesheet">
     </link>
+
 </head>
 
-<body class="font-sans antialiased" style="zoom: 90%">
+<body class="font-sans antialiased" style="zoom: 100%">
     @inertia
 </body>
 

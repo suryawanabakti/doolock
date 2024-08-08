@@ -1,7 +1,7 @@
 import DashboardInfoCard from "@/Components/DashboardInfoCard.jsx";
-import { LayoutContext } from "@/Layouts/layout/context/layoutcontext";
+
 import Layout from "@/Layouts/layout/layout.jsx";
-import { useContext, useEffect, useRef, useState } from "react";
+
 import Chart from "react-apexcharts";
 
 const Dashboard = ({
@@ -39,7 +39,7 @@ const Dashboard = ({
                     value={mahasiswaCount}
                     icon="users"
                     iconColor="teal"
-                    descriptionValue="2 new"
+                    descriptionValue={`${mahasiswaCount} new`}
                     descriptionText="since last year"
                 ></DashboardInfoCard>
                 <DashboardInfoCard
@@ -47,7 +47,7 @@ const Dashboard = ({
                     value={dosenCount}
                     icon="users"
                     iconColor="teal"
-                    descriptionValue="2 new"
+                    descriptionValue={`${dosenCount} new`}
                     descriptionText="since last year"
                 ></DashboardInfoCard>
                 <DashboardInfoCard
@@ -55,7 +55,7 @@ const Dashboard = ({
                     value={ruanganCount}
                     icon="home"
                     iconColor="teal"
-                    descriptionValue="2 new"
+                    descriptionValue={`${ruanganCount} new`}
                     descriptionText="since last year"
                 ></DashboardInfoCard>
                 <DashboardInfoCard
@@ -63,7 +63,7 @@ const Dashboard = ({
                     value={scannerCount}
                     icon="qrcode"
                     iconColor="teal"
-                    descriptionValue="2 new"
+                    descriptionValue={`${scannerCount} new`}
                     descriptionText="since last year"
                 ></DashboardInfoCard>
                 <div className="card col-12">
