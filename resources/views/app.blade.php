@@ -22,7 +22,7 @@
 
 </head>
 
-<body class="font-sans antialiased" style="zoom: 100%">
+<body class="font-sans antialiased">
     @inertia
 </body>
 

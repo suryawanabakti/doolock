@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('nomor_hp')->nullable();
             $table->string('ket'); // role
             $table->tinyInteger('status');
+            $table->integer('tahun_masuk')->default('2024');
             $table->timestamps();
         });
     }

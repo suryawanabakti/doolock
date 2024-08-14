@@ -15,4 +15,9 @@ class Mahasiswa extends Model
     {
         return $this->belongsTo(Ruangan::class);
     }
+
+    public function ruanganAkses()
+    {
+        return $this->hasOne(RuanganAkses::class);
+    }
 }

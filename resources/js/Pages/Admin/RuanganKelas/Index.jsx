@@ -1,4 +1,5 @@
 import Layout from "@/Layouts/layout/layout";
+import { router } from "@inertiajs/react";
 import axios from "axios";
 import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
@@ -31,8 +32,9 @@ export default function Ruangan({ ruangans }) {
         id: "",
         nama_ruangan: "",
         jam_buka: "00:00:00",
-        jam_tutup: "00:00:00",
+        jam_tutup: "23:58:00",
     };
+
     const [ruangan, setRuangan] = useState(emptyRuangan);
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || "";
@@ -45,6 +47,19 @@ export default function Ruangan({ ruangans }) {
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
+                <Button
+                    icon="pi pi-unlock"
+                    rounded
+                    outlined
+                    className="mr-2"
+                    onClick={() =>
+                        router.visit(
+                            route("admin.ruangan-hak-akses.index", {
+                                id: rowData.id,
+                            })
+                        )
+                    }
+                />
                 <Button
                     icon="pi pi-pencil"
                     rounded
@@ -288,8 +303,8 @@ export default function Ruangan({ ruangans }) {
                                 field="jam_buka"
                                 header="Jam Buka"
                                 filterPlaceholder="jam buka"
-                                style={{ minWidth: "15rem" }}
-                                headerStyle={{ width: "15rem" }}
+                                style={{ minWidth: "10rem" }}
+                                headerStyle={{ width: "10rem" }}
                             />
                             <Column
                                 headerClassName="fw-bold"

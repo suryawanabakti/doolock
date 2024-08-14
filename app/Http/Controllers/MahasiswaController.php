@@ -10,13 +10,11 @@ use Illuminate\Http\Request;
 
 class MahasiswaController extends Controller
 {
-    public function import(Request $request)
-    {
-    }
+    public function import(Request $request) {}
     public function active(Request $request)
     {
         Mahasiswa::whereKey($request->selectedCustomers)->update(['status' => 1]);
-        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'mhs')->get()->map(fn ($data) =>  [
+        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'mhs')->get()->map(fn($data) =>  [
             "id" => $data->id,
             "id_tag" => $data->id_tag,
             "nama" => $data->nama,
@@ -29,7 +27,7 @@ class MahasiswaController extends Controller
     public function block(Request $request)
     {
         Mahasiswa::whereKey($request->selectedCustomers)->update(['status' => 0]);
-        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn ($data) =>  [
+        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
             "id" => $data->id,
             "id_tag" => $data->id_tag,
             "nama" => $data->nama,
@@ -41,7 +39,7 @@ class MahasiswaController extends Controller
     }
     public function index()
     {
-        $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn ($data) =>  [
+        $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
             "id" => $data->id,
             "ruangan" => $data->ruangan ?? null,
             "kelas" => $data->kelas,
@@ -51,13 +49,13 @@ class MahasiswaController extends Controller
             "nim" => $data->nim,
             "ket" => $data->ket,
             "status" => $data->status == 1 ? 'Active' : 'Block',
+            "tahun_masuk" => $data->tahun_masuk
         ]);
 
-        $kelas = Ruangan::where('type', 'kelas')->get()->map(function () {
-        });
+        $kelas = Ruangan::where('type', 'kelas')->get()->map(function () {});
         return inertia("Admin/Mahasiswa/Index", [
             "mahasiswa" => $mahasiswa,
-            "kelas" => Ruangan::where('type', 'kelas')->get()->map(fn ($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
+            "kelas" => Ruangan::where('type', 'kelas')->get()->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
         ]);
     }
 
@@ -74,7 +72,8 @@ class MahasiswaController extends Controller
             "ruangan" => $mahasiswa->ruangan,
             "nama" => $mahasiswa->nama,
             "ket" => $mahasiswa->ket,
-            "status" => $mahasiswa->status == 1 ? "Active" : "Block"
+            "status" => $mahasiswa->status == 1 ? "Active" : "Block",
+            "tahun_masuk" => $mahasiswa->tahun_masuk
         ];
     }
 

@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatByRuanganController;
 use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\RuanganController;
+use App\Http\Controllers\RuanganHakAksesController;
 use App\Http\Controllers\RuanganKelasController;
 use App\Http\Controllers\ScanerController;
 use App\Http\Controllers\SettingController;
@@ -45,10 +46,11 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', DashboardController::class)
+    ->middleware('auth')
     ->name('dashboard');
-//    ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+
     Route::get('/admin/ruangan-kelas', [RuanganKelasController::class, 'index'])->name('admin.ruangan-kelas.index');
     Route::post('/admin/ruangan-kelas', [RuanganKelasController::class, 'store'])->name('admin.ruangan-kelas.store');
     Route::patch('/admin/ruangan-kelas/{ruangan}', [RuanganKelasController::class, 'update'])->name('admin.ruangan-kelas.update');
@@ -58,6 +60,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/ruangan', [RuanganController::class, 'store'])->name('admin.ruangan.store');
     Route::patch('/admin/ruangan/{ruangan}', [RuanganController::class, 'update'])->name('admin.ruangan.update');
     Route::delete('/admin/ruangan/{ruangan}', [RuanganController::class, 'destroy'])->name('admin.ruangan.destroy');
+
+    Route::get('/admin/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('admin.ruangan-hak-akses.index');
+    Route::post('/admin/ruangan-hak-akses', [RuanganHakAksesController::class, 'store'])->name('admin.ruangan-hak-akses.store');
 
     Route::get('/admin/mahasiswa', [MahasiswaController::class, 'index'])->name('admin.mahasiswa.index');
     Route::post('/admin/mahasiswa', [MahasiswaController::class, 'store'])->name('admin.mahasiswa.store');

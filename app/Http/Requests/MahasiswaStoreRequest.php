@@ -27,6 +27,7 @@ class MahasiswaStoreRequest extends FormRequest
             "id_tag" => ['required', 'unique:mahasiswa,id_tag'],
             "nim" => ['required', 'unique:mahasiswa,nim'],
             "status" => ['required'],
+            "tahun_masuk" => ['required',  'max_digits:4', 'min_digits:4']
         ];
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Absensi;
 use App\Models\Histori;
 use App\Models\Mahasiswa;
 use App\Models\Ruangan;
+use App\Models\RuanganAkses;
 use App\Models\ScanerStatus;
 use App\Models\User;
 use Carbon\Carbon;
@@ -23,28 +24,27 @@ class DoorLockController extends Controller
         $status = 0;
         $mahasiswa = Mahasiswa::where('id_tag', $request->id)->first();
 
-        if (!empty($mahasiswa)) {
-            if ($mahasiswa->status == 0) {
-                $status = 0;
-            }
-            if ($mahasiswa->status == 1) {
-                $status = 1;
-            }
+        if ($mahasiswa) {
+            $status = $mahasiswa->status;
         } else {
             $status = 2;
         }
 
-        $ruangan = Ruangan::whereHas('scanner', fn ($query) => $query->where('kode', $request->kode))->first();
 
-        if (!empty($ruangan)) {
-            $waktuSekarang = Carbon::now('GMT+8')->format('H:i:s') > $ruangan->jam_buka && Carbon::now('GMT+8')->format('H:i:s') < $ruangan->jam_tutup;
-            if (!$waktuSekarang) {
+        $ruangan = Ruangan::with('scanner')->whereHas('scanner', fn($query) => $query->where('kode', $request->kode))->first();
+
+        $now = Carbon::now('GMT+8')->format('H:i:s');
+        if (!$ruangan || $now < $ruangan->jam_buka || $now > $ruangan->jam_tutup) {
+            echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        if ($mahasiswa && $mahasiswa->ket == 'mhs') {
+            $ruanganAkses = RuanganAkses::where('mahasiswa_id', $mahasiswa->id)->where('ruangan_id', $ruangan->id)->where('day', Carbon::now('Asia/Makassar')->format('D'))->first();
+            if (!$ruanganAkses) {
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
                 return;
             }
-        } else {
-            echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
-            return;
         }
 
         $histori = Histori::create([
@@ -54,16 +54,21 @@ class DoorLockController extends Controller
             'status' => $status,
         ]);
 
-        if (!empty($mahasiswa)) {
+        if ($mahasiswa) {
+            ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now('Asia/Makassar')->format('Y-m-d H:i:s')]);
+
             if ($mahasiswa->status == 0) {
-                ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
-                $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
+                $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
             }
+
             if ($mahasiswa->status == 1) {
-                ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
-                $absenToday = Absensi::where('id_tag', $request->id)->where('ruangan_id', $ruangan->id)->whereDate('waktu_masuk', Carbon::now('GMT+8'))->first();
-                if (empty($absenToday)) {
+                $absenToday = Absensi::where('id_tag', $request->id)
+                    ->where('ruangan_id', $ruangan->id)
+                    ->whereDate('waktu_masuk', Carbon::now('GMT+8'))
+                    ->first();
+
+                if (!$absenToday) {
                     Absensi::create([
                         'id_tag' => $request->id,
                         'ruangan_id' => $ruangan->id,
@@ -71,16 +76,17 @@ class DoorLockController extends Controller
                     ]);
                 } else {
                     $scannerStatus = ScanerStatus::where('kode', $request->kode)->first();
-                    if ($scannerStatus->type == 'dalam') {
+                    if ($scannerStatus && $scannerStatus->type == 'dalam') {
                         $absenToday->update(['waktu_keluar' => Carbon::now('GMT+8')]);
                     }
                 }
-                $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
-                echo  json_encode([$mahasiswa->id_tag], JSON_UNESCAPED_UNICODE);
+
+                $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
+                echo json_encode([$mahasiswa->id_tag], JSON_UNESCAPED_UNICODE);
             }
         } else {
             ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
-            $data = Histori::with('user', 'scanner.ruangan')->where('id', $histori->id)->first();
+            $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
         }
 

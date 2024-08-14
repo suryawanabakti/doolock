@@ -28,7 +28,8 @@ class MahasiswaUpdateRequest extends FormRequest
             "id_tag" => ['required',  Rule::unique(Mahasiswa::class)->ignore($this->id)],
             "nim" => ['required', Rule::unique(Mahasiswa::class)->ignore($this->id)],
             "status" => ['required'],
-            "ruangan_id" => ['required']
+            "ruangan_id" => ['required'],
+            "tahun_masuk" => ['required',  'max_digits:4', 'min_digits:4']
         ];
     }
 }

@@ -45,7 +45,8 @@ class MahasiswaSeeder extends Seeder
             'nim' => '12345453',
             'ruangan_id' => $kelasA->id,
             'ket' => 'mhs',
-            'status' => 1
+            'status' => 1,
+            'tahun_masuk' => '2024'
         ]);
 
         Mahasiswa::create([
@@ -54,7 +55,8 @@ class MahasiswaSeeder extends Seeder
             'nim' => '12345112',
             'ruangan_id' => $kelasA->id,
             'ket' => 'mhs',
-            'status' => 1
+            'status' => 1,
+            'tahun_masuk' => '2024'
         ]);
 
         Mahasiswa::create([
@@ -63,7 +65,8 @@ class MahasiswaSeeder extends Seeder
             'nim' => '129999',
             'ruangan_id' => $kelasA->id,
             'ket' => 'mhs',
-            'status' => 1
+            'status' => 1,
+            'tahun_masuk' => '2024'
         ]);
 
         Mahasiswa::create([
@@ -72,7 +75,8 @@ class MahasiswaSeeder extends Seeder
             'nim' => '12344',
             'ruangan_id' => $kelasA->id,
             'ket' => 'mhs',
-            'status' => 1
+            'status' => 1,
+            'tahun_masuk' => '2024'
         ]);
 
 
@@ -82,7 +86,8 @@ class MahasiswaSeeder extends Seeder
             'nim' => '123512',
             'ruangan_id' => $kelasA->id,
             'ket' => 'mhs',
-            'status' => 1
+            'status' => 1,
+            'tahun_masuk' => '2024'
         ]);
 
         Mahasiswa::create([
@@ -91,7 +96,8 @@ class MahasiswaSeeder extends Seeder
             'nim' => '2345678901',
             'ruangan_id' => $kelasA->id,
             'ket' => 'mhs',
-            'status' => 0
+            'status' => 0,
+            'tahun_masuk' => '2024'
         ]);
     }
 }

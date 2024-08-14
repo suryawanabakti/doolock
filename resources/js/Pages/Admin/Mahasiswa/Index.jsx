@@ -42,6 +42,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
         nama: "",
         status: 1,
         ruangan_id: "",
+        tahun_masuk: 2024,
         file_import: null,
     });
     const [importDialog, setImportDialog] = useState(false);
@@ -244,6 +245,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
             nama: data.nama,
             ruangan_id: data.ruangan?.id,
             status: data.status == "Active" ? 1 : 0,
+            tahun_masuk: data.tahun_masuk,
         });
         setSelectedCountry({
             code: data.ruangan?.id,
@@ -449,6 +451,13 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                                 style={{ minWidth: "14rem" }}
                             />
                             <Column
+                                field="tahun_masuk"
+                                header="Tahun"
+                                sortable
+                                filterPlaceholder="Search by tahun masuk"
+                                style={{ minWidth: "5rem" }}
+                            />
+                            <Column
                                 field="kelas"
                                 header="Kelas"
                                 body={(rowData) => {
@@ -458,6 +467,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                                         </span>
                                     );
                                 }}
+                                filter
                                 filterPlaceholder="Search by kelas"
                                 style={{ minWidth: "7rem" }}
                             />
@@ -570,6 +580,23 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                     )}
                 </div>
                 <div className="field">
+                    <label htmlFor="tahun_masuk" className="font-bold">
+                        Tahun Masuk
+                    </label>
+                    <InputText
+                        id="tahun_masuk"
+                        type="number"
+                        required
+                        autoFocus
+                        value={data.tahun_masuk}
+                        placeholder="Masukkan Tahun Masuk"
+                        onChange={(e) => setData("tahun_masuk", e.target.value)}
+                    />
+                    {errors.tahun_masuk && (
+                        <small className="p-error">{errors.tahun_masuk}</small>
+                    )}
+                </div>
+                <div className="field">
                     <label htmlFor="ruangan" className="font-bold">
                         Kelas
                     </label>
@@ -678,6 +705,23 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                     />
                     {errors.nama && (
                         <small className="p-error">{errors.nama}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="tahun_masuk" className="font-bold">
+                        Tahun Masuk
+                    </label>
+                    <InputText
+                        id="tahun_masuk"
+                        type="number"
+                        required
+                        autoFocus
+                        value={data.tahun_masuk}
+                        placeholder="Masukkan Tahun Masuk"
+                        onChange={(e) => setData("tahun_masuk", e.target.value)}
+                    />
+                    {errors.tahun_masuk && (
+                        <small className="p-error">{errors.tahun_masuk}</small>
                     )}
                 </div>
                 <div className="field">
