@@ -37,7 +37,8 @@ class RuanganHakAksesController extends Controller
         }
         // Temukan ruangan yang dipilih
         $ruangan = Ruangan::find($ruanganId);
-        $hakAkses = HakAkses::with(['ruangan'])->withCount('hakAksesMahasiswa')->where('ruangan_id', $ruanganId)->get();
+
+        $hakAkses = HakAkses::with(['ruangan', 'hakAksesMahasiswa.mahasiswa'])->withCount('hakAksesMahasiswa')->where('ruangan_id', $ruanganId)->orderBy('created_at', 'DESC')->get();
 
         $kelas =  Ruangan::where('type', 'kelas')->get()->map(function ($data) {
             return [
@@ -56,8 +57,27 @@ class RuanganHakAksesController extends Controller
 
     public function store(Request $request)
     {
+        if (!$request->mahasiswa) {
+            return response()->json(["message" => "Mahasiswa harus di isi"], 400);
+        }
+        return DB::transaction(function () use ($request) {
+            $checkHakAkses = HakAkses::where('day', $request->day)
+                ->where(function ($query) use ($request) {
+                    $query->where(function ($q) use ($request) {
+                        $q->where('jam_masuk', '<=', $request->jam_masuk)
+                            ->where('jam_keluar', '>=', $request->jam_masuk);
+                    })->orWhere(function ($q) use ($request) {
+                        $q->where('jam_masuk', '<=', $request->jam_keluar)
+                            ->where('jam_keluar', '>=', $request->jam_keluar);
+                    });
+                })
+                ->first();
+            if ($checkHakAkses) {
+                return response()->json(["message" => "Gagal simpan , sudah ada jadwal hari $request->day dari $checkHakAkses->jam_masuk sampai $checkHakAkses->jam_keluar"], 400);
+            }
 
-        DB::transaction(function () use ($request) {
+
+
             $hakAkses = HakAkses::create([
                 "day" => $request->day,
                 "ruangan_id" => $request->ruangan_id,
@@ -75,8 +95,12 @@ class RuanganHakAksesController extends Controller
                 ];
             }
             HakAksesMahasiswa::insert($data);
+            return HakAkses::with(['ruangan', 'hakAksesMahasiswa.mahasiswa'])->withCount('hakAksesMahasiswa')->where('id', $hakAkses->id)->first();
         });
+    }
 
-        return back();
+    public function destroy(HakAkses $hakAkses)
+    {
+        $hakAkses->delete();
     }
 }

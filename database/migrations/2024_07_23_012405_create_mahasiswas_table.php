@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('id_tag')->unique();
             $table->string('nama');
             $table->string('nim')->unique();
+            $table->string('pin')->nullable()->unique();
             $table->unsignedBigInteger('ruangan_id')->nullable();
             $table->foreign('ruangan_id')->references('id')->on('ruangans');
             $table->string('kelas')->nullable();

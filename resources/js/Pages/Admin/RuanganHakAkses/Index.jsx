@@ -1,10 +1,11 @@
 import Layout from "@/Layouts/layout/layout";
-import { router, useForm } from "@inertiajs/react";
+import { Link, router, useForm } from "@inertiajs/react";
 import axios from "axios";
 import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
 import { CascadeSelect } from "primereact/cascadeselect";
 import { Column } from "primereact/column";
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
@@ -99,21 +100,29 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
     });
     const handleSave = async (e) => {
         e.preventDefault();
-
         setLoading(true);
-
-        post(route("admin.ruangan-hak-akses.store"), {
-            onSuccess: () => {
-                toast.current.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: `Berhasil simpan ${selectedRows.length} Mahasiswa. 🎉`,
-                    life: 3000,
-                });
-                setDialogTambah(false);
-                setSelectedRows([]);
-            },
-        });
+        try {
+            const res = await axios.post(
+                route("admin.ruangan-hak-akses.store"),
+                data
+            );
+            const updatedData = [res.data, ...dataHakAkses];
+            setDataHakAkses(updatedData);
+            toast.current.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Berhasil simpan",
+                life: 3000,
+            });
+            setDialogTambah(false);
+        } catch (error) {
+            toast.current.show({
+                severity: "warn",
+                summary: "Error",
+                detail: error.response?.data?.message ?? "Something Went Wrong",
+                life: 9000,
+            });
+        }
 
         setLoading(false);
     };
@@ -168,7 +177,15 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
         setIngredient(value);
         setData("day", value);
     };
-
+    const [dialogDetail, setDialogDetail] = useState(false);
+    const [dataDetail, setDataDetail] = useState(null);
+    const [hariDetail, setHariDetail] = useState(null);
+    const openDetail = (rowData) => {
+        setHariDetail(rowData.day);
+        console.log(rowData.hak_akses_mahasiswa);
+        setDataDetail(rowData.hak_akses_mahasiswa);
+        setDialogDetail(true);
+    };
     const centerToolbar = () => {
         return (
             <div className="flex flex-wrap gap-2">
@@ -292,15 +309,64 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
     });
 
     const [globalFilter, setGlobalFilter] = useState(null);
-
+    const confirm2 = (event, rowData) => {
+        confirmPopup({
+            target: event.currentTarget,
+            message: "Do you want to delete this record?",
+            icon: "pi pi-info-circle",
+            defaultFocus: "reject",
+            acceptClassName: "p-button-danger",
+            accept: async () => {
+                try {
+                    await axios.delete(
+                        route("admin.ruangan-hak-akses.destroy", rowData.id)
+                    );
+                    toast.current.show({
+                        severity: "info",
+                        summary: "Confirmed",
+                        detail: "You have deleted Hak Akses",
+                        life: 3000,
+                    });
+                    const updatedData = dataHakAkses.filter(
+                        (user) => user.id !== rowData.id
+                    );
+                    // Update the state with the new array
+                    setDataHakAkses(updatedData);
+                } catch (e) {
+                    console.log("ERROR", e);
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "You have error deleted " + e.message,
+                        life: 3000,
+                    });
+                }
+            },
+        });
+    };
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <React.Fragment>
+                <Button
+                    icon="pi pi-trash"
+                    rounded
+                    outlined
+                    severity="danger"
+                    onClick={(event) => confirm2(event, rowData)}
+                />
+            </React.Fragment>
+        );
+    };
     return (
         <Layout>
             <Toast ref={toast} />
+            <ConfirmPopup />
             <div className="grid">
                 <div className="col-12">
                     <Toolbar
                         className="mb-4"
                         left={leftToolbarTemplate3}
+                        right={rightToolbarTemplate}
                     ></Toolbar>
 
                     <DataTable
@@ -318,8 +384,8 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
                             header="Nama Ruangan"
                             sortable
                             filterPlaceholder="ID TAG"
-                            style={{ minWidth: "10rem" }}
-                            headerStyle={{ width: "10rem" }}
+                            style={{ minWidth: "15rem" }}
+                            headerStyle={{ width: "15rem" }}
                         />
                         <Column
                             headerClassName="fw-bold"
@@ -352,11 +418,26 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
                             headerClassName="fw-bold"
                             field="hak_akses_mahasiswa_count"
                             header="Jml.mhs"
+                            body={(rowData) => {
+                                return (
+                                    <a
+                                        href="#"
+                                        onClick={() => openDetail(rowData)}
+                                    >
+                                        {rowData.hak_akses_mahasiswa_count}
+                                    </a>
+                                );
+                            }}
                             sortable
                             filterPlaceholder="ID TAG"
                             style={{ minWidth: "6rem" }}
                             headerStyle={{ width: "6rem" }}
                         />
+                        <Column
+                            body={actionBodyTemplate}
+                            exportable={false}
+                            style={{ minWidth: "5rem" }}
+                        ></Column>
                     </DataTable>
                 </div>
             </div>
@@ -364,7 +445,11 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
                 visible={dialogTambah}
                 style={{ width: "90%" }}
                 breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-                header={`Tambah Hak Akses ${ruangan.nama_ruangan}`}
+                header={() => (
+                    <>
+                        <span>{`Tambah Hak Akses ${ruangan.nama_ruangan}`}</span>
+                    </>
+                )}
                 modal
                 className="p-fluid"
                 footer={() => {}}
@@ -376,16 +461,13 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
                     <div className="col-12">
                         <Toolbar
                             className="mb-4"
-                            left={leftToolbarTemplate}
-                        ></Toolbar>
-                        <Toolbar
-                            className="mb-4"
                             center={centerToolbar}
                         ></Toolbar>
                         <Toolbar
                             className="mb-4"
                             center={centerToolbar2}
                         ></Toolbar>
+
                         <DataTable
                             loading={loadingTable}
                             globalFilter={globalFilter}
@@ -441,6 +523,62 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
                                 header="Kelas"
                                 style={{ minWidth: "10rem" }}
                                 headerStyle={{ width: "10rem" }}
+                            />
+                        </DataTable>
+                        <Toolbar
+                            className="mb-4"
+                            center={leftToolbarTemplate}
+                        ></Toolbar>
+                    </div>
+                </div>
+            </Dialog>
+            <Dialog
+                visible={dialogDetail}
+                style={{ width: "60%" }}
+                breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+                header={`Daftar Mahasiswa Yang Memiliki Akses`}
+                modal
+                className="p-fluid"
+                footer={() => {}}
+                onHide={() => {
+                    setDialogDetail(false);
+                }}
+            >
+                <div className="grid">
+                    <div className="col-12">
+                        <DataTable
+                            value={dataDetail}
+                            filters={filters}
+                            rows={10}
+                            dataKey="id"
+                            paginator
+                        >
+                            <Column
+                                headerClassName="fw-bold"
+                                field="mahasiswa.id_tag"
+                                header="ID"
+                                sortable
+                                filterPlaceholder="ID "
+                                style={{ minWidth: "5rem" }}
+                                headerStyle={{ width: "5rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="mahasiswa.nim"
+                                header="NIM"
+                                sortable
+                                filterPlaceholder="NIM "
+                                style={{ minWidth: "5rem" }}
+                                headerStyle={{ width: "5rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="mahasiswa.nama"
+                                header="Nama"
+                                sortable
+                                filterPlaceholder="Nama"
+                                style={{ minWidth: "5rem" }}
+                                headerStyle={{ width: "5rem" }}
                             />
                         </DataTable>
                     </div>

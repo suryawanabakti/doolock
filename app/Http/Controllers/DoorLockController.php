@@ -41,9 +41,10 @@ class DoorLockController extends Controller
         }
 
         if ($mahasiswa && $mahasiswa->ket == 'mhs') {
-            $ruanganAkses = HakAksesMahasiswa::where('mahasiswa_id', $mahasiswa->id)->whereHas('hakAkses', function ($query) use ($ruangan) {
+            $ruanganAkses = HakAksesMahasiswa::orderBy('created_at', 'DESC')->where('mahasiswa_id', $mahasiswa->id)->whereHas('hakAkses', function ($query) use ($ruangan) {
                 return $query->where('day', Carbon::now('Asia/Makassar')->format('D'))->where('ruangan_id', $ruangan->id);
             })->first();
+
             if (!$ruanganAkses) {
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
                 return;
