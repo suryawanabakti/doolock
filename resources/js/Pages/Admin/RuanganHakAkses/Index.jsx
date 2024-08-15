@@ -1,12 +1,15 @@
 import Layout from "@/Layouts/layout/layout";
-import { router } from "@inertiajs/react";
+import { router, useForm } from "@inertiajs/react";
 import axios from "axios";
 import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
+import { CascadeSelect } from "primereact/cascadeselect";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
+import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
 import { RadioButton } from "primereact/radiobutton";
 import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
@@ -14,13 +17,9 @@ import React, { useEffect } from "react";
 import { useRef } from "react";
 import { useState } from "react";
 
-export default function Index({
-    mahasiswa,
-    mahasiswaSelected,
-    ruangan,
-    today,
-}) {
+export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
     const [dataMahasiswa, setDataMahasiswa] = useState(mahasiswa);
+    const [dataHakAkses, setDataHakAkses] = useState(hakAkses);
 
     const onInputSearch = (e) => {
         var value = e.target.value;
@@ -40,31 +39,82 @@ export default function Index({
             </span>
         </div>
     );
-    const toast = useRef(null);
-    const [loading, setLoading] = useState(false);
-    const handleSave = async (e) => {
-        e.preventDefault();
+    const [selectedKelas, setSelectedKelas] = useState(null);
+    const onChangeSelected = async (value) => {
+        setLoadingTable(true);
         try {
-            setLoading(true);
-            const res = await axios.post(
-                route("admin.ruangan-hak-akses.store"),
-                {
-                    day: today,
-                    selectedRows,
-                    ruangan_id: ruangan.id,
-                }
+            const res = await axios.get(
+                route("admin.ruangan-hak-akses.getMahasiswa", {
+                    kelas_id: value?.id,
+                })
             );
-            toast.current.show({
-                severity: "success",
-                summary: "Success",
-                detail: `Berhasil simpan ${selectedRows.length} Mahasiswa. 🎉`,
-                life: 3000,
-            });
+            setDataMahasiswa(res.data);
+            setSelectedKelas(value);
             console.log(res);
         } catch (error) {
             console.log(error);
-            alert("error");
         }
+        setLoadingTable(false);
+    };
+    const header2 = (
+        <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
+            <h5>Pilih Mahasiswa</h5>
+
+            {selectedKelas && (
+                <Button
+                    label="Tampilkan Semua"
+                    icon="pi pi-refresh"
+                    severity="primary"
+                    className="w-15rem"
+                    onClick={() => onChangeSelected()}
+                />
+            )}
+            <Dropdown
+                value={selectedKelas}
+                onChange={(e) => onChangeSelected(e.value)}
+                options={kelas}
+                optionLabel="name"
+                placeholder="Semua Kelas"
+                className="w-full md:w-14rem"
+                emptyMessage="Tidak ada kelas"
+            ></Dropdown>
+            <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText
+                    type="search"
+                    onInput={(e) => onInputSearch(e)}
+                    placeholder="Global Search"
+                />
+            </span>
+        </div>
+    );
+    const toast = useRef(null);
+    const [loading, setLoading] = useState(false);
+    const { data, setData, errors, post, processing } = useForm({
+        ruangan_id: ruangan.id,
+        jam_masuk: "07:30",
+        jam_keluar: "20:00",
+        mahasiswa: [],
+        day: today,
+    });
+    const handleSave = async (e) => {
+        e.preventDefault();
+
+        setLoading(true);
+
+        post(route("admin.ruangan-hak-akses.store"), {
+            onSuccess: () => {
+                toast.current.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: `Berhasil simpan ${selectedRows.length} Mahasiswa. 🎉`,
+                    life: 3000,
+                });
+                setDialogTambah(false);
+                setSelectedRows([]);
+            },
+        });
+
         setLoading(false);
     };
 
@@ -95,26 +145,31 @@ export default function Index({
             </div>
         );
     };
+    const [dialogTambah, setDialogTambah] = useState(false);
+    const openNew = () => {
+        setDialogTambah(true);
+    };
+    const leftToolbarTemplate3 = () => {
+        return (
+            <div className="flex flex-wrap gap-2">
+                <Button
+                    label={`Tambah Hak Akses ${ruangan.nama_ruangan}`}
+                    icon="pi pi-save"
+                    severity="primary"
+                    onClick={openNew}
+                />
+            </div>
+        );
+    };
 
     const [ingredient, setIngredient] = useState(today);
     const [loadingTable, setLoadingTable] = useState(false);
     const handleDayChange = async (value) => {
         setIngredient(value);
-        setLoadingTable(true);
-        router.visit(
-            route("admin.ruangan-hak-akses.index", {
-                id: ruangan.id,
-                today: value,
-            }),
-            {
-                onFinish: () => {
-                    setLoadingTable(false);
-                },
-            }
-        );
+        setData("day", value);
     };
 
-    const leftToolbarTemplate2 = () => {
+    const centerToolbar = () => {
         return (
             <div className="flex flex-wrap gap-2">
                 <div className="flex align-items-center">
@@ -205,7 +260,28 @@ export default function Index({
         );
     };
 
-    const [selectedRows, setSelectedRows] = useState(mahasiswaSelected);
+    const centerToolbar2 = () => {
+        return (
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <label htmlFor="jam_masuk">Jam Masuk:</label>
+                <InputText
+                    id="jam_masuk"
+                    type="time"
+                    value={data.jam_masuk}
+                    onChange={(e) => setData("jam_masuk", e.target.value)}
+                />
+                <label htmlFor="jam_keluar">Jam Keluar:</label>
+                <InputText
+                    id="jam_keluar"
+                    type="time"
+                    value={data.jam_keluar}
+                    onChange={(e) => setData("jam_keluar", e.target.value)}
+                />
+            </div>
+        );
+    };
+
+    const [selectedRows, setSelectedRows] = useState([]);
 
     const [filters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -224,36 +300,22 @@ export default function Index({
                 <div className="col-12">
                     <Toolbar
                         className="mb-4"
-                        left={leftToolbarTemplate}
-                        right={rightToolbarTemplate}
+                        left={leftToolbarTemplate3}
                     ></Toolbar>
-                    <Toolbar
-                        className="mb-4"
-                        center={leftToolbarTemplate2}
-                    ></Toolbar>
+
                     <DataTable
                         loading={loadingTable}
-                        globalFilter={globalFilter}
                         filters={filters}
                         header={header}
                         rows={10}
                         dataKey="id"
                         paginator
-                        value={dataMahasiswa}
-                        selection={selectedRows}
-                        onSelectionChange={(e) => {
-                            console.log(e.value);
-                            setSelectedRows(e.value);
-                        }}
+                        value={dataHakAkses}
                     >
                         <Column
-                            selectionMode="multiple"
-                            headerStyle={{ width: "3rem" }}
-                        ></Column>
-                        <Column
                             headerClassName="fw-bold"
-                            field="id_tag"
-                            header="ID TAG"
+                            field="ruangan.nama_ruangan"
+                            header="Nama Ruangan"
                             sortable
                             filterPlaceholder="ID TAG"
                             style={{ minWidth: "10rem" }}
@@ -261,35 +323,129 @@ export default function Index({
                         />
                         <Column
                             headerClassName="fw-bold"
-                            field="nim"
-                            header="Nim"
+                            field="day"
+                            header="Hari"
                             sortable
-                            filterPlaceholder="nim"
+                            filterPlaceholder="ID TAG"
+                            style={{ minWidth: "5rem" }}
+                            headerStyle={{ width: "5rem" }}
+                        />
+                        <Column
+                            headerClassName="fw-bold"
+                            field="jam_masuk"
+                            header="Jam Masuk"
+                            sortable
+                            filterPlaceholder="ID TAG"
                             style={{ minWidth: "10rem" }}
                             headerStyle={{ width: "10rem" }}
                         />
                         <Column
                             headerClassName="fw-bold"
-                            field="nama"
-                            header="Nama"
+                            field="jam_keluar"
+                            header="Jam Keluar"
                             sortable
-                            filterPlaceholder="nama"
+                            filterPlaceholder="ID TAG"
                             style={{ minWidth: "10rem" }}
                             headerStyle={{ width: "10rem" }}
                         />
                         <Column
                             headerClassName="fw-bold"
-                            field="ruangan.nama_ruangan"
+                            field="hak_akses_mahasiswa_count"
+                            header="Jml.mhs"
                             sortable
-                            filter
-                            filterPlaceholder="Nama Kelas"
-                            header="Kelas"
-                            style={{ minWidth: "10rem" }}
-                            headerStyle={{ width: "10rem" }}
+                            filterPlaceholder="ID TAG"
+                            style={{ minWidth: "6rem" }}
+                            headerStyle={{ width: "6rem" }}
                         />
                     </DataTable>
                 </div>
             </div>
+            <Dialog
+                visible={dialogTambah}
+                style={{ width: "90%" }}
+                breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+                header={`Tambah Hak Akses ${ruangan.nama_ruangan}`}
+                modal
+                className="p-fluid"
+                footer={() => {}}
+                onHide={() => {
+                    setDialogTambah(false);
+                }}
+            >
+                <div className="grid">
+                    <div className="col-12">
+                        <Toolbar
+                            className="mb-4"
+                            left={leftToolbarTemplate}
+                        ></Toolbar>
+                        <Toolbar
+                            className="mb-4"
+                            center={centerToolbar}
+                        ></Toolbar>
+                        <Toolbar
+                            className="mb-4"
+                            center={centerToolbar2}
+                        ></Toolbar>
+                        <DataTable
+                            loading={loadingTable}
+                            globalFilter={globalFilter}
+                            filters={filters}
+                            header={header2}
+                            rows={10}
+                            dataKey="id"
+                            paginator
+                            value={dataMahasiswa}
+                            selection={selectedRows}
+                            onSelectionChange={(e) => {
+                                setData("mahasiswa", e.value);
+                                setSelectedRows(e.value);
+                            }}
+                        >
+                            <Column
+                                selectionMode="multiple"
+                                headerStyle={{ width: "3rem" }}
+                            ></Column>
+                            <Column
+                                headerClassName="fw-bold"
+                                field="id_tag"
+                                header="ID TAG"
+                                sortable
+                                filterPlaceholder="ID TAG"
+                                style={{ minWidth: "10rem" }}
+                                headerStyle={{ width: "10rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="nim"
+                                header="Nim"
+                                sortable
+                                filterPlaceholder="nim"
+                                style={{ minWidth: "10rem" }}
+                                headerStyle={{ width: "10rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="nama"
+                                header="Nama"
+                                sortable
+                                filterPlaceholder="nama"
+                                style={{ minWidth: "10rem" }}
+                                headerStyle={{ width: "10rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="ruangan.nama_ruangan"
+                                sortable
+                                filter
+                                filterPlaceholder="Nama Kelas"
+                                header="Kelas"
+                                style={{ minWidth: "10rem" }}
+                                headerStyle={{ width: "10rem" }}
+                            />
+                        </DataTable>
+                    </div>
+                </div>
+            </Dialog>
         </Layout>
     );
 }

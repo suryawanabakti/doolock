@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\StoreHistoryEvent;
 use App\Models\Absensi;
+use App\Models\HakAksesMahasiswa;
 use App\Models\Histori;
 use App\Models\Mahasiswa;
 use App\Models\Ruangan;
@@ -40,10 +41,24 @@ class DoorLockController extends Controller
         }
 
         if ($mahasiswa && $mahasiswa->ket == 'mhs') {
-            $ruanganAkses = RuanganAkses::where('mahasiswa_id', $mahasiswa->id)->where('ruangan_id', $ruangan->id)->where('day', Carbon::now('Asia/Makassar')->format('D'))->first();
+            $ruanganAkses = HakAksesMahasiswa::where('mahasiswa_id', $mahasiswa->id)->whereHas('hakAkses', function ($query) use ($ruangan) {
+                return $query->where('day', Carbon::now('Asia/Makassar')->format('D'))->where('ruangan_id', $ruangan->id);
+            })->first();
             if (!$ruanganAkses) {
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
                 return;
+            }
+
+            if ($ruanganAkses) {
+                // Ambil waktu saat ini
+                $now = Carbon::now('Asia/Makassar');
+                // Ambil jam masuk dan jam keluar dari hak akses
+                $jamMasuk = Carbon::parse($ruanganAkses->hakAkses->jam_masuk);
+                $jamKeluar = Carbon::parse($ruanganAkses->hakAkses->jam_keluar);
+                if (!$now->between($jamMasuk, $jamKeluar)) {
+                    echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+                    return;
+                }
             }
         }
 

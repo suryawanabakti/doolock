@@ -18,6 +18,6 @@ class Mahasiswa extends Model
 
     public function ruanganAkses()
     {
-        return $this->hasOne(RuanganAkses::class);
+        return $this->hasOne(HakAksesMahasiswa::class);
     }
 }
