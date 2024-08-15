@@ -13,33 +13,11 @@ class MahasiswaController extends Controller
     public function import(Request $request) {}
     public function active(Request $request)
     {
-        Mahasiswa::whereKey($request->selectedCustomers)->update(['status' => 1]);
-        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'mhs')->get()->map(fn($data) =>  [
-            "id" => $data->id,
-            "id_tag" => $data->id_tag,
-            "nama" => $data->nama,
-            "nim" => $data->nim,
-            "ket" => $data->ket,
-            "status" => $data->status == 1 ? 'Active' : 'Block',
-        ]);
-    }
+        // Ambil ID dari selectedCustomers dan simpan dalam array $dataKey
+        $dataKey = array_column($request->selectedCustomers, 'id');
 
-    public function block(Request $request)
-    {
-        Mahasiswa::whereKey($request->selectedCustomers)->update(['status' => 0]);
-        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
-            "id" => $data->id,
-            "id_tag" => $data->id_tag,
-            "nama" => $data->nama,
-            "nama" => $data->nama,
-            "nim" => $data->nim,
-            "ket" => $data->ket,
-            "status" => $data->status == 1 ? 'Active' : 'Block',
-        ]);
-    }
-    public function index()
-    {
-        $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
+        Mahasiswa::whereIn('id', $dataKey)->update(['status' => 1]);
+        return $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
             "id" => $data->id,
             "ruangan" => $data->ruangan ?? null,
             "kelas" => $data->kelas,
@@ -51,8 +29,56 @@ class MahasiswaController extends Controller
             "status" => $data->status == 1 ? 'Active' : 'Block',
             "tahun_masuk" => $data->tahun_masuk
         ]);
+        return $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
+            "id" => $data->id,
+            "pin" => $data->pin,
+            "ruangan" => $data->ruangan ?? null,
+            "kelas" => $data->kelas,
+            "id_tag" => $data->id_tag,
+            "nama" => $data->nama,
+            "ruangan" => $data->ruangan,
+            "nim" => $data->nim,
+            "ket" => $data->ket,
+            "status" => $data->status == 1 ? 'Active' : 'Block',
+            "tahun_masuk" => $data->tahun_masuk
+        ]);
+    }
 
-        $kelas = Ruangan::where('type', 'kelas')->get()->map(function () {});
+    public function block(Request $request)
+    {
+        // Ambil ID dari selectedCustomers dan simpan dalam array $dataKey
+        $dataKey = array_column($request->selectedCustomers, 'id');
+
+        Mahasiswa::whereIn('id', $dataKey)->update(['status' => 0]);
+        return $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
+            "id" => $data->id,
+            "pin" => $data->pin,
+            "ruangan" => $data->ruangan ?? null,
+            "kelas" => $data->kelas,
+            "id_tag" => $data->id_tag,
+            "nama" => $data->nama,
+            "ruangan" => $data->ruangan,
+            "nim" => $data->nim,
+            "ket" => $data->ket,
+            "status" => $data->status == 1 ? 'Active' : 'Block',
+            "tahun_masuk" => $data->tahun_masuk
+        ]);
+    }
+    public function index()
+    {
+        $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
+            "id" => $data->id,
+            "pin" => $data->pin,
+            "ruangan" => $data->ruangan ?? null,
+            "kelas" => $data->kelas,
+            "id_tag" => $data->id_tag,
+            "nama" => $data->nama,
+            "ruangan" => $data->ruangan,
+            "nim" => $data->nim,
+            "ket" => $data->ket,
+            "status" => $data->status == 1 ? 'Active' : 'Block',
+            "tahun_masuk" => $data->tahun_masuk
+        ]);
         return inertia("Admin/Mahasiswa/Index", [
             "mahasiswa" => $mahasiswa,
             "kelas" => Ruangan::where('type', 'kelas')->get()->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
@@ -65,6 +91,7 @@ class MahasiswaController extends Controller
         $data['ket'] = 'mhs';
         $mahasiswa = Mahasiswa::create($data);
         return [
+            "pin" => $mahasiswa->pin,
             "id" => $mahasiswa->id,
             "id_tag" => $mahasiswa->id_tag,
             "nim" => $mahasiswa->nim,
@@ -81,6 +108,7 @@ class MahasiswaController extends Controller
     {
         $mahasiswa->update($request->validated());
         return [
+            "pin" => $mahasiswa->pin,
             "id" => $mahasiswa->id,
             "id_tag" => $mahasiswa->id_tag,
             "nim" => $mahasiswa->nim,

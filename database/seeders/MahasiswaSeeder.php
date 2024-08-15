@@ -24,6 +24,10 @@ class MahasiswaSeeder extends Seeder
             'nama_ruangan' => 'Kelas A',
             'type' => 'kelas'
         ]);
+        $kelasB = Ruangan::create([
+            'nama_ruangan' => 'Kelas B',
+            'type' => 'kelas'
+        ]);
 
         $scanner = ScanerStatus::create([
             'kode' => 'RFID-A1',
@@ -49,15 +53,7 @@ class MahasiswaSeeder extends Seeder
             'tahun_masuk' => '2024'
         ]);
 
-        Mahasiswa::create([
-            'id_tag' => "130D6629",
-            'nama' => 'Winda Halima',
-            'nim' => '12345112',
-            'ruangan_id' => $kelasA->id,
-            'ket' => 'mhs',
-            'status' => 1,
-            'tahun_masuk' => '2024'
-        ]);
+
 
         Mahasiswa::create([
             'id_tag' => "D08CB0A4",
@@ -97,6 +93,81 @@ class MahasiswaSeeder extends Seeder
             'ruangan_id' => $kelasA->id,
             'ket' => 'mhs',
             'status' => 0,
+            'tahun_masuk' => '2024'
+        ]);
+
+
+        Mahasiswa::create([
+            'id_tag' => "900ba5",
+            'nama' => 'Xayah',
+            'nim' => '4445678902',
+            'ruangan_id' => $kelasB->id,
+            'ket' => 'mhs',
+            'status' => 1,
+            'tahun_masuk' => '2024'
+        ]);
+
+        Mahasiswa::create([
+            'id_tag' => "8ef24f",
+            'nama' => 'Rakan',
+            'nim' => '4445278902',
+            'ruangan_id' => $kelasB->id,
+            'ket' => 'mhs',
+            'status' => 1,
+            'tahun_masuk' => '2024'
+        ]);
+
+
+        Mahasiswa::create([
+            'id_tag' => "8fc3df",
+            'nama' => 'Aldous',
+            'nim' => '4445270902',
+            'ruangan_id' => $kelasB->id,
+            'ket' => 'mhs',
+            'status' => 1,
+            'tahun_masuk' => '2024'
+        ]);
+
+        Mahasiswa::create([
+            'id_tag' => "8fd909",
+            'nama' => 'Nami',
+            'nim' => '4425370902',
+            'ket' => 'dsn',
+            'status' => 1,
+            'tahun_masuk' => '2024'
+        ]);
+        Mahasiswa::create([
+            'id_tag' => "8fd940",
+            'nama' => 'Nami',
+            'nim' => '4445370909',
+            'ket' => 'dsn',
+            'status' => 1,
+            'tahun_masuk' => '2024'
+        ]);
+        Mahasiswa::create([
+            'id_tag' => "7bb63e",
+            'nama' => 'Kayla',
+            'nim' => '4345370902',
+            'ket' => 'mhs',
+            'ruangan_id' => $kelasB->id,
+            'status' => 1,
+            'tahun_masuk' => '2024'
+        ]);
+        Mahasiswa::create([
+            'id_tag' => "72e4cc",
+            'nama' => 'Syndra',
+            'nim' => '1445370902',
+            'ket' => 'mhs',
+            'ruangan_id' => $kelasB->id,
+            'status' => 1,
+            'tahun_masuk' => '2024'
+        ]);
+        Mahasiswa::create([
+            'id_tag' => "7a2d3a",
+            'nama' => 'Ronaldo',
+            'nim' => '1445360902',
+            'ket' => 'dsn',
+            'status' => 1,
             'tahun_masuk' => '2024'
         ]);
     }

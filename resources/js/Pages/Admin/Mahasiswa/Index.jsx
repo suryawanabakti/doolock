@@ -36,6 +36,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
     };
 
     const { data, setData, processing, post, reset } = useForm({
+        pin: "",
         id_tag: "",
         id: "",
         nim: "",
@@ -89,7 +90,9 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                         item.id === data.id
                             ? {
                                   ...item,
+                                  pin: res.data.pin,
                                   nama: res.data.nama,
+                                  ruangan: res.data.ruangan,
                                   id_tag: res.data.id_tag,
                                   status: res.data.status,
                                   nim: res.data.nim,
@@ -240,6 +243,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
     const openEdit = (data) => {
         setData({
             id: data.id,
+            pin: data.pin,
             nim: data.nim,
             id_tag: data.id_tag,
             nama: data.nama,
@@ -458,15 +462,8 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                                 style={{ minWidth: "5rem" }}
                             />
                             <Column
-                                field="kelas"
+                                field="ruangan.nama_ruangan"
                                 header="Kelas"
-                                body={(rowData) => {
-                                    return (
-                                        <span>
-                                            {rowData.ruangan?.nama_ruangan}
-                                        </span>
-                                    );
-                                }}
                                 filter
                                 filterPlaceholder="Search by kelas"
                                 style={{ minWidth: "7rem" }}
@@ -532,8 +529,27 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 onHide={() => onHideDialog()}
             >
                 <div className="field">
+                    <label htmlFor="pin" className="font-bold">
+                        PIN
+                    </label>
+                    <InputText
+                        id="pin"
+                        autoFocus
+                        onChange={(e) => setData("pin", e.target.value)}
+                        value={data.pin}
+                        placeholder="Masukkan PIN"
+                    />
+                    {errors.pin && (
+                        <small className="p-error">{errors.pin}</small>
+                    )}
+                </div>
+
+                <div className="field">
                     <label htmlFor="id_tag" className="font-bold">
-                        ID TAG
+                        ID TAG{" "}
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
                     </label>
                     <InputText
                         id="id_tag"
@@ -547,9 +563,13 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                         <small className="p-error">{errors.id_tag}</small>
                     )}
                 </div>
+
                 <div className="field">
                     <label htmlFor="nim" className="font-bold">
-                        NIM
+                        NIM{" "}
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
                     </label>
                     <InputText
                         id="nim"
@@ -565,7 +585,10 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 </div>
                 <div className="field">
                     <label htmlFor="name" className="font-bold">
-                        Nama
+                        Nama{" "}
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
                     </label>
                     <InputText
                         id="name"
@@ -581,7 +604,10 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 </div>
                 <div className="field">
                     <label htmlFor="tahun_masuk" className="font-bold">
-                        Tahun Masuk
+                        Tahun Masuk{" "}
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
                     </label>
                     <InputText
                         id="tahun_masuk"
@@ -598,7 +624,10 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 </div>
                 <div className="field">
                     <label htmlFor="ruangan" className="font-bold">
-                        Kelas
+                        Kelas{" "}
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
                     </label>
                     <Dropdown
                         value={selectedCountry}
@@ -622,7 +651,10 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 </div>
                 <div className="field">
                     <label htmlFor="name" className="font-bold mb-3">
-                        Status
+                        Status{" "}
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
                     </label>
                     <div className="formgrid grid">
                         <div className="field-radiobutton col-6">
@@ -660,8 +692,23 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 onHide={() => onHideDialog2()}
             >
                 <div className="field">
+                    <label htmlFor="pin" className="font-bold">
+                        PIN
+                    </label>
+                    <InputText
+                        id="pin"
+                        autoFocus
+                        onChange={(e) => setData("pin", e.target.value)}
+                        value={data.pin}
+                        placeholder="Masukkan PIN"
+                    />
+                    {errors.pin && (
+                        <small className="p-error">{errors.pin}</small>
+                    )}
+                </div>
+                <div className="field">
                     <label htmlFor="id_tag" className="font-bold">
-                        ID TAG
+                        ID TAG <span style={{ color: "red" }}>*</span>
                     </label>
                     <InputText
                         id="id_tag"
@@ -677,7 +724,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 </div>
                 <div className="field">
                     <label htmlFor="nim" className="font-bold">
-                        NIM
+                        NIM <span style={{ color: "red" }}>*</span>
                     </label>
                     <InputText
                         id="nim"
@@ -693,7 +740,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 </div>
                 <div className="field">
                     <label htmlFor="name" className="font-bold">
-                        Nama
+                        Nama <span style={{ color: "red" }}>*</span>
                     </label>
                     <InputText
                         id="name"
@@ -709,7 +756,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 </div>
                 <div className="field">
                     <label htmlFor="tahun_masuk" className="font-bold">
-                        Tahun Masuk
+                        Tahun Masuk <span style={{ color: "red" }}>*</span>
                     </label>
                     <InputText
                         id="tahun_masuk"
@@ -726,7 +773,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 </div>
                 <div className="field">
                     <label htmlFor="ruangan" className="font-bold">
-                        Kelas
+                        Kelas <span style={{ color: "red" }}>*</span>
                     </label>
                     <Dropdown
                         value={selectedCountry}
@@ -750,7 +797,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 </div>
                 <div className="field">
                     <label htmlFor="name" className="font-bold mb-3">
-                        Status
+                        Status <span style={{ color: "red" }}>*</span>
                     </label>
                     <div className="formgrid grid">
                         <div className="field-radiobutton col-6">

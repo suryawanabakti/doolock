@@ -24,6 +24,7 @@ class MahasiswaUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "pin" => ['nullable',  Rule::unique(Mahasiswa::class)->ignore($this->id)],
             "nama" => ['required'],
             "id_tag" => ['required',  Rule::unique(Mahasiswa::class)->ignore($this->id)],
             "nim" => ['required', Rule::unique(Mahasiswa::class)->ignore($this->id)],

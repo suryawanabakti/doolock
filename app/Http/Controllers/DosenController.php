@@ -13,8 +13,9 @@ class DosenController extends Controller
 {
     public function index()
     {
-        $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'dsn')->get()->map(fn ($data) =>  [
+        $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'dsn')->get()->map(fn($data) =>  [
             "id" => $data->id,
+            "pin" => $data->pin,
             "id_tag" => $data->id_tag,
             "nama" => $data->nama,
             "nim" => $data->nim,
@@ -29,8 +30,9 @@ class DosenController extends Controller
     public function active(Request $request)
     {
         Mahasiswa::whereKey($request->selectedCustomers)->update(['status' => 1]);
-        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'dsn')->get()->map(fn ($data) =>  [
+        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'dsn')->get()->map(fn($data) =>  [
             "id" => $data->id,
+            "pin" => $data->pin,
             "id_tag" => $data->id_tag,
             "nama" => $data->nama,
             "nim" => $data->nim,
@@ -42,8 +44,9 @@ class DosenController extends Controller
     public function block(Request $request)
     {
         Mahasiswa::whereKey($request->selectedCustomers)->update(['status' => 0]);
-        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'dsn')->get()->map(fn ($data) =>  [
+        return    $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->where('ket', 'dsn')->get()->map(fn($data) =>  [
             "id" => $data->id,
+            "pin" => $data->pin,
             "id_tag" => $data->id_tag,
             "nama" => $data->nama,
             "nim" => $data->nim,
@@ -59,6 +62,7 @@ class DosenController extends Controller
         $mahasiswa = Mahasiswa::create($data);
         return [
             "id" => $mahasiswa->id,
+            "pin" => $mahasiswa->pin,
             "id_tag" => $mahasiswa->id_tag,
             "nim" => $mahasiswa->nim,
             "nama" => $mahasiswa->nama,
@@ -72,6 +76,7 @@ class DosenController extends Controller
         $mahasiswa->update($request->validated());
         return [
             "id" => $mahasiswa->id,
+            "pin" => $mahasiswa->pin,
             "id_tag" => $mahasiswa->id_tag,
             "nim" => $mahasiswa->nim,
             "nama" => $mahasiswa->nama,

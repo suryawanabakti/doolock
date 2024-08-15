@@ -22,6 +22,7 @@ class MahasiswaStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'pin' => ['nullable', 'unique:mahasiswa,pin'],
             'ruangan_id' => ['required'],
             "nama" => ['required'],
             "id_tag" => ['required', 'unique:mahasiswa,id_tag'],

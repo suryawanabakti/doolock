@@ -126,7 +126,18 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
             </Link>
         );
     };
-
+    const getKeterangan = (type) => {
+        switch (type) {
+            case "luar":
+                return "Masuk";
+                break;
+            case "dalam":
+                return "Keluar";
+                break;
+            default:
+                break;
+        }
+    };
     const ruanganBodyTemplate = (customer) => {
         return (
             <div>
@@ -283,7 +294,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                                 sortable
                                 body={userBodyTemplate}
                                 filterPlaceholder="Search by user"
-                                headerStyle={{ width: "12rem" }}
+                                headerStyle={{ width: "30rem" }}
                             />
 
                             <Column
@@ -293,8 +304,19 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                                 sortable
                                 filterPlaceholder="Search by status"
                                 body={statusBodyTemplate}
-                                headerStyle={{ width: "10rem" }}
+                                headerStyle={{ width: "5rem" }}
                                 filter
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                header="Ket."
+                                filterPlaceholder="Search by status"
+                                body={(rowData) => (
+                                    <span>
+                                        {getKeterangan(rowData.scanner.type)}
+                                    </span>
+                                )}
+                                headerStyle={{ width: "8rem" }}
                             />
                         </DataTable>
                     </div>

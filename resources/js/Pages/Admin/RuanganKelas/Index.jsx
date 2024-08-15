@@ -48,7 +48,7 @@ export default function Ruangan({ ruangans }) {
         return (
             <React.Fragment>
                 <Button
-                    icon="pi pi-unlock"
+                    icon="pi pi-key"
                     rounded
                     outlined
                     className="mr-2"

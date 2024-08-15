@@ -23,6 +23,7 @@ class DosenStoreRequest extends FormRequest
     {
         return [
             "nama" => ['required'],
+            "pin" => ['nullable', 'unique:mahasiswa,pin'],
             "id_tag" => ['required', 'unique:mahasiswa,id_tag'],
             "nim" => ['required', 'unique:mahasiswa,nim'],
             "status" => ['required'],

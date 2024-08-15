@@ -26,7 +26,27 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
         var value = e.target.value;
         setGlobalFilter(value);
     };
-
+    const getDays = (rowData) => {
+        console.log(rowData);
+        switch (rowData.day) {
+            case "mon":
+                return "Senin";
+            case "tue":
+                return "Selasa";
+            case "wed":
+                return "Wednesday";
+            case "thu":
+                return "Kami";
+            case "fri":
+                return "Jum'at";
+            case "sat":
+                return "Sabtu";
+            case "sun":
+                return "Minggu";
+            default:
+                return null;
+        }
+    };
     const header = (
         <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
             <h5>Hak Akses Masuk {ruangan.nama_ruangan}</h5>
@@ -357,88 +377,81 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
             </React.Fragment>
         );
     };
+
     return (
         <Layout>
             <Toast ref={toast} />
             <ConfirmPopup />
             <div className="grid">
                 <div className="col-12">
-                    <Toolbar
-                        className="mb-4"
-                        left={leftToolbarTemplate3}
-                        right={rightToolbarTemplate}
-                    ></Toolbar>
+                    <div className="card">
+                        <Toolbar
+                            className="mb-4"
+                            left={leftToolbarTemplate3}
+                            right={rightToolbarTemplate}
+                        ></Toolbar>
 
-                    <DataTable
-                        loading={loadingTable}
-                        filters={filters}
-                        header={header}
-                        rows={10}
-                        dataKey="id"
-                        paginator
-                        value={dataHakAkses}
-                    >
-                        <Column
-                            headerClassName="fw-bold"
-                            field="ruangan.nama_ruangan"
-                            header="Nama Ruangan"
-                            sortable
-                            filterPlaceholder="ID TAG"
-                            style={{ minWidth: "15rem" }}
-                            headerStyle={{ width: "15rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="day"
-                            header="Hari"
-                            sortable
-                            filterPlaceholder="ID TAG"
-                            style={{ minWidth: "5rem" }}
-                            headerStyle={{ width: "5rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="jam_masuk"
-                            header="Jam Masuk"
-                            sortable
-                            filterPlaceholder="ID TAG"
-                            style={{ minWidth: "10rem" }}
-                            headerStyle={{ width: "10rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="jam_keluar"
-                            header="Jam Keluar"
-                            sortable
-                            filterPlaceholder="ID TAG"
-                            style={{ minWidth: "10rem" }}
-                            headerStyle={{ width: "10rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses_mahasiswa_count"
-                            header="Jml.mhs"
-                            body={(rowData) => {
-                                return (
-                                    <a
-                                        href="#"
-                                        onClick={() => openDetail(rowData)}
-                                    >
-                                        {rowData.hak_akses_mahasiswa_count}
-                                    </a>
-                                );
-                            }}
-                            sortable
-                            filterPlaceholder="ID TAG"
-                            style={{ minWidth: "6rem" }}
-                            headerStyle={{ width: "6rem" }}
-                        />
-                        <Column
-                            body={actionBodyTemplate}
-                            exportable={false}
-                            style={{ minWidth: "5rem" }}
-                        ></Column>
-                    </DataTable>
+                        <DataTable
+                            loading={loadingTable}
+                            filters={filters}
+                            header={header}
+                            rows={10}
+                            dataKey="id"
+                            paginator
+                            value={dataHakAkses}
+                        >
+                            <Column
+                                headerClassName="fw-bold"
+                                field="day"
+                                header="Hari"
+                                body={(rowData) => {
+                                    return getDays(rowData);
+                                }}
+                                sortable
+                                filterPlaceholder="ID TAG"
+                                style={{ minWidth: "10rem" }}
+                                headerStyle={{ width: "10rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="jam_masuk"
+                                header="Jam Masuk"
+                                sortable
+                                filterPlaceholder="ID TAG"
+                                style={{ minWidth: "15rem" }}
+                                headerStyle={{ width: "15rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="jam_keluar"
+                                header="Jam Keluar"
+                                sortable
+                                filterPlaceholder="ID TAG"
+                            />
+                            <Column
+                                headerClassName="fw-bold"
+                                field="hak_akses_mahasiswa_count"
+                                header="Jumlah Mahasiswa"
+                                body={(rowData) => {
+                                    return (
+                                        <a
+                                            href="#"
+                                            onClick={() => openDetail(rowData)}
+                                        >
+                                            {rowData.hak_akses_mahasiswa_count}
+                                        </a>
+                                    );
+                                }}
+                                sortable
+                                filterPlaceholder="Jumlah Mahasiswa"
+                            />
+                            <Column
+                                body={actionBodyTemplate}
+                                exportable={false}
+                                style={{ minWidth: "5rem" }}
+                            ></Column>
+                        </DataTable>
+                    </div>
                 </div>
             </div>
             <Dialog
@@ -454,6 +467,7 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
                 className="p-fluid"
                 footer={() => {}}
                 onHide={() => {
+                    setSelectedRows([]);
                     setDialogTambah(false);
                 }}
             >

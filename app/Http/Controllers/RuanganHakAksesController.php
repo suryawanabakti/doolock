@@ -16,9 +16,9 @@ class RuanganHakAksesController extends Controller
     public function getMahasiswa(Request $request)
     {
         if ($request->kelas_id) {
-            return Mahasiswa::with(['ruangan'])->where('ruangan_id', $request->kelas_id)->get();
+            return Mahasiswa::with(['ruangan'])->where('ket', 'mhs')->where('ruangan_id', $request->kelas_id)->get();
         }
-        return Mahasiswa::with(['ruangan'])->get();
+        return Mahasiswa::with(['ruangan'])->where('ket', 'mhs')->get();
     }
     public function index(Request $request)
     {

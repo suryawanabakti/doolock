@@ -19,6 +19,7 @@ import { useRef } from "react";
 
 const Dosen = ({ mahasiswa }) => {
     const { data, setData, processing, post, reset } = useForm({
+        pin: "",
         id_tag: "",
         id: "",
         nim: "",
@@ -72,6 +73,7 @@ const Dosen = ({ mahasiswa }) => {
                         item.id === data.id
                             ? {
                                   ...item,
+                                  pin: res.data.pin,
                                   nama: res.data.nama,
                                   id_tag: res.data.id_tag,
                                   status: res.data.status,
@@ -222,6 +224,7 @@ const Dosen = ({ mahasiswa }) => {
     const openEdit = (data) => {
         setData({
             id: data.id,
+            pin: data.pin,
             nim: data.nim,
             id_tag: data.id_tag,
             nama: data.nama,
@@ -398,6 +401,13 @@ const Dosen = ({ mahasiswa }) => {
                                 headerStyle={{ width: "3rem" }}
                             ></Column>
                             <Column
+                                field="pin"
+                                header="PIN"
+                                filterPlaceholder="Search by pin"
+                                style={{ minWidth: "5rem" }}
+                                sortable
+                            />
+                            <Column
                                 headerClassName="fw-bold"
                                 field="id_tag"
                                 header="ID TAG"
@@ -448,6 +458,21 @@ const Dosen = ({ mahasiswa }) => {
                 footer={productDialogFooter}
                 onHide={() => onHideDialog()}
             >
+                <div className="field">
+                    <label htmlFor="pin" className="font-bold">
+                        PIN
+                    </label>
+                    <InputText
+                        id="pin"
+                        autoFocus
+                        onChange={(e) => setData("pin", e.target.value)}
+                        value={data.pin}
+                        placeholder="Masukkan PIN"
+                    />
+                    {errors.pin && (
+                        <small className="p-error">{errors.pin}</small>
+                    )}
+                </div>
                 <div className="field">
                     <label htmlFor="id_tag" className="font-bold">
                         ID TAG
@@ -535,6 +560,21 @@ const Dosen = ({ mahasiswa }) => {
                 footer={productDialogFooter2}
                 onHide={() => onHideDialog2()}
             >
+                <div className="field">
+                    <label htmlFor="pin" className="font-bold">
+                        PIN
+                    </label>
+                    <InputText
+                        id="pin"
+                        autoFocus
+                        onChange={(e) => setData("pin", e.target.value)}
+                        value={data.pin}
+                        placeholder="Masukkan PIN"
+                    />
+                    {errors.pin && (
+                        <small className="p-error">{errors.pin}</small>
+                    )}
+                </div>
                 <div className="field">
                     <label htmlFor="id_tag" className="font-bold">
                         ID TAG

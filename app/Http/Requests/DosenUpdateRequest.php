@@ -25,6 +25,7 @@ class DosenUpdateRequest extends FormRequest
     {
         return [
             "nama" => ['required'],
+            "pin" => ['nullable',  Rule::unique(Mahasiswa::class)->ignore($this->id)],
             "id_tag" => ['required',  Rule::unique(Mahasiswa::class)->ignore($this->id)],
             "nim" => ['required', Rule::unique(Mahasiswa::class)->ignore($this->id)],
             "status" => ['required']

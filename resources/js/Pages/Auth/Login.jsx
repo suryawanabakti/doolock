@@ -28,7 +28,9 @@ export default function Login({ status, canResetPassword }) {
     function setChecked(checked) {
         return undefined;
     }
-
+    console.log(
+        "Halo! Nama saya Surya Wana Bakti. Selamat datang di program saya 😁."
+    );
     return (
         <GuestLayout>
             <Head title="Log in" />

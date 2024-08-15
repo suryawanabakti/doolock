@@ -21,6 +21,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/v1/get-data-dosen', [ReferenceController::class, 'getDosen']);
+
 Route::get('/v1/ambilpost', [DoorLockController::class, 'index']);
+Route::get('/v1/ambilpostpin', [DoorLockController::class, 'index2']);
+
 Route::get('/v1/get-data-mahasiswa-by-kelas', [ReferenceController::class, 'getMahasiswaByKelas']);
 Route::get('/v1/get-data-users', [ReferenceController::class, 'getUsers']);
