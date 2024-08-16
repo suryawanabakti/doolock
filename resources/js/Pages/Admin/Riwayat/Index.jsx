@@ -26,6 +26,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
         window.Echo.private(`management.${auth.user.id}`).listen(
             "StoreHistoryEvent",
             (event) => {
+                console.log("EVENT", event);
                 console.log("REALTIME EVENT", event);
                 if (event.histori?.status == 0) {
                     var status = "Blok";
@@ -36,6 +37,10 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
 
                 if (event.histori?.status == 2) {
                     var status = "Tidak Terdaftar";
+                }
+
+                if (event.histori?.status == 3) {
+                    var status = "No Akses";
                 }
 
                 var data = {
