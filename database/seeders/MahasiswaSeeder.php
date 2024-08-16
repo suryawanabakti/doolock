@@ -59,6 +59,7 @@ class MahasiswaSeeder extends Seeder
             'nim' => '4425370902',
             'ket' => 'mhs',
             'status' => 1,
+            'ruangan_id' => $kelasA->id,
             'tahun_masuk' => '2024'
         ]);
 
@@ -68,6 +69,7 @@ class MahasiswaSeeder extends Seeder
             'nim' => '4445370909',
             'ket' => 'mhs',
             'status' => 0,
+            'ruangan_id' => $kelasA->id,
             'tahun_masuk' => '2024'
         ]);
         Mahasiswa::create([
@@ -94,6 +96,7 @@ class MahasiswaSeeder extends Seeder
             'nim' => '1445360902',
             'ket' => 'mhs',
             'status' => 0,
+            'ruangan_id' => $kelasA->id,
             'tahun_masuk' => '2024'
         ]);
     }
