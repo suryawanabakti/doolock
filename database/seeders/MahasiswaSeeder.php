@@ -24,7 +24,7 @@ class MahasiswaSeeder extends Seeder
             'nama_ruangan' => 'Kelas A',
             'type' => 'kelas'
         ]);
-        $kelasA = Ruangan::create([
+        $kelasB = Ruangan::create([
             'nama_ruangan' => 'Kelas B',
             'type' => 'kelas'
         ]);
@@ -72,6 +72,7 @@ class MahasiswaSeeder extends Seeder
             'ruangan_id' => $kelasA->id,
             'tahun_masuk' => '2024'
         ]);
+
         Mahasiswa::create([
             'id_tag' => "7bb63e",
             'nama' => 'Kayla',
@@ -81,6 +82,7 @@ class MahasiswaSeeder extends Seeder
             'status' => 1,
             'tahun_masuk' => '2024'
         ]);
+
         Mahasiswa::create([
             'id_tag' => "72e4cc",
             'nama' => 'Syndra',
@@ -90,6 +92,7 @@ class MahasiswaSeeder extends Seeder
             'status' => 1,
             'tahun_masuk' => '2024'
         ]);
+
         Mahasiswa::create([
             'id_tag' => "7a2d3a",
             'nama' => 'Ronaldo',
