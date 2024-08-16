@@ -13,21 +13,22 @@ class DosenSeeder extends Seeder
      */
     public function run(): void
     {
-
         Mahasiswa::create([
-            'id_tag' => "E3AB2B25",
-            'nama' => 'Michael Johnson',
-            'nim' => '3456789012',
+            'id_tag' => "900ba5",
+            'nama' => 'Xayah',
+            'nim' => '4445678902',
             'ket' => 'dsn',
-            'status' => 0
+            'status' => 1,
+            'tahun_masuk' => '2024'
         ]);
 
         Mahasiswa::create([
-            'id_tag' => "F32CA712",
-            'nama' => 'Emily Brown Johnson',
-            'nim' => '4567890123',
+            'id_tag' => "8ef24f",
+            'nama' => 'Rakan',
+            'nim' => '4445278902',
             'ket' => 'dsn',
-            'status' => 1
+            'status' => 1,
+            'tahun_masuk' => '2024'
         ]);
     }
 }
