@@ -143,7 +143,8 @@ class DoorLockController extends Controller
         }
 
         $mahasiswa = Mahasiswa::where('pin', $request->pin)->first();
-        if (empty($mahasiswa)) {
+
+        if (!$mahasiswa) {
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
             return;
         }
