@@ -234,7 +234,7 @@ class DoorLockController extends Controller
                 }
 
                 $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
-                echo json_encode([$mahasiswa->id_tag], JSON_UNESCAPED_UNICODE);
+                echo json_encode([$mahasiswa->pin], JSON_UNESCAPED_UNICODE);
                 return;
             }
         } else {

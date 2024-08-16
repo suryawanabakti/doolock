@@ -104,6 +104,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/ambilpost', [DoorLockController::class, 'index']);
 Route::get('/ambilpostpin', [DoorLockController::class, 'index2']);
+
 Route::get('/ref/riwayat', [DoorLockController::class, 'getRiwayat']);
 
 Route::get('/uikit/button', function () {
