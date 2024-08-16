@@ -175,9 +175,6 @@ class DoorLockController extends Controller
                     'status' => 3,
                 ]);
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
-                if (env("APP_REALTIME") == "true") {
-                    broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
-                }
                 return;
             }
 
@@ -195,9 +192,7 @@ class DoorLockController extends Controller
                         'waktu' => Carbon::now('GMT+8'),
                         'status' => 3,
                     ]);
-                    if (env("APP_REALTIME") == "true") {
-                        broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
-                    }
+
                     return;
                 }
             }
@@ -216,6 +211,7 @@ class DoorLockController extends Controller
             if ($mahasiswa->status == 0) {
                 $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+                return;
             }
 
             if ($mahasiswa->status == 1) {
@@ -239,15 +235,13 @@ class DoorLockController extends Controller
 
                 $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
                 echo json_encode([$mahasiswa->id_tag], JSON_UNESCAPED_UNICODE);
+                return;
             }
         } else {
             ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
             $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
-        }
-
-        if (env("APP_REALTIME") == "true") {
-            broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+            return;
         }
     }
 
