@@ -83,6 +83,8 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                 return "danger";
             case "Tidak Terdaftar":
                 return "warning";
+            case "No Akses":
+                return "warning";
             default:
                 return null;
         }

@@ -67,6 +67,9 @@ class RiwayatController extends Controller
             if ($data->status == 2) {
                 $status = "Tidak Terdaftar";
             }
+            if ($data->status == 3) {
+                $status = "No Akses";
+            }
             return [
                 "id" => $data->id,
                 "kode" => $data->kode,
@@ -106,6 +109,9 @@ class RiwayatController extends Controller
                 }
                 if ($data->status == 2) {
                     $status = "Tidak Terdaftar";
+                }
+                if ($data->status == 3) {
+                    $status = "No Akses";
                 }
                 return [
                     "id" => $data->id,
@@ -148,6 +154,9 @@ class RiwayatController extends Controller
                 }
                 if ($data->status == 2) {
                     $status = "Tidak Terdaftar";
+                }
+                if ($data->status == 3) {
+                    $status = "No Akses";
                 }
                 return [
                     "id" => $data->id,

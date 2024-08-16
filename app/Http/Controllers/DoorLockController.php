@@ -44,7 +44,16 @@ class DoorLockController extends Controller
             })->first();
 
             if (!$ruanganAkses) {
+                $histori = Histori::create([
+                    'id_tag' => $request->id,
+                    'kode' => $request->kode,
+                    'waktu' => Carbon::now('GMT+8'),
+                    'status' => 3,
+                ]);
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+                if (env("APP_REALTIME") == "true") {
+                    broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+                }
                 return;
             }
 
@@ -56,6 +65,15 @@ class DoorLockController extends Controller
                 $jamKeluar = Carbon::parse($ruanganAkses->hakAkses->jam_keluar);
                 if (!$now->between($jamMasuk, $jamKeluar)) {
                     echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+                    $histori = Histori::create([
+                        'id_tag' => $request->id,
+                        'kode' => $request->kode,
+                        'waktu' => Carbon::now('GMT+8'),
+                        'status' => 3,
+                    ]);
+                    if (env("APP_REALTIME") == "true") {
+                        broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+                    }
                     return;
                 }
             }
@@ -140,7 +158,16 @@ class DoorLockController extends Controller
             })->first();
 
             if (!$ruanganAkses) {
+                $histori = Histori::create([
+                    'id_tag' => $request->id,
+                    'kode' => $request->kode,
+                    'waktu' => Carbon::now('GMT+8'),
+                    'status' => 3,
+                ]);
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+                if (env("APP_REALTIME") == "true") {
+                    broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+                }
                 return;
             }
 
@@ -152,13 +179,22 @@ class DoorLockController extends Controller
                 $jamKeluar = Carbon::parse($ruanganAkses->hakAkses->jam_keluar);
                 if (!$now->between($jamMasuk, $jamKeluar)) {
                     echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+                    $histori = Histori::create([
+                        'id_tag' => $request->id,
+                        'kode' => $request->kode,
+                        'waktu' => Carbon::now('GMT+8'),
+                        'status' => 3,
+                    ]);
+                    if (env("APP_REALTIME") == "true") {
+                        broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+                    }
                     return;
                 }
             }
         }
 
         $histori = Histori::create([
-            'id_tag' => $mahasiswa->id_tag,
+            'id_tag' => $mahasiswa->id_tag ?? $request->pin,
             'kode' => $request->kode,
             'waktu' => Carbon::now('GMT+8'),
             'status' => $status,
