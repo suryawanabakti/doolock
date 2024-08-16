@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\StoreHistoryEvent;
 use App\Models\Absensi;
+use App\Models\HakAkses;
 use App\Models\HakAksesMahasiswa;
 use App\Models\Histori;
 use App\Models\Mahasiswa;
@@ -39,6 +40,7 @@ class DoorLockController extends Controller
         }
 
         if ($mahasiswa && $mahasiswa->ket == 'mhs') {
+
             $ruanganAkses = HakAksesMahasiswa::orderBy('created_at', 'DESC')->where('mahasiswa_id', $mahasiswa->id)->whereHas('hakAkses', function ($query) use ($ruangan) {
                 return $query->where('day', Carbon::now('Asia/Makassar')->format('D'))->where('ruangan_id', $ruangan->id);
             })->first();
@@ -64,6 +66,7 @@ class DoorLockController extends Controller
                 // Ambil jam masuk dan jam keluar dari hak akses
                 $jamMasuk = Carbon::parse($ruanganAkses->hakAkses->jam_masuk);
                 $jamKeluar = Carbon::parse($ruanganAkses->hakAkses->jam_keluar);
+
                 if (!$now->between($jamMasuk, $jamKeluar)) {
                     echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
                     $histori = Histori::create([
@@ -136,23 +139,13 @@ class DoorLockController extends Controller
     public function index2(Request $request)
     {
         $status = 0;
-
-        if (!$request->pin) {
-            echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
-            return;
-        }
-
-        $mahasiswa = Mahasiswa::where('pin', $request->pin)->first();
-
-        if (!$mahasiswa) {
-            echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
-            return;
-        }
+        $mahasiswa = Mahasiswa::where('id_tag', $request->pin)->first();
 
         if ($mahasiswa) {
             $status = $mahasiswa->status;
         } else {
-            $status = 2;
+            echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+            return;
         }
 
         $ruangan = Ruangan::with('scanner')->whereHas('scanner', fn($query) => $query->where('kode', $request->kode))->first();
@@ -170,12 +163,16 @@ class DoorLockController extends Controller
 
             if (!$ruanganAkses) {
                 $histori = Histori::create([
-                    'id_tag' => $mahasiswa->id_tag,
+                    'id_tag' => $request->id,
                     'kode' => $request->kode,
                     'waktu' => Carbon::now('GMT+8'),
                     'status' => 3,
                 ]);
+                $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+                if (env("APP_REALTIME") == "true") {
+                    broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+                }
                 return;
             }
 
@@ -193,11 +190,15 @@ class DoorLockController extends Controller
                         'waktu' => Carbon::now('GMT+8'),
                         'status' => 3,
                     ]);
-
+                    $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
+                    if (env("APP_REALTIME") == "true") {
+                        broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
+                    }
                     return;
                 }
             }
         }
+
 
         $histori = Histori::create([
             'id_tag' => $mahasiswa->id_tag,
@@ -206,13 +207,14 @@ class DoorLockController extends Controller
             'status' => $status,
         ]);
 
+
+
         if ($mahasiswa) {
             ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now('Asia/Makassar')->format('Y-m-d H:i:s')]);
 
             if ($mahasiswa->status == 0) {
                 $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
-                return;
             }
 
             if ($mahasiswa->status == 1) {
@@ -235,14 +237,17 @@ class DoorLockController extends Controller
                 }
 
                 $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
+
                 echo json_encode([$mahasiswa->pin], JSON_UNESCAPED_UNICODE);
-                return;
             }
         } else {
             ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
             $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
-            return;
+        }
+
+        if (env("APP_REALTIME") == "true") {
+            broadcast(new StoreHistoryEvent($data ?? null, $ruangan));
         }
     }
 
