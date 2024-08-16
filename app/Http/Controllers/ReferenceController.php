@@ -19,7 +19,10 @@ class ReferenceController extends Controller
     public function getMahasiswaByKelas(Request $request)
     {
         $scanner = ScanerStatus::where('kode', $request->kode)->first();
-
+        if (empty($scanner)) {
+            echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+            return;
+        }
         $dataMahasiswa = json_encode(Mahasiswa::whereHas('ruanganAkses.hakAkses', function ($query) use ($scanner) {
             $query->where('ruangan_id', $scanner->ruangan_id)->where('day', Carbon::now('Asia/Makassar')->format('D'));
         })->where('ket', 'mhs')->where("kelas", $request->kelas)->get()->map(fn($data) => $data->id_tag), JSON_UNESCAPED_UNICODE);
