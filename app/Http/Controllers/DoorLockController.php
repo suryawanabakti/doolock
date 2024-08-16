@@ -143,6 +143,10 @@ class DoorLockController extends Controller
         }
 
         $mahasiswa = Mahasiswa::where('pin', $request->pin)->first();
+        if (empty($mahasiswa)) {
+            echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+            return;
+        }
 
         if ($mahasiswa) {
             $status = $mahasiswa->status;
@@ -165,7 +169,7 @@ class DoorLockController extends Controller
 
             if (!$ruanganAkses) {
                 $histori = Histori::create([
-                    'id_tag' => $request->id,
+                    'id_tag' => $mahasiswa->id_tag,
                     'kode' => $request->kode,
                     'waktu' => Carbon::now('GMT+8'),
                     'status' => 3,
@@ -186,7 +190,7 @@ class DoorLockController extends Controller
                 if (!$now->between($jamMasuk, $jamKeluar)) {
                     echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
                     $histori = Histori::create([
-                        'id_tag' => $request->id,
+                        'id_tag' => $mahasiswa->id_tag,
                         'kode' => $request->kode,
                         'waktu' => Carbon::now('GMT+8'),
                         'status' => 3,
@@ -200,7 +204,7 @@ class DoorLockController extends Controller
         }
 
         $histori = Histori::create([
-            'id_tag' => $mahasiswa->id_tag ?? $request->pin,
+            'id_tag' => $mahasiswa->id_tag,
             'kode' => $request->kode,
             'waktu' => Carbon::now('GMT+8'),
             'status' => $status,
@@ -215,7 +219,7 @@ class DoorLockController extends Controller
             }
 
             if ($mahasiswa->status == 1) {
-                $absenToday = Absensi::where('id_tag', $request->id)
+                $absenToday = Absensi::where('id_tag', $mahasiswa->id_tag)
                     ->where('ruangan_id', $ruangan->id)
                     ->whereDate('waktu_masuk', Carbon::now('GMT+8'))
                     ->first();
