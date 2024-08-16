@@ -111,7 +111,7 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
     );
     const toast = useRef(null);
     const [loading, setLoading] = useState(false);
-    const { data, setData, errors, post, processing } = useForm({
+    const { data, setData, errors, post, processing, reset } = useForm({
         ruangan_id: ruangan.id,
         jam_masuk: "07:30",
         jam_keluar: "20:00",
@@ -135,6 +135,8 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
                 life: 3000,
             });
             setDialogTambah(false);
+            reset();
+            setSelectedRows([]);
         } catch (error) {
             toast.current.show({
                 severity: "warn",

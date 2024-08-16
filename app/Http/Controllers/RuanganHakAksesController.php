@@ -61,7 +61,7 @@ class RuanganHakAksesController extends Controller
             return response()->json(["message" => "Mahasiswa harus di isi"], 400);
         }
         return DB::transaction(function () use ($request) {
-            $checkHakAkses = HakAkses::where('day', $request->day)
+            $checkHakAkses = HakAkses::where('ruangan_id', $request->ruangan_id)->where('day', $request->day)
                 ->where(function ($query) use ($request) {
                     $query->where(function ($q) use ($request) {
                         $q->where('jam_masuk', '<=', $request->jam_masuk)
