@@ -139,7 +139,7 @@ class DoorLockController extends Controller
     public function index2(Request $request)
     {
         $status = 0;
-        $mahasiswa = Mahasiswa::where('id_tag', $request->pin)->first();
+        $mahasiswa = Mahasiswa::where('pin', $request->pin)->first();
 
         if ($mahasiswa) {
             $status = $mahasiswa->status;
@@ -163,7 +163,7 @@ class DoorLockController extends Controller
 
             if (!$ruanganAkses) {
                 $histori = Histori::create([
-                    'id_tag' => $request->id,
+                    'id_tag' => $mahasiswa->id_tag,
                     'kode' => $request->kode,
                     'waktu' => Carbon::now('GMT+8'),
                     'status' => 3,
