@@ -98,7 +98,6 @@ const Scanner = ({ scanner, ruangans }) => {
                                   ruangan: res.data.ruangan,
                                   type: res.data.type,
                                   last: res.data.last,
-                                  status: res.data.status,
                               }
                             : item
                     )
@@ -200,13 +199,13 @@ const Scanner = ({ scanner, ruangans }) => {
         switch (customer.status) {
             case "Active":
                 return "success";
-            case "Block":
+            case "Not Active":
                 return "danger";
             default:
                 return null;
         }
     };
-    const [statuses] = useState(["Active", "Block"]);
+    const [statuses] = useState(["Active", "Not Active"]);
 
     const statusBodyTemplate = (customer) => {
         return (
@@ -274,38 +273,7 @@ const Scanner = ({ scanner, ruangans }) => {
             <Button label="Save" icon="pi pi-check" onClick={submit2} />
         </React.Fragment>
     );
-    const activeUser = (e) => {
-        e.preventDefault();
-        axios
-            .post(
-                route("admin.scanner.active", {
-                    selectedCustomers: selectedCustomers,
-                })
-            )
-            .then((res) => {
-                setCustomers(res.data);
-                setSelectedCustomers([]);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-    const blockUser = (e) => {
-        e.preventDefault();
-        axios
-            .post(
-                route("admin.scanner.block", {
-                    selectedCustomers: selectedCustomers,
-                })
-            )
-            .then((res) => {
-                setCustomers(res.data);
-                setSelectedCustomers([]);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         kelas: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -543,33 +511,6 @@ const Scanner = ({ scanner, ruangans }) => {
                         </div>
                     </div>
                 </div>
-                <div className="field">
-                    <label htmlFor="status" className="font-bold mb-3">
-                        Status
-                    </label>
-                    <div className="formgrid grid">
-                        <div className="field-radiobutton col-6">
-                            <RadioButton
-                                inputId="active"
-                                name="status"
-                                value="1"
-                                checked={data.status == 1}
-                                onClick={() => setData("status", 1)}
-                            />
-                            <label htmlFor="active">Active</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton
-                                inputId="block"
-                                name="status"
-                                value="0"
-                                checked={data.status == 0}
-                                onClick={() => setData("status", 0)}
-                            />
-                            <label htmlFor="block">Block</label>
-                        </div>
-                    </div>
-                </div>
             </Dialog>
 
             <Dialog
@@ -645,33 +586,6 @@ const Scanner = ({ scanner, ruangans }) => {
                                 onClick={() => setData("type", "luar")}
                             />
                             <label htmlFor="luar">Luar</label>
-                        </div>
-                    </div>
-                </div>
-                <div className="field">
-                    <label htmlFor="status" className="font-bold mb-3">
-                        Status
-                    </label>
-                    <div className="formgrid grid">
-                        <div className="field-radiobutton col-6">
-                            <RadioButton
-                                inputId="active"
-                                name="status"
-                                value="1"
-                                checked={data.status == 1}
-                                onClick={() => setData("status", 1)}
-                            />
-                            <label htmlFor="active">Active</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton
-                                inputId="block"
-                                name="status"
-                                value="0"
-                                checked={data.status == 0}
-                                onClick={() => setData("status", 0)}
-                            />
-                            <label htmlFor="block">Block</label>
                         </div>
                     </div>
                 </div>

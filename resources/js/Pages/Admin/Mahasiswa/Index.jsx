@@ -1,5 +1,5 @@
 import Layout from "@/Layouts/layout/layout.jsx";
-import { useForm } from "@inertiajs/react";
+import { router, useForm } from "@inertiajs/react";
 import axios from "axios";
 import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
@@ -390,6 +390,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
     };
     // TAMBAH
     const [selectedCountry, setSelectedCountry] = useState(null);
+    const [errorsImport, setErrorsImport] = useState([]);
 
     return (
         <Layout>
@@ -399,6 +400,15 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
             <div className="grid">
                 <div className="col-12">
                     <div className="card">
+                        {Object.values(errorsImport).map((value) => {
+                            return (
+                                <>
+                                    <div className="text-sm mb-2 text-red-500">
+                                        {value}
+                                    </div>
+                                </>
+                            );
+                        })}
                         <Toolbar
                             className="mb-4"
                             left={leftToolbarTemplate}
@@ -496,9 +506,16 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                 className="p-fluid"
                 footer={() => {}}
                 onHide={() => {
+                    reset();
                     setImportDialog(false);
                 }}
             >
+                <p>
+                    Download Example{" "}
+                    <a href="/example-mahasiswa.xlsx" download>
+                        here
+                    </a>
+                </p>
                 <div className="field">
                     <label htmlFor="file" className="font-bold">
                         File Excel
@@ -517,6 +534,40 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                         <small className="p-error">{errors.file_import}</small>
                     )}
                 </div>
+
+                <Button
+                    label="Import"
+                    onClick={() =>
+                        router.post(
+                            route("admin.mahasiswa.import"),
+                            {
+                                file_import: data.file_import,
+                            },
+                            {
+                                onError: (err) => {
+                                    toast.current.show({
+                                        severity: "error",
+                                        summary: "Error",
+                                        detail: "Gagal import, harap perbaiki data di excel yg anda upload",
+                                        life: 10000,
+                                    });
+                                    setErrorsImport(err);
+                                },
+                                onSuccess: (res) => {
+                                    toast.current.show({
+                                        severity: "success",
+                                        summary: "Berahasil",
+                                        detail: "Berhasil import",
+                                        life: 3000,
+                                    });
+                                },
+                                onFinish: (res) => {
+                                    setImportDialog(false);
+                                },
+                            }
+                        )
+                    }
+                />
             </Dialog>
             <Dialog
                 visible={productDialog}

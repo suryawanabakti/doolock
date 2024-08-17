@@ -6,23 +6,33 @@ use App\Http\Requests\StoreScannerRequest;
 use App\Http\Requests\UpdateScannerRequest;
 use App\Models\Ruangan;
 use App\Models\ScanerStatus;
+use Carbon\Carbon;
 
 class ScanerController extends Controller
 {
     public function index()
     {
-        $scanner = ScanerStatus::orderBy('created_at', 'DESC')->get()->map(fn ($data) =>  [
-            "id" => $data->id,
-            "kode" => $data->kode,
-            "ruangan" => $data->ruangan,
-            "type" => $data->type,
-            "last" => $data->last,
-            "status" => $data->status == 1 ? 'Active' : 'Block',
-        ]);
+
+        $scanner = ScanerStatus::orderBy('created_at', 'DESC')->get()->map(function ($data) {
+            $last = $data->last ? Carbon::parse($data->last) : Carbon::now('Asia/Makassar')->startOfDay();
+            if ($last->lt(Carbon::now('Asia/Makassar')->subHours(2))) {
+                $status = "Not Active";
+            } else {
+                $status = "Active";
+            }
+            return [
+                "id" => $data->id,
+                "kode" => $data->kode,
+                "ruangan" => $data->ruangan,
+                "type" => $data->type,
+                "last" => Carbon::parse($last)->format('Y-m-d H:i:s'),
+                "status" => $status,
+            ];
+        });
 
         return inertia("Admin/Scanner/Index", [
             "scanner" => $scanner,
-            "ruangans" => Ruangan::query()->get()->map(fn ($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
+            "ruangans" => Ruangan::query()->get()->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
         ]);
     }
 
@@ -36,7 +46,6 @@ class ScanerController extends Controller
             "ruangan" => $scanner->ruangan,
             "type" => $scanner->type,
             "last" => $scanner->last,
-            "status" => $scanner->status === 1 ? 'Active' : 'Block',
         ];
     }
 
@@ -50,7 +59,6 @@ class ScanerController extends Controller
             "ruangan" => $scanerStatus->ruangan,
             "type" => $scanerStatus->type,
             "last" => $scanerStatus->last,
-            "status" => $scanerStatus->status === 1 ? 'Active' : 'Block',
         ];
     }
     public function destroy(ScanerStatus $scanerStatus)

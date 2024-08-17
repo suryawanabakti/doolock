@@ -29,8 +29,7 @@ const DetailMahasiswa = ({ mulai, sampai, mahasiswa, riwayat }) => {
         return (
             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
                 <h5>
-                    {" "}
-                    {mahasiswa.ket == "mhs" ? "Mahasiswa" : "Dosen"} :{" "}
+                    Detail {mahasiswa.ket == "mhs" ? "Mahasiswa" : "Dosen"} :{" "}
                     {mahasiswa.nim} {mahasiswa.nama} ({mahasiswa.id_tag})
                 </h5>
                 <span className="p-input-icon-left">

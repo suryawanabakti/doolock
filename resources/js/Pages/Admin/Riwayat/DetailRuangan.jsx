@@ -29,7 +29,7 @@ const DetailRuangan = ({ mulai, sampai, ruangan, riwayat }) => {
             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
                 {ruangan && (
                     <React.Fragment>
-                        <h5> Ruangan : {ruangan?.nama_ruangan} </h5>
+                        <h5> Detail Ruangan : {ruangan?.nama_ruangan} </h5>
                         <span className="p-input-icon-left">
                             <i className="pi pi-search" />
                             <InputText
@@ -187,11 +187,6 @@ const DetailRuangan = ({ mulai, sampai, ruangan, riwayat }) => {
             <div className="grid">
                 <div className="col-12">
                     <div className="card">
-                        <div className="field">
-                            <label htmlFor="ruangan" className="font-bold">
-                                Ruangan
-                            </label>
-                        </div>
                         <Toolbar
                             className="mb-4"
                             left={leftToolbarTemplate}

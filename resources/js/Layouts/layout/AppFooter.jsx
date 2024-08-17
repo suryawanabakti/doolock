@@ -6,7 +6,9 @@ const AppFooter = () => {
             <span>
                 Made with <span className="text-red-500">☕</span> by
             </span>
-            <span className="font-medium ml-2">Smart Inovasi</span>
+            <span className="font-medium ml-2">
+                Surya Wana Bakti & Team Smart Inovasi.
+            </span>
         </div>
     );
 };

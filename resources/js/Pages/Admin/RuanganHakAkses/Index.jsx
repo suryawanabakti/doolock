@@ -80,7 +80,6 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
     const header2 = (
         <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
             <h5>Pilih Mahasiswa</h5>
-
             {selectedKelas && (
                 <Button
                     label="Tampilkan Semua"
@@ -483,7 +482,11 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
                             className="mb-4"
                             center={centerToolbar2}
                         ></Toolbar>
-
+                        {selectedRows.length > 0 && (
+                            <div className="mb-2">
+                                You have selected {selectedRows.length} people.
+                            </div>
+                        )}
                         <DataTable
                             loading={loadingTable}
                             globalFilter={globalFilter}

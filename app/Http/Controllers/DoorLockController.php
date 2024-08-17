@@ -139,6 +139,10 @@ class DoorLockController extends Controller
     public function index2(Request $request)
     {
         $status = 0;
+        if (!$request->pin) {
+            echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+            return;
+        }
         $mahasiswa = Mahasiswa::where('pin', $request->pin)->first();
 
         if ($mahasiswa) {
@@ -235,7 +239,7 @@ class DoorLockController extends Controller
 
                 $data = Histori::with('user', 'scanner.ruangan')->find($histori->id);
 
-                echo json_encode([$mahasiswa->pin], JSON_UNESCAPED_UNICODE);
+                echo json_encode([$mahasiswa->id_tag], JSON_UNESCAPED_UNICODE);
             }
         } else {
             ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);

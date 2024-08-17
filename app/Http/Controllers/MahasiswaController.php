@@ -4,13 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MahasiswaStoreRequest;
 use App\Http\Requests\MahasiswaUpdateRequest;
+use App\Imports\MahasiswaImport;
 use App\Models\Mahasiswa;
 use App\Models\Ruangan;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MahasiswaController extends Controller
 {
-    public function import(Request $request) {}
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file_import' => ['required', 'file'],
+        ]);
+        Excel::import(new MahasiswaImport, $request->file('file_import')->store('temp'));
+        return "berhasil";
+    }
     public function active(Request $request)
     {
         // Ambil ID dari selectedCustomers dan simpan dalam array $dataKey

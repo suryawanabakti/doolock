@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreScannerRequest extends FormRequest
+class StoreHakAksesRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,16 @@ class StoreScannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "kode" => ['required', 'unique:scaner_status,kode'],
-            "ruangan_id" => ['required'],
-            "type" => ['required'],
+            "jam_masuk" => ['required', 'before_or_equal:jam_keluar'],
+            "jam_keluar" => ['required', 'after_or_equal:jam_keluar']
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'jam_masuk.before_or_equal' => 'Jam masuk harus sebelum jam keluar.',
+            'jam_keluar.after_or_equal' => 'Jam keluar harus setelah jam masuk.',
         ];
     }
 }

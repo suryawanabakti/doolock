@@ -27,7 +27,6 @@ class UpdateScannerRequest extends FormRequest
             "kode" => ['required',  Rule::unique(ScanerStatus::class, 'kode')->ignore($this->id)],
             "ruangan_id" => ['required'],
             "type" => ['required'],
-            "status" => ['required']
         ];
     }
 }

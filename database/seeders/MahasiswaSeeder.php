@@ -20,28 +20,40 @@ class MahasiswaSeeder extends Seeder
             'type' => 'umum',
         ]);
 
+        $anatomiKering = Ruangan::create([
+            'nama_ruangan' => 'Anatomi Kering',
+            'type' => 'lab',
+        ]);
+
         $kelasA = Ruangan::create([
             'nama_ruangan' => 'Kelas A',
             'type' => 'kelas'
         ]);
-        $kelasB = Ruangan::create([
-            'nama_ruangan' => 'Kelas B',
-            'type' => 'kelas'
-        ]);
 
-        $scanner = ScanerStatus::create([
+        ScanerStatus::create([
             'kode' => 'RFID-A1',
             'ruangan_id' => $perpustakaan->id,
             'type' => 'dalam',
-            'status' => 1
         ]);
 
-        $scanner = ScanerStatus::create([
+        ScanerStatus::create([
             'kode' => 'RFID-A2',
             'ruangan_id' => $perpustakaan->id,
             'type' => 'luar',
-            'status' => 1
         ]);
+
+        ScanerStatus::create([
+            'kode' => 'R11A',
+            'ruangan_id' => $anatomiKering->id,
+            'type' => 'dalam',
+        ]);
+
+        ScanerStatus::create([
+            'kode' => 'R11B',
+            'ruangan_id' => $anatomiKering->id,
+            'type' => 'luar',
+        ]);
+
 
         Mahasiswa::create([
             'id_tag' => "8fc3df",

@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('scaner_status', function (Blueprint $table) {
             $table->id();
             $table->string('kode')->unique();
-            $table->boolean('status');
             $table->unsignedBigInteger('ruangan_id')->nullable();
             $table->foreign('ruangan_id')->references('id')->on('ruangans');
             $table->enum('type', ['dalam', 'luar']);

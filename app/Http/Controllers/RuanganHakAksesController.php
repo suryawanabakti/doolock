@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreHakAksesRequest;
 use App\Models\HakAkses;
 use App\Models\HakAksesMahasiswa;
 use App\Models\Mahasiswa;
@@ -25,7 +26,7 @@ class RuanganHakAksesController extends Controller
         $ruanganId = $request->id;
 
         // Dapatkan semua mahasiswa dengan eager loading ruangan dan ruanganAkses
-        $mahasiswa = Mahasiswa::with(['ruanganAkses', 'ruangan'])
+        $mahasiswa = Mahasiswa::orderBy('id', 'DESC')->with(['ruanganAkses', 'ruangan'])
             ->where('ket', 'mhs')
             ->get();
 
@@ -55,7 +56,7 @@ class RuanganHakAksesController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreHakAksesRequest $request)
     {
         if (!$request->mahasiswa) {
             return response()->json(["message" => "Mahasiswa harus di isi"], 400);
