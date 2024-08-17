@@ -9,7 +9,7 @@ class Histori extends Model
 {
     use HasFactory;
     public $table = 'histori';
-    protected $fillable = ['id_tag', 'kode', 'waktu', 'status'];
+    protected $fillable = ['id_tag', 'kode', 'waktu', 'status', 'nama', 'nim'];
     // public $timestamps = false;
 
     public function user()

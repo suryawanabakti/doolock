@@ -115,12 +115,13 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                 }}
             >
                 {" "}
-                {customer.user ? `${customer.user.nama}` : "-"}
+                {customer.user ? `${customer.user.nama}` : customer.nama}
             </Link>
         );
     };
 
     const nimBodyTemplate = (customer) => {
+        console.log(customer);
         return (
             <Link
                 href={route("admin.riwayat.mahasiswa")}
@@ -129,7 +130,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                 }}
             >
                 {" "}
-                {customer.user ? `${customer.user.nim}` : "-"}
+                {customer.user ? `${customer.user.nim}` : customer.nim}
             </Link>
         );
     };
@@ -289,6 +290,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                                 field="user.nim"
                                 header="NIM"
                                 filter
+                                body={nimBodyTemplate}
                                 sortable
                                 filterPlaceholder="Search by user"
                                 headerStyle={{ width: "12rem" }}
@@ -320,7 +322,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                                 filterPlaceholder="Search by status"
                                 body={(rowData) => (
                                     <span>
-                                        {getKeterangan(rowData.scanner.type)}
+                                        {getKeterangan(rowData.scanner?.type)}
                                     </span>
                                 )}
                                 headerStyle={{ width: "8rem" }}

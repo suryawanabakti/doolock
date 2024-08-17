@@ -76,6 +76,8 @@ class RiwayatController extends Controller
                 "waktu" => $data->waktu,
                 "id_tag" => $data->id_tag,
                 "scanner" => $data->scanner,
+                "nim" => $data->nim,
+                "nama" => $data->nama,
                 "user" => $data->user,
                 "status" => $status ?? 0,
             ];
@@ -120,6 +122,8 @@ class RiwayatController extends Controller
                     "id_tag" => $data->id_tag,
                     "scanner" => $data->scanner,
                     "user" => $data->user,
+                    "nim" => $data->nim,
+                    "nama" => $data->nama,
                     "status" => $status ?? 0,
                 ];
             });
@@ -165,6 +169,8 @@ class RiwayatController extends Controller
                     "id_tag" => $data->id_tag,
                     "scanner" => $data->scanner,
                     "user" => $data->user,
+                    "nim" => $data->nim,
+                    "nama" => $data->nama,
                     "status" => $status ?? 0,
                 ];
             });

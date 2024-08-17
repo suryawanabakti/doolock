@@ -23,7 +23,7 @@ class RestrictIP
         ];
 
         if (!in_array($request->ip(), $allowedIps)) {
-            abort(403, "Aplikasi tidak bisa jalan, selain di ip local anda");
+            abort(403);
         }
 
         return $next($request);

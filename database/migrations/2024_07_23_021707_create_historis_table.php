@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('kode');
             $table->timestamp('waktu');
             $table->string('id_tag');
+            $table->string('nama');
+            $table->string('nim');
             $table->boolean('status');
             $table->timestamps();
         });

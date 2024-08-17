@@ -47,6 +47,8 @@ class DoorLockController extends Controller
 
             if (!$ruanganAkses) {
                 $histori = Histori::create([
+                    'nim' => $mahasiswa->nim,
+                    'nama' => $mahasiswa->nama,
                     'id_tag' => $request->id,
                     'kode' => $request->kode,
                     'waktu' => Carbon::now('GMT+8'),
@@ -72,6 +74,8 @@ class DoorLockController extends Controller
                     $histori = Histori::create([
                         'id_tag' => $request->id,
                         'kode' => $request->kode,
+                        'nim' => $mahasiswa->nim,
+                        'nama' => $mahasiswa->nama,
                         'waktu' => Carbon::now('GMT+8'),
                         'status' => 3,
                     ]);
@@ -86,6 +90,8 @@ class DoorLockController extends Controller
 
 
         $histori = Histori::create([
+            'nim' => $mahasiswa->nim,
+            'nama' => $mahasiswa->nama,
             'id_tag' => $request->id,
             'kode' => $request->kode,
             'waktu' => Carbon::now('GMT+8'),
@@ -169,6 +175,8 @@ class DoorLockController extends Controller
                 $histori = Histori::create([
                     'id_tag' => $mahasiswa->id_tag,
                     'kode' => $request->kode,
+                    'nim' => $mahasiswa->nim,
+                    'nama' => $mahasiswa->nama,
                     'waktu' => Carbon::now('GMT+8'),
                     'status' => 3,
                 ]);
@@ -189,6 +197,8 @@ class DoorLockController extends Controller
                 if (!$now->between($jamMasuk, $jamKeluar)) {
                     echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
                     $histori = Histori::create([
+                        'nim' => $mahasiswa->nim,
+                        'nama' => $mahasiswa->nama,
                         'id_tag' => $mahasiswa->id_tag,
                         'kode' => $request->kode,
                         'waktu' => Carbon::now('GMT+8'),
@@ -204,6 +214,8 @@ class DoorLockController extends Controller
         }
 
         $histori = Histori::create([
+            'nim' => $mahasiswa->nim,
+            'nama' => $mahasiswa->nama,
             'id_tag' => $mahasiswa->id_tag,
             'kode' => $request->kode,
             'waktu' => Carbon::now('GMT+8'),

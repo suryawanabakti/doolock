@@ -369,10 +369,10 @@ const Scanner = ({ scanner, ruangans }) => {
                         <DataTable
                             filters={filters}
                             value={customers}
-                            selection={selectedCustomers}
-                            onSelectionChange={(e) =>
-                                setSelectedCustomers(e.value)
-                            }
+                            // selection={selectedCustomers}
+                            // onSelectionChange={(e) =>
+                            //     setSelectedCustomers(e.value)
+                            // }
                             dataKey="id"
                             paginator
                             rows={10}
@@ -382,10 +382,6 @@ const Scanner = ({ scanner, ruangans }) => {
                             globalFilter={globalFilter}
                             header={header}
                         >
-                            <Column
-                                selectionMode="multiple"
-                                headerStyle={{ width: "3rem" }}
-                            ></Column>
                             <Column
                                 headerClassName="fw-bold"
                                 field="kode"
