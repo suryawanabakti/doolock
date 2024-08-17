@@ -371,8 +371,8 @@ const Scanner = ({ scanner, ruangans }) => {
                             value={customers}
                             // selection={selectedCustomers}
                             // onSelectionChange={(e) =>
-                            //     setSelectedCustomers(e.value)
-                            // }
+                            //     setSelect-edCustomers(e.value)
+                            // }7hys    QZNP
                             dataKey="id"
                             paginator
                             rows={10}

@@ -36,7 +36,6 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 */
 
 Route::get('/', function () {
-    return redirect('/login');
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -49,7 +48,7 @@ Route::get('/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'restrict.ip'])->group(function () {
 
     Route::get('/admin/ruangan-kelas', [RuanganKelasController::class, 'index'])->name('admin.ruangan-kelas.index');
     Route::post('/admin/ruangan-kelas', [RuanganKelasController::class, 'store'])->name('admin.ruangan-kelas.store');
