@@ -199,15 +199,12 @@ class DoorLockController extends Controller
             }
         }
 
-
         $histori = Histori::create([
             'id_tag' => $mahasiswa->id_tag,
             'kode' => $request->kode,
             'waktu' => Carbon::now('GMT+8'),
             'status' => $status,
         ]);
-
-
 
         if ($mahasiswa) {
             ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now('Asia/Makassar')->format('Y-m-d H:i:s')]);
