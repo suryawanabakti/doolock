@@ -63,8 +63,8 @@ class DoorLockController extends Controller
         }
 
         $histori = Histori::create([
-            'nim' => $mahasiswa->nim ?? null,
-            'nama' => $mahasiswa->nama ?? null,
+            'nim' => $mahasiswa->nim,
+            'nama' => $mahasiswa->nama,
             'id_tag' => $request->id,
             'kode' => $request->kode,
             'waktu' => Carbon::now('GMT+8'),
@@ -103,6 +103,7 @@ class DoorLockController extends Controller
         } else {
             ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now()->format('Y-m-d H:i:s')]);
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+            return;
         }
 
         if (env("APP_REALTIME") == "true") {

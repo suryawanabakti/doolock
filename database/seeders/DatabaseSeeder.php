@@ -34,6 +34,14 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('nrt796pr71')
         ]);
 
+        \App\Models\User::factory()->create([
+            'name' => 'Penjaga Anatomi',
+            'role' => 'penjaga',
+            'email' => 'anatomi@fkuh',
+            'password' => bcrypt('nrt796pr71')
+        ]);
+
+
         $this->call([
             MahasiswaSeeder::class,
             DosenSeeder::class

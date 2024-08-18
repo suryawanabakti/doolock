@@ -18,9 +18,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     const [customers, setCustomers] = useState(riwayat);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
     const toast = useRef(null);
-    console.log(moment().tz("Asia/Makassar").format("YYYY-MM-DD"));
-    console.log("SAMPAI", sampai);
-    console.log("DATEEE", new Date(sampai));
+
     const [dates, setDates] = useState([new Date(mulai), new Date(sampai)]);
     useEffect(() => {
         window.Echo.private(`management.${auth.user.id}`).listen(

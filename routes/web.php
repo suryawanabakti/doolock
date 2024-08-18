@@ -13,16 +13,9 @@ use App\Http\Controllers\RuanganHakAksesController;
 use App\Http\Controllers\RuanganKelasController;
 use App\Http\Controllers\ScanerController;
 use App\Http\Controllers\SettingController;
-use App\Models\Histori;
-use App\Models\Mahasiswa;
-use App\Models\Ruangan;
-use App\Models\ScanerStatus;
-use Carbon\Carbon;
 use Illuminate\Foundation\Application;
-use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,8 +52,7 @@ Route::get('/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
 
-Route::middleware(['auth', 'restrict.ip'])->group(function () {
-
+Route::middleware(['auth'])->group(function () {
     Route::get('/admin/ruangan-kelas', [RuanganKelasController::class, 'index'])->name('admin.ruangan-kelas.index');
     Route::post('/admin/ruangan-kelas', [RuanganKelasController::class, 'store'])->name('admin.ruangan-kelas.store');
     Route::patch('/admin/ruangan-kelas/{ruangan}', [RuanganKelasController::class, 'update'])->name('admin.ruangan-kelas.update');
