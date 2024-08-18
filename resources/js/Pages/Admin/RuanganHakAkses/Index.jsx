@@ -4,6 +4,7 @@ import axios from "axios";
 import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
 import { CascadeSelect } from "primereact/cascadeselect";
+import { Checkbox } from "primereact/checkbox";
 import { Column } from "primereact/column";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { DataTable } from "primereact/datatable";
@@ -67,6 +68,8 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
             const res = await axios.get(
                 route("admin.ruangan-hak-akses.getMahasiswa", {
                     kelas_id: value?.id,
+                    ruangan_id: ruangan.id,
+                    day: day,
                 })
             );
             setDataMahasiswa(res.data);
@@ -77,18 +80,39 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
         }
         setLoadingTable(false);
     };
+    const [tampilkanSemua, setTampilkanSemua] = useState(false);
+    const handleShowAll = async (e) => {
+        e.preventDefault();
+        setLoadingTable(true);
+        if (tampilkanSemua) {
+            const res = await axios.get(
+                route("admin.ruangan-hak-akses.getMahasiswa", {
+                    ruangan_id: ruangan.id,
+                    day: day,
+                    tampilkan_semua: 0,
+                })
+            );
+            console.log("FALSE", res);
+            setDataMahasiswa(res.data);
+            setTampilkanSemua(false);
+        } else {
+            const res = await axios.get(
+                route("admin.ruangan-hak-akses.getMahasiswa", {
+                    ruangan_id: ruangan.id,
+                    day: day,
+                    tampilkan_semua: 1,
+                })
+            );
+            console.log("TRUE", res);
+            setDataMahasiswa(res.data);
+            setTampilkanSemua(true);
+        }
+        setLoadingTable(false);
+    };
     const header2 = (
         <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
             <h5>Pilih Mahasiswa</h5>
-            {selectedKelas && (
-                <Button
-                    label="Tampilkan Semua"
-                    icon="pi pi-refresh"
-                    severity="primary"
-                    className="w-15rem"
-                    onClick={() => onChangeSelected()}
-                />
-            )}
+
             <Dropdown
                 value={selectedKelas}
                 onChange={(e) => onChangeSelected(e.value)}
@@ -98,6 +122,26 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
                 className="w-full md:w-14rem"
                 emptyMessage="Tidak ada kelas"
             ></Dropdown>
+            {selectedKelas && (
+                <Button
+                    label=""
+                    icon="pi pi-refresh"
+                    severity="icon"
+                    size="small"
+                    onClick={() => onChangeSelected()}
+                />
+            )}
+            <div className="flex align-items-center">
+                <Checkbox
+                    inputId="tampilkanSemua"
+                    name="tampilkanSemua"
+                    onChange={handleShowAll}
+                    checked={tampilkanSemua}
+                />
+                <label htmlFor="tampilkanSemua" className="ml-2">
+                    Tampilkan semua
+                </label>
+            </div>
             <span className="p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText
@@ -176,9 +220,13 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
         );
     };
     const [dialogTambah, setDialogTambah] = useState(false);
+    const [day, setDay] = useState(today);
     const openNew = async () => {
         const res = await axios.get(
-            route("admin.ruangan-hak-akses.getMahasiswa")
+            route("admin.ruangan-hak-akses.getMahasiswa", {
+                ruangan_id: ruangan.id,
+                day: day,
+            })
         );
         console.log(res);
         setDataMahasiswa(res.data);
@@ -200,6 +248,17 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
     const [ingredient, setIngredient] = useState(today);
     const [loadingTable, setLoadingTable] = useState(false);
     const handleDayChange = async (value) => {
+        setLoadingTable(true);
+        const res = await axios.get(
+            route("admin.ruangan-hak-akses.getMahasiswa", {
+                ruangan_id: ruangan.id,
+                day: value,
+            })
+        );
+        setLoadingTable(false);
+        setDay(value);
+        console.log(res);
+        setDataMahasiswa(res.data);
         setIngredient(value);
         setData("day", value);
     };

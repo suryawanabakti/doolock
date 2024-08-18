@@ -21,7 +21,7 @@ class MahasiswaSeeder extends Seeder
         ]);
 
         $anatomiKering = Ruangan::create([
-            'nama_ruangan' => 'Anatomi Kering',
+            'nama_ruangan' => 'Anatomi Basah',
             'type' => 'lab',
         ]);
 
