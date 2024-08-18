@@ -92,7 +92,7 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
                     tampilkan_semua: 0,
                 })
             );
-            console.log("FALSE", res);
+
             setDataMahasiswa(res.data);
             setTampilkanSemua(false);
         } else {
