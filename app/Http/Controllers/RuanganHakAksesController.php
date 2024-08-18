@@ -19,9 +19,7 @@ class RuanganHakAksesController extends Controller
         if ($request->kelas_id) {
             return Mahasiswa::with(['ruangan'])->where('ket', 'mhs')->where('ruangan_id', $request->kelas_id)->get();
         }
-        return Mahasiswa::with(['ruangan'])->whereDoesntHave('ruanganAkses.hakAkses', function ($query) {
-            $query->where('day', Carbon::now('Asia/Makassar')->format('D'));
-        })->where('ket', 'mhs')->get();
+        return Mahasiswa::with(['ruangan'])->where('ket', 'mhs')->get();
     }
     public function index(Request $request)
     {
