@@ -45,6 +45,16 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/show-ip', function () {
+    return request()->ip();
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+});
+
 Route::get('/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
