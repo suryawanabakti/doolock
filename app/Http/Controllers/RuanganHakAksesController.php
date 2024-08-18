@@ -19,16 +19,15 @@ class RuanganHakAksesController extends Controller
         if ($request->kelas_id) {
             return Mahasiswa::with(['ruangan'])->where('ket', 'mhs')->where('ruangan_id', $request->kelas_id)->get();
         }
-        return Mahasiswa::with(['ruangan'])->where('ket', 'mhs')->get();
+        return Mahasiswa::with(['ruangan'])->whereDoesntHave('ruanganAkses.hakAkses', function ($query) {
+            $query->where('day', Carbon::now('Asia/Makassar')->format('D'));
+        })->where('ket', 'mhs')->get();
     }
     public function index(Request $request)
     {
         $ruanganId = $request->id;
 
-        // Dapatkan semua mahasiswa dengan eager loading ruangan dan ruanganAkses
-        $mahasiswa = Mahasiswa::orderBy('id', 'DESC')->with(['ruanganAkses', 'ruangan'])
-            ->where('ket', 'mhs')
-            ->get();
+
 
         // Filter mahasiswa yang memiliki ruanganAkses sesuai dengan ruangan yang dipilih
 
@@ -50,7 +49,6 @@ class RuanganHakAksesController extends Controller
         return inertia("Admin/RuanganHakAkses/Index", [
             "hakAkses" => $hakAkses,
             "kelas" => $kelas,
-            "mahasiswa" => $mahasiswa,
             "ruangan" => $ruangan,
             "today" => $today
         ]);

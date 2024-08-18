@@ -18,8 +18,8 @@ import React, { useEffect } from "react";
 import { useRef } from "react";
 import { useState } from "react";
 
-export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
-    const [dataMahasiswa, setDataMahasiswa] = useState(mahasiswa);
+export default function Index({ ruangan, today, hakAkses, kelas }) {
+    const [dataMahasiswa, setDataMahasiswa] = useState([]);
     const [dataHakAkses, setDataHakAkses] = useState(hakAkses);
 
     const onInputSearch = (e) => {
@@ -176,7 +176,12 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
         );
     };
     const [dialogTambah, setDialogTambah] = useState(false);
-    const openNew = () => {
+    const openNew = async () => {
+        const res = await axios.get(
+            route("admin.ruangan-hak-akses.getMahasiswa")
+        );
+        console.log(res);
+        setDataMahasiswa(res.data);
         setDialogTambah(true);
     };
     const leftToolbarTemplate3 = () => {
@@ -201,7 +206,7 @@ export default function Index({ mahasiswa, ruangan, today, hakAkses, kelas }) {
     const [dialogDetail, setDialogDetail] = useState(false);
     const [dataDetail, setDataDetail] = useState(null);
     const [hariDetail, setHariDetail] = useState(null);
-    const openDetail = (rowData) => {
+    const openDetail = async (rowData) => {
         setHariDetail(rowData.day);
         console.log(rowData.hak_akses_mahasiswa);
         setDataDetail(rowData.hak_akses_mahasiswa);

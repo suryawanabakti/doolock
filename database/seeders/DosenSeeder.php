@@ -14,6 +14,7 @@ class DosenSeeder extends Seeder
     public function run(): void
     {
         Mahasiswa::create([
+            'pin' => 123456,
             'id_tag' => "900ba5",
             'nama' => 'Xayah',
             'nim' => '4445678902',
