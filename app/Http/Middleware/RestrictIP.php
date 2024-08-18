@@ -20,6 +20,7 @@ class RestrictIP
         $allowedIps = [
             '127.0.0.1', // Ganti dengan IP yang diizinkan
             '192.168.100.9', // Ganti dengan IP yang diizinkan
+            '192.168.100.1',
         ];
 
         if (!in_array($request->ip(), $allowedIps)) {
