@@ -19,9 +19,11 @@ class RuanganHakAksesController extends Controller
         if ($request->kelas_id) {
             return Mahasiswa::with(['ruangan'])->where('ket', 'mhs')->where('ruangan_id', $request->kelas_id)->whereDoesntHave('ruanganAkses.hakAkses', fn($query) => $query->where('ruangan_id', $request->ruangan_id)->where('day', $request->day))->where('ket', 'mhs')->get();
         }
+
         if ($request->tampilkan_semua == 1) {
             return Mahasiswa::with(['ruangan'])->where('ket', 'mhs')->get();
         }
+
         return Mahasiswa::with(['ruangan'])->whereDoesntHave('ruanganAkses.hakAkses', fn($query) => $query->where('ruangan_id', $request->ruangan_id)->where('day', $request->day))->where('ket', 'mhs')->get();
     }
     public function index(Request $request)
@@ -53,6 +55,7 @@ class RuanganHakAksesController extends Controller
 
     public function store(StoreHakAksesRequest $request)
     {
+        Ruangan::find($request->ruangan_id)->update(['open_api' => 1]);
         if (!$request->mahasiswa) {
             return response()->json(["message" => "Mahasiswa harus di isi"], 400);
         }
@@ -97,6 +100,7 @@ class RuanganHakAksesController extends Controller
 
     public function destroy(HakAkses $hakAkses)
     {
+        Ruangan::find($hakAkses->ruangan_id)->update(['open_api' => 1]);
         $hakAkses->delete();
     }
 }

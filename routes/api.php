@@ -25,5 +25,5 @@ Route::get('/v1/get-data-dosen', [ReferenceController::class, 'getDosen']);
 Route::get('/v1/ambilpost', [DoorLockController::class, 'index']);
 Route::get('/v1/ambilpostpin', [DoorLockController::class, 'index2']);
 
-Route::get('/v1/get-data-mahasiswa-by-scanner', [ReferenceController::class, 'getMahasiswaByKelas']);
+Route::get('/v1/get-data-mahasiswa-by-scanner', [ReferenceController::class, 'getMahasiswaByScanner']);
 Route::get('/v1/get-data-users', [ReferenceController::class, 'getUsers']);

@@ -2,12 +2,14 @@ import Layout from "@/Layouts/layout/layout";
 import { router } from "@inertiajs/react";
 import axios from "axios";
 import { FilterMatchMode } from "primereact/api";
+import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
+import { RadioButton } from "primereact/radiobutton";
 import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
 import React from "react";
@@ -36,7 +38,9 @@ export default function Ruangan({ ruangans }) {
         nama_ruangan: "",
         jam_buka: "00:01:00",
         jam_tutup: "23:58:00",
+        open_api: "",
     };
+
     const [ruangan, setRuangan] = useState(emptyRuangan);
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || "";
@@ -192,6 +196,7 @@ export default function Ruangan({ ruangans }) {
                 route("admin.ruangan.update", ruangan.id),
                 ruangan
             );
+            console.log(res.data.open_api);
             setDataRuangan((prevItems) =>
                 prevItems.map((item) =>
                     item.id === res.data.id
@@ -200,6 +205,7 @@ export default function Ruangan({ ruangans }) {
                               nama_ruangan: res.data.nama_ruangan,
                               jam_buka: res.data.jam_buka,
                               jam_tutup: res.data.jam_tutup,
+                              open_api: res.data.open_api,
                           }
                         : item
                 )
@@ -285,30 +291,68 @@ export default function Ruangan({ ruangans }) {
                         >
                             <Column
                                 headerClassName="fw-bold"
+                                field="first_scanner.kode"
+                                header="Kode"
+                                body={(rowData) => {
+                                    return rowData.first_scanner
+                                        ? rowData.first_scanner?.kode.slice(
+                                              0,
+                                              -1
+                                          )
+                                        : "-";
+                                }}
+                                filterPlaceholder="jam buka"
+                                style={{ minWidth: "7rem" }}
+                                headerStyle={{ width: "7rem" }}
+                            />
+                            <Column
+                                headerClassName="fw-bold"
                                 field="nama_ruangan"
                                 header="Nama Ruangan"
                                 sortable
                                 filterPlaceholder="id"
-                                style={{ minWidth: "20rem" }}
-                                headerStyle={{ width: "20rem" }}
+                                style={{ minWidth: "18rem" }}
+                                headerStyle={{ width: "18rem" }}
                             />
+
                             <Column
                                 headerClassName="fw-bold"
                                 field="jam_buka"
                                 header="Jam Buka"
                                 filterPlaceholder="jam buka"
-                                style={{ minWidth: "10rem" }}
-                                headerStyle={{ width: "10rem" }}
+                                style={{ minWidth: "8rem" }}
+                                headerStyle={{ width: "8rem" }}
                             />
                             <Column
                                 headerClassName="fw-bold"
                                 field="jam_tutup"
                                 header="Jam Tutup"
                                 filterPlaceholder="jam tutup"
-                                style={{ minWidth: "10rem" }}
-                                headerStyle={{ width: "10rem" }}
+                                style={{ minWidth: "8rem" }}
+                                headerStyle={{ width: "8rem" }}
                             />
-
+                            <Column
+                                headerClassName="fw-bold"
+                                field="open_api"
+                                header="Api"
+                                body={(rowData) => {
+                                    return rowData.open_api == 1 ? (
+                                        <Badge
+                                            value={"Open"}
+                                            severity="success"
+                                        />
+                                    ) : (
+                                        <Badge
+                                            value={"Closed"}
+                                            severity="danger"
+                                        />
+                                    );
+                                }}
+                                filterPlaceholder="API"
+                                sortable
+                                style={{ minWidth: "1rem" }}
+                                headerStyle={{ width: "1rem" }}
+                            />
                             <Column
                                 body={actionBodyTemplate}
                                 exportable={false}
@@ -322,7 +366,7 @@ export default function Ruangan({ ruangans }) {
                 visible={dialogEdit}
                 style={{ width: "32rem" }}
                 breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-                header="New Ruangan"
+                header="Edit Ruangan"
                 modal
                 className="p-fluid"
                 footer={footerDialogEdit}

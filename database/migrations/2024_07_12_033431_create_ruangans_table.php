@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_ruangan')->nullable();
             $table->enum('type', ['umum', 'kelas', 'lab']);
+            $table->boolean('open_api')->default(1);
             $table->timestamps();
         });
     }
