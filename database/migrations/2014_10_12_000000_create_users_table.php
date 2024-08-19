@@ -18,6 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'super', 'penjaga']);
+            $table->unsignedBigInteger('ruangan_id')->nullable();
+            $table->foreign('ruangan_id')->references('id')->on('ruangans')->cascadeOnDelete();
             $table->rememberToken();
             $table->timestamps();
         });

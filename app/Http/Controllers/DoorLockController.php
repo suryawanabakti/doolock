@@ -35,7 +35,9 @@ class DoorLockController extends Controller
             return;
         }
 
-        if ($mahasiswa && $mahasiswa->ket === 'mhs') {
+        $scanner = ScanerStatus::where('kode', $request->kode)->first();
+
+        if ($mahasiswa && $mahasiswa->ket === 'mhs' && $scanner->type == 'luar') {
             $ruanganAkses = HakAksesMahasiswa::where('mahasiswa_id', $mahasiswa->id)
                 ->whereHas('hakAkses', function ($query) use ($ruangan) {
                     $query->where('day', Carbon::now('Asia/Makassar')->format('D'))
@@ -53,7 +55,7 @@ class DoorLockController extends Controller
             $now = Carbon::now('Asia/Makassar');
             $jamMasuk = Carbon::parse($ruanganAkses->hakAkses->jam_masuk);
             $jamKeluar = Carbon::parse($ruanganAkses->hakAkses->jam_keluar);
-            $scanner = ScanerStatus::where('kode', $request->kode)->first();
+
 
             if (!$now->between($jamMasuk, $jamKeluar) && $scanner && $scanner->type === 'luar') {
                 $this->createHistoriAndBroadcast($mahasiswa, $request->id, $request->kode, 3, $ruangan);

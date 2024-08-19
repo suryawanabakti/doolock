@@ -1,6 +1,8 @@
 import Layout from "@/Layouts/layout/layout.jsx";
 import { Link, router } from "@inertiajs/react";
 import axios from "axios";
+import moment from "moment-timezone";
+import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Column } from "primereact/column";
@@ -12,66 +14,32 @@ import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
 import { Tooltip } from "primereact/tooltip";
 import React, { useEffect, useRef, useState } from "react";
-import moment from "moment-timezone";
-import { FilterMatchMode } from "primereact/api";
-const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
+
+const DetailRuangan = ({ mulai, sampai, ruangan, riwayat }) => {
     const [customers, setCustomers] = useState(riwayat);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
     const toast = useRef(null);
-
     const [dates, setDates] = useState([new Date(mulai), new Date(sampai)]);
-    useEffect(() => {
-        window.Echo.private(`management.1`).listen(
-            "StoreHistoryEvent",
-            (event) => {
-                console.log("EVENT", event);
-                console.log("REALTIME EVENT", event);
-                if (event.histori?.status == 0) {
-                    var status = "Blok";
-                }
-                if (event.histori?.status == 1) {
-                    var status = "Terbuka";
-                }
-
-                if (event.histori?.status == 2) {
-                    var status = "Tidak Terdaftar";
-                }
-
-                if (event.histori?.status == 3) {
-                    var status = "No Akses";
-                }
-
-                var data = {
-                    id: event.histori.id,
-                    id_tag: event.histori.id_tag,
-                    user: event.histori.user,
-                    status: status,
-                    scanner: event.histori.scanner,
-                    kode: event.histori.kode,
-                    waktu: event.histori.waktu,
-                };
-
-                const updatedUsers = [data, ...customers];
-                setCustomers(updatedUsers);
-            }
-        );
-    }, [customers]);
-
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
     const [globalFilter, setGlobalFilter] = useState("");
     const renderHeader = () => {
         return (
             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
-                <h5>
-                    <span>Riwayat</span>
-                </h5>
-                <span className="p-input-icon-left">
-                    <i className="pi pi-search" />
-                    <InputText
-                        type="search"
-                        onInput={(e) => setGlobalFilter(e.target.value)}
-                        placeholder="Global Search"
-                    />
-                </span>
+                {ruangan && (
+                    <React.Fragment>
+                        <h5> Detail Ruangan : {ruangan?.nama_ruangan} </h5>
+                        <span className="p-input-icon-left">
+                            <i className="pi pi-search" />
+                            <InputText
+                                type="search"
+                                onInput={(e) => setGlobalFilter(e.target.value)}
+                                placeholder="Global Search"
+                            />
+                        </span>
+                    </React.Fragment>
+                )}
             </div>
         );
     };
@@ -79,6 +47,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     const header = renderHeader();
 
     const getSeverity = (customer) => {
+        console.log(customer.status);
         switch (customer.status) {
             case "Terbuka":
                 return "success";
@@ -99,86 +68,44 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
             <Tag value={customer.status} severity={getSeverity(customer)}></Tag>
         );
     };
-    const [filters, setFilters] = useState({
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        "user.nim": { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    });
+
     const userBodyTemplate = (customer) => {
-        return (
-            <Link
-                href={route("admin.riwayat.mahasiswa")}
-                data={{
-                    id_tag: customer.id_tag,
-                }}
-            >
-                {" "}
-                {customer.user ? `${customer.user.nama}` : customer.nama}
-            </Link>
-        );
+        console.log("USER", customer.user);
+        return <span> {customer.user ? customer.user.nama : "-"}</span>;
     };
 
-    const nimBodyTemplate = (customer) => {
-        console.log(customer);
-        return (
-            <Link
-                href={route("admin.riwayat.mahasiswa")}
-                data={{
-                    id_tag: customer.id_tag,
-                }}
-            >
-                {" "}
-                {customer.user ? `${customer.user.nim}` : customer.nim}
-            </Link>
-        );
-    };
-    const getKeterangan = (type) => {
-        switch (type) {
-            case "luar":
-                return "Masuk";
-                break;
-            case "dalam":
-                return "Keluar";
-                break;
-            default:
-                break;
-        }
-    };
     const ruanganBodyTemplate = (customer) => {
         return (
-            <div>
+            <p
+                id="textWithTooltip"
+                // data-pr-tooltip="This is a tooltip!"
+                // data-pr-position="top"
+            >
                 {" "}
-                {customer.scanner ? (
-                    <Link
-                        data={{
-                            ruangan_id: customer.scanner?.ruangan_id,
-                        }}
-                        href={route("admin.riwayat.ruangan")}
-                    >
-                        {customer.scanner.ruangan.nama_ruangan}
-                    </Link>
-                ) : (
-                    customer.kode
-                )}
+                {customer.scanner
+                    ? `${customer.scanner.ruangan.nama_ruangan} / ${customer.scanner?.type}`
+                    : customer.kode}
                 {/* <Tooltip target="#textWithTooltip" /> */}
-            </div>
+            </p>
         );
     };
 
     const filterByDate = (e) => {
         e.preventDefault();
         router.get(
-            route("admin.riwayat.index"),
-            { dates: dates },
+            route("penjaga.riwayat.ruangan"),
+            { dates, ruangan_id: ruangan.id },
             {
                 onSuccess: () => {},
             }
         );
     };
+
     const [dateRange, setDateRange] = useState([
         new Date(mulai),
         new Date(sampai),
     ]);
+
     const handleChangeDate = (e) => {
         setDateRange(e.value);
         setDates([
@@ -203,22 +130,56 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     };
     const rightToolbarTemplate = () => {
         return (
-            <a
-                href={`/admin/riwayat/export?mulai=${dateRange[0]}&sampai=${dateRange[1]}`}
-                rel="noopener noreferrer"
-                className="p-button font-bold p-component"
-            >
-                <span
-                    class="p-button-icon p-c p-button-icon-left pi pi-download"
-                    data-pc-section="icon"
-                ></span>
-                <span class="p-button-label p-c" data-pc-section="label">
-                    Export
-                </span>
-            </a>
+            <React.Fragment>
+                <Button
+                    label="Export"
+                    icon="pi pi-download"
+                    className="p-button-help mr-2"
+                />
+                <Button
+                    label="Kembali"
+                    link
+                    onClick={() => router.get(route("penjaga.riwayat.index"))}
+                />
+            </React.Fragment>
         );
     };
 
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <React.Fragment>
+                <Button icon="pi pi-pencil" rounded outlined className="mr-2" />
+                <Button
+                    icon="pi pi-trash"
+                    rounded
+                    outlined
+                    severity="danger"
+                    onClick={(event) => confirm2(event, rowData)}
+                />
+            </React.Fragment>
+        );
+    };
+
+    const countryOptionTemplate = (option) => {
+        return (
+            <div className="flex align-items-center">
+                <div>{option.name}</div>
+            </div>
+        );
+    };
+    const selectedCountryTemplate = (option, props) => {
+        if (option) {
+            return (
+                <div className="flex align-items-center">
+                    <div>{option.name}</div>
+                </div>
+            );
+        }
+
+        return <span>{props.placeholder}</span>;
+    };
+
+    useEffect(() => {}, []);
     return (
         <Layout>
             <Toast ref={toast} />
@@ -232,6 +193,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                             right={rightToolbarTemplate}
                         ></Toolbar>
                         <DataTable
+                            filters={filters}
                             value={customers}
                             selection={selectedCustomers}
                             onSelectionChange={(e) =>
@@ -244,7 +206,6 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                             globalFilter={globalFilter}
-                            filters={filters}
                             header={header}
                         >
                             <Column
@@ -258,20 +219,23 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
 
                             <Column
                                 headerClassName="fw-bold"
-                                field="scanner.ruangan.nama_ruangan"
-                                header="Ruangan"
+                                field="kode"
+                                header="Kode Scanner"
                                 sortable
                                 filterPlaceholder="Type"
-                                body={ruanganBodyTemplate}
-                                filter
-                                headerStyle={{ width: "10rem" }}
+                                headerStyle={{ width: "12rem" }}
                             />
+
                             <Column
                                 headerClassName="fw-bold"
-                                field="scanner.type"
-                                header="Type Scanner"
+                                field="type"
+                                header="Type"
+                                sortable
                                 filterPlaceholder="Type"
-                                headerStyle={{ width: "6rem" }}
+                                body={(rowData) => {
+                                    return <span>{rowData.scanner?.type}</span>;
+                                }}
+                                headerStyle={{ width: "12rem" }}
                             />
 
                             <Column
@@ -279,31 +243,18 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                                 field="id_tag"
                                 header="ID TAG"
                                 sortable
-                                filter
                                 filterPlaceholder="Search by user"
                                 headerStyle={{ width: "8rem" }}
                             />
-                            <Column
-                                headerClassName="fw-bold"
-                                field="user.nim"
-                                header="NIM"
-                                filter
-                                body={nimBodyTemplate}
-                                sortable
-                                filterPlaceholder="Search by user"
-                                headerStyle={{ width: "12rem" }}
-                            />
+
                             <Column
                                 headerClassName="fw-bold"
                                 field="user.nama"
                                 header="Nama"
-                                filter
                                 sortable
-                                body={userBodyTemplate}
                                 filterPlaceholder="Search by user"
-                                headerStyle={{ width: "30rem" }}
+                                headerStyle={{ width: "12rem" }}
                             />
-
                             <Column
                                 headerClassName="fw-bold"
                                 field="status"
@@ -311,19 +262,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                                 sortable
                                 filterPlaceholder="Search by status"
                                 body={statusBodyTemplate}
-                                headerStyle={{ width: "5rem" }}
-                                filter
-                            />
-                            <Column
-                                headerClassName="fw-bold"
-                                header="Ket."
-                                filterPlaceholder="Search by status"
-                                body={(rowData) => (
-                                    <span>
-                                        {getKeterangan(rowData.scanner?.type)}
-                                    </span>
-                                )}
-                                headerStyle={{ width: "8rem" }}
+                                headerStyle={{ width: "12rem" }}
                             />
                         </DataTable>
                     </div>
@@ -333,4 +272,4 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     );
 };
 
-export default Riwayat;
+export default DetailRuangan;

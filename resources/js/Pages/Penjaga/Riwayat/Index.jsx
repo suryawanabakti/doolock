@@ -24,8 +24,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
         window.Echo.private(`management.1`).listen(
             "StoreHistoryEvent",
             (event) => {
-                console.log("EVENT", event);
-                console.log("REALTIME EVENT", event);
+                console.log("REALTIME EVENT", event.histori);
                 if (event.histori?.status == 0) {
                     var status = "Blok";
                 }
@@ -50,9 +49,10 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                     kode: event.histori.kode,
                     waktu: event.histori.waktu,
                 };
-
-                const updatedUsers = [data, ...customers];
-                setCustomers(updatedUsers);
+                if (event.histori?.scanner.ruangan_id == auth.user.ruangan_id) {
+                    const updatedUsers = [data, ...customers];
+                    setCustomers(updatedUsers);
+                }
             }
         );
     }, [customers]);
@@ -107,7 +107,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     const userBodyTemplate = (customer) => {
         return (
             <Link
-                href={route("admin.riwayat.mahasiswa")}
+                href={route("penjaga.riwayat.mahasiswa")}
                 data={{
                     id_tag: customer.id_tag,
                 }}
@@ -122,7 +122,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
         console.log(customer);
         return (
             <Link
-                href={route("admin.riwayat.mahasiswa")}
+                href={route("penjaga.riwayat.mahasiswa")}
                 data={{
                     id_tag: customer.id_tag,
                 }}
@@ -153,7 +153,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                         data={{
                             ruangan_id: customer.scanner?.ruangan_id,
                         }}
-                        href={route("admin.riwayat.ruangan")}
+                        href={route("penjaga.riwayat.ruangan")}
                     >
                         {customer.scanner.ruangan.nama_ruangan}
                     </Link>
@@ -168,7 +168,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     const filterByDate = (e) => {
         e.preventDefault();
         router.get(
-            route("admin.riwayat.index"),
+            route("penjaga.riwayat.index"),
             { dates: dates },
             {
                 onSuccess: () => {},

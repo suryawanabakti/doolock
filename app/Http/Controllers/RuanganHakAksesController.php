@@ -28,7 +28,13 @@ class RuanganHakAksesController extends Controller
     }
     public function index(Request $request)
     {
-        $ruanganId = $request->id;
+        if (auth()->user()->role == 'penjaga') {
+            $ruanganId = auth()->user()->ruangan_id;
+        } else {
+            $ruanganId = $request->id;
+        }
+
+
         // Filter mahasiswa yang memiliki ruanganAkses sesuai dengan ruangan yang dipilih
         $today = Carbon::now('Asia/Makassar')->format('D');
         if ($request->has('today')) {
@@ -45,6 +51,14 @@ class RuanganHakAksesController extends Controller
                 "name" => $data->nama_ruangan
             ];
         });
+        if (auth()->user()->role == 'penjaga') {
+            return inertia("Penjaga/RuanganHakAkses/Index", [
+                "hakAkses" => $hakAkses,
+                "kelas" => $kelas,
+                "ruangan" => $ruangan,
+                "today" => $today
+            ]);
+        }
         return inertia("Admin/RuanganHakAkses/Index", [
             "hakAkses" => $hakAkses,
             "kelas" => $kelas,
@@ -55,6 +69,12 @@ class RuanganHakAksesController extends Controller
 
     public function store(StoreHakAksesRequest $request)
     {
+        if (auth()->user()->role == 'penjaga') {
+            if (auth()->user()->ruangan_id !== $request->ruangan_id) {
+                abort(403);
+            }
+        }
+
         Ruangan::find($request->ruangan_id)->update(['open_api' => 1]);
         if (!$request->mahasiswa) {
             return response()->json(["message" => "Mahasiswa harus di isi"], 400);

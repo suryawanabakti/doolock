@@ -16,40 +16,47 @@ class DashboardController extends Controller
     /**
      * Handle the incoming request.
      */
+    protected function thisAdmin() {}
     public function __invoke(Request $request)
     {
-        $mahasiswaCount = Mahasiswa::where('ket', 'mhs')->count();
-        $dosenCount = Mahasiswa::where('ket', 'dsn')->count();
-        $ruanganCount = Ruangan::count();
-        $scannerCount = ScanerStatus::count();
-        // Mendapatkan tanggal awal dan akhir bulan ini
-        $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
-        $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
-        $visits = Absensi::select(
-            'ruangans.nama_ruangan as nama_ruangan',
-            DB::raw('COUNT(*) as count')
-        )
-            ->join('ruangans', 'absensis.ruangan_id', '=', 'ruangans.id')
-            ->whereBetween('waktu_masuk', [$startOfMonth, $endOfMonth])
-            ->groupBy('ruangans.nama_ruangan')
-            ->get();
-        // Format data untuk grafik
-        $data = [
-            'labels' => $visits->pluck('nama_ruangan'),
-            'series' => [
-                [
-                    'name' => 'Jumlah Kunjungan',
-                    'data' => $visits->pluck('count'),
+        if (auth()->user()->role == 'admin') {
+            $mahasiswaCount = Mahasiswa::where('ket', 'mhs')->count();
+            $dosenCount = Mahasiswa::where('ket', 'dsn')->count();
+            $ruanganCount = Ruangan::count();
+            $scannerCount = ScanerStatus::count();
+            // Mendapatkan tanggal awal dan akhir bulan ini
+            $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
+            $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
+            $visits = Absensi::select(
+                'ruangans.nama_ruangan as nama_ruangan',
+                DB::raw('COUNT(*) as count')
+            )
+                ->join('ruangans', 'absensis.ruangan_id', '=', 'ruangans.id')
+                ->whereBetween('waktu_masuk', [$startOfMonth, $endOfMonth])
+                ->groupBy('ruangans.nama_ruangan')
+                ->get();
+            // Format data untuk grafik
+            $data = [
+                'labels' => $visits->pluck('nama_ruangan'),
+                'series' => [
+                    [
+                        'name' => 'Jumlah Kunjungan',
+                        'data' => $visits->pluck('count'),
+                    ],
                 ],
-            ],
-        ];
-        
-        return Inertia::render('Dashboard', [
-            "mahasiswaCount" => $mahasiswaCount,
-            "dosenCount" => $dosenCount,
-            "ruanganCount" => $ruanganCount,
-            "scannerCount" => $scannerCount,
-            "data" => $data,
-        ]);
+            ];
+
+            return Inertia::render('Dashboard', [
+                "mahasiswaCount" => $mahasiswaCount,
+                "dosenCount" => $dosenCount,
+                "ruanganCount" => $ruanganCount,
+                "scannerCount" => $scannerCount,
+                "data" => $data,
+            ]);
+        }
+
+        if (auth()->user()->role == 'penjaga') {
+            return redirect()->route('penjaga.riwayat.index');
+        }
     }
 }

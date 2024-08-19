@@ -90,6 +90,50 @@ class RiwayatController extends Controller
         ]);
     }
 
+    public function indexPenjaga(Request $request)
+    {
+        $sampai = null;
+
+        if ($request->dates) {
+            $mulai = Carbon::createFromDate($request->dates[0])->format('Y-m-d');
+            $sampai = Carbon::createFromDate($request->dates[1])->format('Y-m-d');
+        }
+
+        $riwayat = Histori::with('scanner.ruangan', 'user')->whereHas('scanner', function ($query) {
+            $query->where('ruangan_id', auth()->user()->ruangan_id);
+        })->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'), Carbon::now('GMT+8')->format('Y-m-d')])->get()->map(function ($data) {
+            if ($data->status == 0) {
+                $status = "Blok";
+            }
+            if ($data->status == 1) {
+                $status = "Terbuka";
+            }
+            if ($data->status == 2) {
+                $status = "Tidak Terdaftar";
+            }
+            if ($data->status == 3) {
+                $status = "No Akses";
+            }
+            return [
+                "id" => $data->id,
+                "kode" => $data->kode,
+                "waktu" => $data->waktu,
+                "id_tag" => $data->id_tag,
+                "scanner" => $data->scanner,
+                "nim" => $data->nim,
+                "nama" => $data->nama,
+                "user" => $data->user,
+                "status" => $status ?? 0,
+            ];
+        });
+
+        return inertia("Penjaga/Riwayat/Index", [
+            "riwayat" => $riwayat,
+            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'),
+            "sampai" => $sampai ?? Carbon::now('GMT+8')->format('Y-m-d'),
+        ]);
+    }
+
     public function ruangan(Request $request)
     {
         $sampai = null;
@@ -129,6 +173,52 @@ class RiwayatController extends Controller
             });
 
         return inertia("Admin/Riwayat/DetailRuangan", [
+            "riwayat" => $riwayat,
+            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'),
+            "sampai" => $sampai  ?? Carbon::now('GMT+8')->format('Y-m-d'),
+            "ruangan" => Ruangan::where('id', $request->ruangan_id)->first()
+        ]);
+    }
+
+    public function ruanganPenjaga(Request $request)
+    {
+        $sampai = null;
+        if ($request->dates) {
+            $mulai = Carbon::createFromDate($request->dates[0])->format('Y-m-d');
+            $sampai = Carbon::createFromDate($request->dates[1])->format('Y-m-d');
+        }
+
+        $riwayat = Histori::with('scanner.ruangan', 'user')
+            ->whereHas('scanner.ruangan', function ($query) use ($request) {
+                $query->where('id', $request->ruangan_id);
+            })
+            ->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'), Carbon::now('GMT+8')->format('Y-m-d')])->get()->map(function ($data) {
+                if ($data->status == 0) {
+                    $status = "Blok";
+                }
+                if ($data->status == 1) {
+                    $status = "Terbuka";
+                }
+                if ($data->status == 2) {
+                    $status = "Tidak Terdaftar";
+                }
+                if ($data->status == 3) {
+                    $status = "No Akses";
+                }
+                return [
+                    "id" => $data->id,
+                    "kode" => $data->kode,
+                    "waktu" => $data->waktu,
+                    "id_tag" => $data->id_tag,
+                    "scanner" => $data->scanner,
+                    "user" => $data->user,
+                    "nim" => $data->nim,
+                    "nama" => $data->nama,
+                    "status" => $status ?? 0,
+                ];
+            });
+
+        return inertia("Penjaga/Riwayat/DetailRuangan", [
             "riwayat" => $riwayat,
             "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'),
             "sampai" => $sampai  ?? Carbon::now('GMT+8')->format('Y-m-d'),
@@ -176,6 +266,53 @@ class RiwayatController extends Controller
             });
 
         return inertia("Admin/Riwayat/DetailMahasiswa", [
+            "riwayat" => $riwayat,
+            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'),
+            "sampai" => $sampai ?? Carbon::now('GMT+8')->format('Y-m-d'),
+            "mahasiswa" => $mahasiswa
+        ]);
+    }
+
+    public function mahasiswaPenjaga(Request $request)
+    {
+        $sampai = null;
+        if ($request->dates) {
+            $mulai = Carbon::createFromDate($request->dates[0])->format('Y-m-d');
+            $sampai = Carbon::createFromDate($request->dates[1])->format('Y-m-d');
+        }
+
+        $mahasiswa = Mahasiswa::where('id_tag', $request->id_tag)->first();
+        if (empty($mahasiswa)) {
+            abort(404);
+        }
+        $riwayat = Histori::with('scanner.ruangan', 'user')->where('id_tag', $request->id_tag)
+            ->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'), Carbon::now('GMT+8')->format('Y-m-d')])->get()->map(function ($data) {
+                if ($data->status == 0) {
+                    $status = "Blok";
+                }
+                if ($data->status == 1) {
+                    $status = "Terbuka";
+                }
+                if ($data->status == 2) {
+                    $status = "Tidak Terdaftar";
+                }
+                if ($data->status == 3) {
+                    $status = "No Akses";
+                }
+                return [
+                    "id" => $data->id,
+                    "kode" => $data->kode,
+                    "waktu" => $data->waktu,
+                    "id_tag" => $data->id_tag,
+                    "scanner" => $data->scanner,
+                    "user" => $data->user,
+                    "nim" => $data->nim,
+                    "nama" => $data->nama,
+                    "status" => $status ?? 0,
+                ];
+            });
+
+        return inertia("Penjaga/Riwayat/DetailMahasiswa", [
             "riwayat" => $riwayat,
             "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'),
             "sampai" => $sampai ?? Carbon::now('GMT+8')->format('Y-m-d'),
