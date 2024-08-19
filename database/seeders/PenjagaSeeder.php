@@ -75,5 +75,13 @@ class PenjagaSeeder extends Seeder
             'ruangan_id' => 9,
             'password' => bcrypt('museum@fkuh')
         ]);
+
+        \App\Models\User::factory()->create([
+            'name' => 'Student Center',
+            'role' => 'penjaga',
+            'email' => 'studentcenter@fkuh',
+            'ruangan_id' => 10,
+            'password' => bcrypt('studentcenter@fkuh')
+        ]);
     }
 }

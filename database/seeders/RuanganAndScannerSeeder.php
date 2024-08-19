@@ -61,6 +61,12 @@ class RuanganAndScannerSeeder extends Seeder
             'type' => 'lab',
         ]);
 
+
+        $studentCenter = Ruangan::create([
+            'nama_ruangan' => 'Student Center',
+            'type' => 'umum',
+        ]);
+
         ScanerStatus::create([
             'kode' => 'RFID-A1',
             'ruangan_id' => $perpustakaan->id,
