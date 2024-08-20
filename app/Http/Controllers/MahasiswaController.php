@@ -18,94 +18,58 @@ class MahasiswaController extends Controller
             'file_import' => ['required', 'file'],
         ]);
         Excel::import(new MahasiswaImport, $request->file('file_import')->store('temp'));
-        return "berhasil";
+        return response()->json(['message' => 'Import berhasil']);
     }
+
     public function active(Request $request)
     {
-        // Ambil ID dari selectedCustomers dan simpan dalam array $dataKey
-        $dataKey = array_column($request->selectedCustomers, 'id');
-
-        Mahasiswa::whereIn('id', $dataKey)->update(['status' => 1]);
-        return $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
-            "id" => $data->id,
-            "ruangan" => $data->ruangan ?? null,
-            "kelas" => $data->kelas,
-            "id_tag" => $data->id_tag,
-            "nama" => $data->nama,
-            "ruangan" => $data->ruangan,
-            "nim" => $data->nim,
-            "ket" => $data->ket,
-            "status" => $data->status == 1 ? 'Active' : 'Block',
-            "tahun_masuk" => $data->tahun_masuk
-        ]);
-        return $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
-            "id" => $data->id,
-            "pin" => $data->pin,
-            "ruangan" => $data->ruangan ?? null,
-            "kelas" => $data->kelas,
-            "id_tag" => $data->id_tag,
-            "nama" => $data->nama,
-            "ruangan" => $data->ruangan,
-            "nim" => $data->nim,
-            "ket" => $data->ket,
-            "status" => $data->status == 1 ? 'Active' : 'Block',
-            "tahun_masuk" => $data->tahun_masuk
-        ]);
+        $this->updateMahasiswaStatus($request->selectedCustomers, 1);
+        return $this->getFormattedMahasiswaList();
     }
 
     public function block(Request $request)
     {
-        // Ambil ID dari selectedCustomers dan simpan dalam array $dataKey
-        $dataKey = array_column($request->selectedCustomers, 'id');
-
-        Mahasiswa::whereIn('id', $dataKey)->update(['status' => 0]);
-        return $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
-            "id" => $data->id,
-            "pin" => $data->pin,
-            "ruangan" => $data->ruangan ?? null,
-            "kelas" => $data->kelas,
-            "id_tag" => $data->id_tag,
-            "nama" => $data->nama,
-            "ruangan" => $data->ruangan,
-            "nim" => $data->nim,
-            "ket" => $data->ket,
-            "status" => $data->status == 1 ? 'Active' : 'Block',
-            "tahun_masuk" => $data->tahun_masuk
-        ]);
+        $this->updateMahasiswaStatus($request->selectedCustomers, 0);
+        return $this->getFormattedMahasiswaList();
     }
+
     public function index()
     {
-        $mahasiswa = Mahasiswa::orderBy('created_at', 'desc')->with('ruangan')->where('ket', 'mhs')->get()->map(fn($data) =>  [
-            "id" => $data->id,
-            "pin" => $data->pin,
-            "ruangan" => $data->ruangan ?? null,
-            "kelas" => $data->kelas,
-            "id_tag" => $data->id_tag,
-            "nama" => $data->nama,
-            "ruangan" => $data->ruangan,
-            "nim" => $data->nim,
-            "ket" => $data->ket,
-            "status" => $data->status == 1 ? 'Active' : 'Block',
-            "tahun_masuk" => $data->tahun_masuk
-        ]);
+        $mahasiswa = $this->getFormattedMahasiswaList();
+        $kelas = Ruangan::where('type', 'kelas')
+            ->get()
+            ->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]);
+
         return inertia("Admin/Mahasiswa/Index", [
             "mahasiswa" => $mahasiswa,
-            "kelas" => Ruangan::where('type', 'kelas')->get()->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
+            "kelas" => $kelas,
         ]);
     }
 
-    public function store(MahasiswaStoreRequest $request)
+    private function updateMahasiswaStatus(array $selectedCustomers, int $status)
     {
-        $data = $request->validated();
-        $data['ket'] = 'mhs';
-        $mahasiswa = Mahasiswa::create($data);
+        $dataKey = array_column($selectedCustomers, 'id');
+        Mahasiswa::whereIn('id', $dataKey)->update(['status' => $status]);
+    }
+
+    private function getFormattedMahasiswaList()
+    {
+        return Mahasiswa::orderBy('created_at', 'desc')
+            ->with('ruangan')
+            ->where('ket', 'mhs')
+            ->get()
+            ->map(fn($data) => $this->formatMahasiswaResponse($data));
+    }
+
+    private function formatMahasiswaResponse(Mahasiswa $mahasiswa)
+    {
         return [
-            "pin" => $mahasiswa->pin,
             "id" => $mahasiswa->id,
+            "pin" => $mahasiswa->pin,
             "id_tag" => $mahasiswa->id_tag,
             "nim" => $mahasiswa->nim,
             "kelas" => $mahasiswa->kelas,
-            "ruangan" => $mahasiswa->ruangan,
+            "ruangan" => $mahasiswa->ruangan ?? null,
             "nama" => $mahasiswa->nama,
             "ket" => $mahasiswa->ket,
             "status" => $mahasiswa->status == 1 ? "Active" : "Block",
@@ -113,19 +77,21 @@ class MahasiswaController extends Controller
         ];
     }
 
+    public function store(MahasiswaStoreRequest $request)
+    {
+        $data = $request->validated();
+        $data['ket'] = 'mhs';
+
+        $mahasiswa = Mahasiswa::create($data);
+
+        return $this->formatMahasiswaResponse($mahasiswa);
+    }
+
     public function update(MahasiswaUpdateRequest $request, Mahasiswa $mahasiswa)
     {
         $mahasiswa->update($request->validated());
-        return [
-            "pin" => $mahasiswa->pin,
-            "id" => $mahasiswa->id,
-            "id_tag" => $mahasiswa->id_tag,
-            "nim" => $mahasiswa->nim,
-            "nama" => $mahasiswa->nama,
-            "ket" => $mahasiswa->ket,
-            "ruangan" => $mahasiswa->ruangan,
-            "status" => $mahasiswa->status == 1 ? "Active" : "Block"
-        ];
+
+        return $this->formatMahasiswaResponse($mahasiswa);
     }
 
     public function destroy(Mahasiswa $mahasiswa)

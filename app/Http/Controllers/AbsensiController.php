@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Absensi;
-use App\Models\Histori;
 use App\Models\Ruangan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,81 +12,72 @@ class AbsensiController extends Controller
 {
     public function index(Request $request)
     {
-        $sampai = null;
-        if ($request->dates) {
-            $mulai = Carbon::createFromDate($request->dates[0])->format('Y-m-d');
-            $sampai = Carbon::createFromDate($request->dates[1])->format('Y-m-d');
-        }
+        $dates = $this->getDates($request->dates);
+        $riwayat = $this->getRiwayatAbsensi($request->ruangan_id, $dates);
 
-        $riwayat = Absensi::with('ruangan', 'user')
-            ->whereHas('ruangan', function ($query) use ($request) {
-                $query->where('id', $request->ruangan_id);
-            })
-            ->orderBy('waktu_keluar', 'DESC')->whereBetween(DB::raw('DATE(waktu_masuk)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'), Carbon::now('GMT+8')->format('Y-m-d')])->get()->map(function ($data) {
-                return [
-                    "tanggal" => $data->created_at->format('d M Y'),
-                    "id_tag" => $data->id_tag,
-                    "user" => $data->user,
-                    "jam_masuk" => (new Carbon($data->waktu_masuk))->format('H:i:s'),
-                    "jam_keluar" => $data->waktu_keluar ? (new Carbon($data->waktu_keluar))->format('H:i:s') : null,
-                ];
-            });
-
-        if ($request->ruangan_id) {
-            if ($riwayat->count() == 0) {
-                $dataKosong = true;
-            } else {
-                $dataKosong = false;
-            }
-        }
+        $dataKosong = $request->ruangan_id ? $riwayat->isEmpty() : false;
 
         return inertia("Admin/Absensi/Index", [
-            "ruangan" => Ruangan::where('id', $request->ruangan_id)->first(),
-            "ruangans" => Ruangan::query()->get()->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
+            "ruangan" => Ruangan::find($request->ruangan_id),
+            "ruangans" => $this->getRuanganList(),
             "riwayat" => $riwayat,
-            "dataKosong" => $dataKosong ?? false,
-            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'),
-            "sampai" => $sampai ?? Carbon::now('GMT+8')->format('Y-m-d'),
+            "dataKosong" => $dataKosong,
+            "mulai" => $dates['mulai'],
+            "sampai" => $dates['sampai'],
         ]);
     }
 
     public function indexPenjaga(Request $request)
     {
-        $sampai = null;
-        if ($request->dates) {
-            $mulai = Carbon::createFromDate($request->dates[0])->format('Y-m-d');
-            $sampai = Carbon::createFromDate($request->dates[1])->format('Y-m-d');
-        }
+        $dates = $this->getDates($request->dates);
+        $riwayat = $this->getRiwayatAbsensi(auth()->user()->ruangan_id, $dates);
 
-        $riwayat = Absensi::with('ruangan', 'user')
-            ->whereHas('ruangan', function ($query) use ($request) {
-                $query->where('id', auth()->user()->ruangan_id);
-            })
-            ->orderBy('waktu_keluar', 'DESC')->whereBetween(DB::raw('DATE(waktu_masuk)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'), Carbon::now('GMT+8')->format('Y-m-d')])->get()->map(function ($data) {
-                return [
-                    "tanggal" => $data->created_at->format('d M Y'),
-                    "id_tag" => $data->id_tag,
-                    "user" => $data->user,
-                    "jam_masuk" => (new Carbon($data->waktu_masuk))->format('H:i:s'),
-                    "jam_keluar" => $data->waktu_keluar ? (new Carbon($data->waktu_keluar))->format('H:i:s') : null,
-                ];
-            });
-
-        if (auth()->user()->ruangan_id) {
-            if ($riwayat->count() == 0) {
-                $dataKosong = true;
-            } else {
-                $dataKosong = false;
-            }
-        }
+        $dataKosong = auth()->user()->ruangan_id ? $riwayat->isEmpty() : false;
 
         return inertia("Penjaga/Absensi/Index", [
-            "ruangan" => Ruangan::where('id', auth()->user()->ruangan_id)->first(),
-            "ruangans" => Ruangan::query()->get()->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
+            "ruangan" => Ruangan::find(auth()->user()->ruangan_id),
+            "ruangans" => $this->getRuanganList(),
             "riwayat" => $riwayat,
-            "dataKosong" => $dataKosong ?? false,
-            "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'),
-            "sampai" => $sampai ?? Carbon::now('GMT+8')->format('Y-m-d'),
+            "dataKosong" => $dataKosong,
+            "mulai" => $dates['mulai'],
+            "sampai" => $dates['sampai'],
+        ]);
+    }
+
+    private function getDates($dates)
+    {
+        $mulai = Carbon::now('Asia/Makassar')->addDays(-3)->format('Y-m-d');
+        $sampai = Carbon::now('Asia/Makassar')->format('Y-m-d');
+
+        if ($dates) {
+            $mulai = Carbon::createFromDate($dates[0])->format('Y-m-d');
+            $sampai = Carbon::createFromDate($dates[1])->format('Y-m-d');
+        }
+
+        return ['mulai' => $mulai, 'sampai' => $sampai];
+    }
+
+    private function getRiwayatAbsensi($ruanganId, $dates)
+    {
+        return Absensi::with('ruangan', 'user')
+            ->whereHas('ruangan', fn($query) => $query->where('id', $ruanganId))
+            ->orderBy('waktu_keluar', 'DESC')
+            ->whereBetween(DB::raw('DATE(waktu_masuk)'), [$dates['mulai'], $dates['sampai']])
+            ->get()
+            ->map(fn($data) => [
+                "tanggal" => $data->created_at->format('d M Y'),
+                "id_tag" => $data->id_tag,
+                "user" => $data->user,
+                "jam_masuk" => (new Carbon($data->waktu_masuk))->format('H:i:s'),
+                "jam_keluar" => $data->waktu_keluar ? (new Carbon($data->waktu_keluar))->format('H:i:s') : null,
+            ]);
+    }
+
+    private function getRuanganList()
+    {
+        return Ruangan::all()->map(fn($data) => [
+            "name" => $data->nama_ruangan,
+            "code" => $data->id
         ]);
     }
 }

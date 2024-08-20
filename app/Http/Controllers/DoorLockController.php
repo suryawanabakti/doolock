@@ -197,6 +197,10 @@ class DoorLockController extends Controller
             'status' => $status,
         ]);
 
+        if (env("APP_REALTIME") === "true") {
+            broadcast(new StoreHistoryEvent($histori->load('user', 'scanner.ruangan'), $ruangan));
+        }
+
         // Memperbarui waktu terakhir pada scanner
         ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now('Asia/Makassar')->format('Y-m-d H:i:s')]);
 
@@ -218,42 +222,12 @@ class DoorLockController extends Controller
                     $absenToday->update(['waktu_keluar' => Carbon::now('Asia/Makassar')]);
                 }
             }
-
             echo json_encode([$mahasiswa->pin], JSON_UNESCAPED_UNICODE);
         } else {
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
         }
-
-        if (env("APP_REALTIME") === "true") {
+        if (env("APP_REALTIME") == "true") {
             broadcast(new StoreHistoryEvent($histori->load('user', 'scanner.ruangan'), $ruangan));
         }
-    }
-
-    public function getRiwayat(Request $request)
-    {
-        if ($request->dates) {
-            $mulai = Carbon::createFromDate($request->dates[0])->addDay(1)->startOfDay()->toIso8601String();
-            $sampai = Carbon::createFromDate($request->dates[1])->addDay(1)->endOfDay()->toIso8601String();
-        }
-        return $riwayat = Histori::with('scanner.ruangan', 'user')->orderBy('waktu', 'DESC')->whereBetween('waktu', $request->dates ? [$mulai, $sampai] : [Carbon::now()->addMonth(-1)->startOfDay()->toIso8601String(), Carbon::now()->endOfDay()->toIso8601String()])->get()->map(function ($data) {
-            if ($data->status == 0) {
-                $status = "Blok";
-            }
-            if ($data->status == 1) {
-                $status = "Terbuka";
-            }
-            if ($data->status == 2) {
-                $status = "Tidak Terdaftar";
-            }
-            return [
-                "id" => $data->id,
-                "kode" => $data->kode,
-                "waktu" => $data->waktu,
-                "id_tag" => $data->id_tag,
-                "scanner" => $data->scanner,
-                "user" => $data->user,
-                "status" => $status ?? 0,
-            ];
-        });
     }
 }

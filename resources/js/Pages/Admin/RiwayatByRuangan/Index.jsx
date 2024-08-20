@@ -1,3 +1,10 @@
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import Layout from "@/Layouts/layout/layout.jsx";
 import { router } from "@inertiajs/react";
 import moment from "moment-timezone";
@@ -12,7 +19,24 @@ import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
-import React, { useEffect, useRef, useState } from "react";
+
+const getSeverity = (status) => {
+    switch (status) {
+        case "Terbuka":
+            return "success";
+        case "Blok":
+            return "danger";
+        case "Tidak Terdaftar":
+        case "No Akses":
+            return "warning";
+        default:
+            return null;
+    }
+};
+
+const StatusBodyTemplate = ({ status }) => (
+    <Tag value={status} severity={getSeverity(status)} />
+);
 
 const RiwayatByRuangan = ({
     auth,
@@ -26,15 +50,22 @@ const RiwayatByRuangan = ({
     const [customers, setCustomers] = useState(riwayat);
     const [selectedCountry, setSelectedCountry] = useState(null);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
-    const toast = useRef(null);
     const [dates, setDates] = useState([new Date(mulai), new Date(sampai)]);
-
     const [globalFilter, setGlobalFilter] = useState("");
-    const renderHeader = () => {
+    const [dateRange, setDateRange] = useState([
+        new Date(mulai),
+        new Date(sampai),
+    ]);
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+    const toast = useRef(null);
+
+    const header = useMemo(() => {
         return (
             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
                 {ruangan && (
-                    <React.Fragment>
+                    <>
                         <h5> Ruangan : {ruangan?.nama_ruangan} </h5>
                         <span className="p-input-icon-left">
                             <i className="pi pi-search" />
@@ -44,116 +75,79 @@ const RiwayatByRuangan = ({
                                 placeholder="Global Search"
                             />
                         </span>
-                    </React.Fragment>
+                    </>
                 )}
             </div>
         );
-    };
+    }, [ruangan]);
 
-    const header = renderHeader();
-
-    const getSeverity = (customer) => {
-        switch (customer.status) {
-            case "Terbuka":
-                return "success";
-            case "Blok":
-                return "danger";
-            case "Tidak Terdaftar":
-                return "warning";
-            default:
-                return null;
-        }
-    };
-    const [statuses] = useState(["Active", "Block"]);
-
-    const statusBodyTemplate = (customer) => {
-        return (
-            <Tag value={customer.status} severity={getSeverity(customer)}></Tag>
-        );
-    };
-
-    const userBodyTemplate = (customer) => {
-        return <span> {customer.user ? customer.user.nama : "-"}</span>;
-    };
-
-    const [dateRange, setDateRange] = useState([
-        new Date(mulai),
-        new Date(sampai),
-    ]);
-    const handleChangeDate = (e) => {
-        setDateRange(e.value);
+    const handleChangeDate = useCallback((e) => {
+        const [start, end] = e.value;
+        setDateRange([start, end]);
         setDates([
-            moment(e.value[0]).tz("Asia/Makassar").format("YYYY-MM-DD"),
-            moment(e.value[1]).tz("Asia/Makassar").format("YYYY-MM-DD"),
+            moment(start).tz("Asia/Makassar").format("YYYY-MM-DD"),
+            moment(end).tz("Asia/Makassar").format("YYYY-MM-DD"),
         ]);
-    };
+    }, []);
 
-    const leftToolbarTemplate = () => {
-        return (
+    const filterByDate = useCallback(
+        (e) => {
+            e.preventDefault();
+            router.get(route("admin.riwayat-by-ruangan.index"), {
+                dates,
+                ruangan_id: ruangan.id,
+            });
+        },
+        [dates, ruangan]
+    );
+
+    const leftToolbarTemplate = useMemo(
+        () => (
             <div className="flex flex-wrap gap-2">
                 <Calendar
                     value={dateRange}
-                    onChange={(e) => handleChangeDate(e)}
+                    onChange={handleChangeDate}
                     selectionMode="range"
                     readOnlyInput
                     hideOnRangeSelection
                 />
                 <Button label="Filter By Date" onClick={filterByDate} />
             </div>
-        );
-    };
-    const [filters, setFilters] = useState({
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    });
-    const rightToolbarTemplate = () => {
-        return (
-            <React.Fragment>
-                <a
-                    href={`/admin/riwayat-by-ruangan/export?mulai=${dateRange[0]}&sampai=${dateRange[1]}&ruangan_id=${ruangan?.id}`}
-                    rel="noopener noreferrer"
-                    className="p-button font-bold p-component"
-                >
-                    <span
-                        class="p-button-icon p-c p-button-icon-left pi pi-download"
-                        data-pc-section="icon"
-                    ></span>
-                    <span class="p-button-label p-c" data-pc-section="label">
-                        Export
-                    </span>
-                </a>
-            </React.Fragment>
-        );
-    };
+        ),
+        [dateRange, handleChangeDate, filterByDate]
+    );
 
-    const countryOptionTemplate = (option) => {
-        return (
+    const rightToolbarTemplate = useMemo(
+        () => (
+            <a
+                href={`/admin/riwayat-by-ruangan/export?mulai=${dateRange[0]}&sampai=${dateRange[1]}&ruangan_id=${ruangan?.id}`}
+                rel="noopener noreferrer"
+                className="p-button font-bold p-component"
+            >
+                <span className="p-button-icon p-c p-button-icon-left pi pi-download"></span>
+                <span className="p-button-label p-c">Export</span>
+            </a>
+        ),
+        [dateRange, ruangan]
+    );
+
+    const countryOptionTemplate = useCallback(
+        (option) => (
             <div className="flex align-items-center">
                 <div>{option.name}</div>
             </div>
-        );
-    };
-    const selectedCountryTemplate = (option, props) => {
-        if (option) {
-            return (
-                <div className="flex align-items-center">
-                    <div>{option.name}</div>
-                </div>
-            );
-        }
+        ),
+        []
+    );
 
-        return <span>{props.placeholder}</span>;
-    };
-    // TEST
-    const filterByDate = (e) => {
-        e.preventDefault();
-        router.get(
-            route("admin.riwayat-by-ruangan.index"),
-            { dates, ruangan_id: ruangan.id },
-            {
-                onSuccess: () => {},
-            }
-        );
-    };
+    const selectedCountryTemplate = useCallback(
+        (option, props) => (
+            <div className="flex align-items-center">
+                <div>{option ? option.name : props.placeholder}</div>
+            </div>
+        ),
+        []
+    );
 
     useEffect(() => {
         if (ruangan) {
@@ -170,35 +164,38 @@ const RiwayatByRuangan = ({
                 });
             }
 
-            window.Echo.private(`management.${auth.user.id}`).listen(
+            window.Echo.private(`management.1`).listen(
                 "StoreHistoryEvent",
                 (event) => {
-                    if (event.histori?.status == 0) {
-                        var status = "Blok";
-                    }
-                    if (event.histori?.status == 1) {
-                        var status = "Terbuka";
-                    }
-                    if (event.histori?.status == 2) {
-                        var status = "Tidak Terdaftar";
-                    }
-                    var data = {
+                    const statusMap = [
+                        "Blok",
+                        "Terbuka",
+                        "Tidak Terdaftar",
+                        "No Akses",
+                    ];
+                    const status = statusMap[event.histori?.status] || null;
+
+                    const data = {
                         id: event.histori.id,
                         id_tag: event.histori.id_tag,
                         user: event.histori.user,
-                        status: status,
+                        status,
                         scanner: event.histori.scanner,
                         kode: event.histori.kode,
                         waktu: event.histori.waktu,
                     };
-                    if (event.ruangan.id == ruangan.id) {
-                        const updatedUsers = [data, ...customers];
-                        setCustomers(updatedUsers);
+
+                    if (event.ruangan.id === ruangan.id) {
+                        setCustomers((prevCustomers) => [
+                            data,
+                            ...prevCustomers,
+                        ]);
                     }
                 }
             );
         }
-    }, [customers]);
+    }, [customers, dataKosong, dates, ruangan]);
+
     return (
         <Layout>
             <Toast ref={toast} />
@@ -215,8 +212,7 @@ const RiwayatByRuangan = ({
                                 onChange={(e) => {
                                     setSelectedCountry(e.value);
                                     router.get(
-                                        `/admin/riwayat-by-ruangan?ruangan_id=${e.value.code}`,
-                                        {}
+                                        `/admin/riwayat-by-ruangan?ruangan_id=${e.value.code}`
                                     );
                                 }}
                                 options={ruangans}
@@ -225,14 +221,14 @@ const RiwayatByRuangan = ({
                                 filter
                                 valueTemplate={selectedCountryTemplate}
                                 itemTemplate={countryOptionTemplate}
-                                className="w-full "
+                                className="w-full"
                             />
                         </div>
                         <Toolbar
                             className="mb-4"
                             left={leftToolbarTemplate}
                             right={rightToolbarTemplate}
-                        ></Toolbar>
+                        />
                         {riwayat.length > 0 && (
                             <DataTable
                                 filters={filters}
@@ -258,7 +254,6 @@ const RiwayatByRuangan = ({
                                     filterPlaceholder="Waktu"
                                     headerStyle={{ width: "12rem" }}
                                 />
-
                                 <Column
                                     headerClassName="fw-bold"
                                     field="kode"
@@ -268,7 +263,6 @@ const RiwayatByRuangan = ({
                                     filterPlaceholder="Type"
                                     headerStyle={{ width: "12rem" }}
                                 />
-
                                 <Column
                                     headerClassName="fw-bold"
                                     field="type"
@@ -276,14 +270,11 @@ const RiwayatByRuangan = ({
                                     header="Type"
                                     sortable
                                     filterPlaceholder="Type"
-                                    body={(rowData) => {
-                                        return (
-                                            <span>{rowData.scanner?.type}</span>
-                                        );
-                                    }}
+                                    body={({ scanner }) => (
+                                        <span>{scanner?.type}</span>
+                                    )}
                                     headerStyle={{ width: "8rem" }}
                                 />
-
                                 <Column
                                     headerClassName="fw-bold"
                                     field="id_tag"
@@ -292,7 +283,6 @@ const RiwayatByRuangan = ({
                                     filterPlaceholder="Search by user"
                                     headerStyle={{ width: "8rem" }}
                                 />
-
                                 <Column
                                     headerClassName="fw-bold"
                                     field="user.nama"
@@ -309,7 +299,9 @@ const RiwayatByRuangan = ({
                                     sortable
                                     filter
                                     filterPlaceholder="Search by status"
-                                    body={statusBodyTemplate}
+                                    body={({ status }) => (
+                                        <StatusBodyTemplate status={status} />
+                                    )}
                                     headerStyle={{ width: "10rem" }}
                                 />
                             </DataTable>

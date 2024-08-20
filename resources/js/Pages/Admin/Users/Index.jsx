@@ -1,109 +1,290 @@
 import Layout from "@/Layouts/layout/layout";
+import axios from "axios";
+import React, { useRef, useState } from "react";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
+import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
+import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
-import React from "react";
-import { useState } from "react";
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 
 export default function Index({ users }) {
     const [dataUsers, setDataUsers] = useState(users);
     const [openDialogTambah, setDialogTambah] = useState(false);
+    const [ruangans, setRuangans] = useState([]);
+    const [btnNew, setBtnNew] = useState(false);
+    const [errors, setErrors] = useState([]);
+    const [user, setUser] = useState({
+        id: null, // Add ID for editing
+        name: "",
+        ruangan_id: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
+    });
+    const [selectedRuangan, setSelectedRuangan] = useState(null);
+    const [dialogEdit, setDialogEdit] = useState(false);
 
-    const openNew = () => {
+    const toast = useRef(null);
+
+    const fetchRuangans = async () => {
+        try {
+            setBtnNew(true);
+            const res = await axios.get(route("admin.users.get-ruangan"));
+            setRuangans(res.data);
+        } catch (error) {
+            console.error("Failed to fetch ruangans", error);
+        } finally {
+            setBtnNew(false);
+        }
+    };
+
+    const openNewDialog = async () => {
+        await fetchRuangans();
+        setUser({
+            id: null,
+            name: "",
+            ruangan_id: "",
+            email: "",
+            password: "",
+            password_confirmation: "",
+        });
         setDialogTambah(true);
     };
 
-    const leftToolbarTemplate = () => {
-        return (
-            <div className="flex flex-wrap gap-2">
-                <Button
-                    label="New"
-                    icon="pi pi-plus"
-                    severity="primary"
-                    onClick={openNew}
-                />
-            </div>
-        );
-    };
-    const onHideDialog = () => {
-        setDialogTambah(false);
-    };
-    const submit = (e) => {
-        e.preventDefault();
+    const openEditDialog = (data) => {
+        setUser({
+            id: data.id,
+            name: data.name,
+            ruangan_id: data.ruangan_id,
+            email: data.email,
+            password: "",
+            password_confirmation: "",
+        });
+        setSelectedRuangan(ruangans.find((r) => r.id === data.ruangan_id));
+        setDialogEdit(true);
     };
 
-    const footerDialogTambah = (
-        <React.Fragment>
+    const handleInputChange = (e, field) => {
+        const { value } = e.target;
+        setUser((prevUser) => ({ ...prevUser, [field]: value }));
+    };
+
+    const handleDropdownChange = (e) => {
+        setSelectedRuangan(e.value);
+        setUser((prevUser) => ({ ...prevUser, ruangan_id: e.value.id }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (user.id) {
+            // Update existing user
+            try {
+                const res = await axios.patch(
+                    route("admin.users.update", user.id),
+                    user
+                );
+                setDataUsers((prevData) =>
+                    prevData.map((u) => (u.id === res.data.id ? res.data : u))
+                );
+                toast.current.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: `User ${user.name} updated successfully`,
+                    life: 3000,
+                });
+                resetForm();
+            } catch (error) {
+                setErrors(error.response?.data?.errors || []);
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail:
+                        error.response?.data?.message || "Error updating user",
+                    life: 3000,
+                });
+            }
+        } else {
+            // Create new user
+            try {
+                const res = await axios.post(route("admin.users.store"), user);
+                setDataUsers((prevData) => [res.data, ...prevData]);
+                toast.current.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: `User ${user.name} created successfully`,
+                    life: 3000,
+                });
+                resetForm();
+            } catch (error) {
+                setErrors(error.response?.data?.errors || []);
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail:
+                        error.response?.data?.message || "Error creating user",
+                    life: 3000,
+                });
+            }
+        }
+    };
+
+    const handleDeleteConfirmation = async (event, rowData) => {
+        confirmPopup({
+            target: event.currentTarget,
+            message: "Do you want to delete this record?",
+            icon: "pi pi-info-circle",
+            acceptClassName: "p-button-danger",
+            accept: async () => {
+                try {
+                    await axios.delete(
+                        route("admin.users.destroy", rowData.id)
+                    );
+                    setDataUsers((prevData) =>
+                        prevData.filter((user) => user.id !== rowData.id)
+                    );
+                    toast.current.show({
+                        severity: "info",
+                        summary: "Deleted",
+                        detail: `User ${rowData.name} deleted successfully`,
+                        life: 3000,
+                    });
+                } catch (error) {
+                    console.error("Failed to delete user", error);
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: `Error deleting user: ${error.message}`,
+                        life: 3000,
+                    });
+                }
+            },
+        });
+    };
+
+    const resetForm = () => {
+        setUser({
+            id: null,
+            name: "",
+            ruangan_id: "",
+            email: "",
+            password: "",
+            password_confirmation: "",
+        });
+        setErrors([]);
+        setDialogTambah(false);
+        setDialogEdit(false);
+    };
+
+    const renderFooter = () => (
+        <>
             <Button
                 label="Cancel"
                 icon="pi pi-times"
                 outlined
-                onClick={() => onHideDialog()}
+                onClick={resetForm}
             />
-            <Button label="Save" icon="pi pi-check" onClick={submit} />
-        </React.Fragment>
+            <Button label="Save" icon="pi pi-check" onClick={handleSubmit} />
+        </>
     );
 
-    const [errors, setErrors] = useState([]);
-    const emptyUser = {
-        name: "",
-        ruangan_id: "",
-        username: "",
-        password: "",
-        password_confirmation: "",
-    };
-    const [user, setUser] = useState(emptyUser);
-    const onInputChange = (e, name) => {
-        const val = (e.target && e.target.value) || "";
-        let _user = { ...user };
-        _user[`${name}`] = val;
-        setUser(_user);
-    };
+    const renderSelectedRuangan = (option) => (
+        <div className="flex align-items-center">
+            <div>{option?.nama_ruangan || "Select a Room"}</div>
+        </div>
+    );
+
+    const renderRuanganTemplate = (option) => (
+        <div className="flex align-items-center">
+            <div>{option.nama_ruangan}</div>
+        </div>
+    );
+
+    const renderActionBody = (rowData) => (
+        <>
+            <Button
+                icon="pi pi-pencil"
+                rounded
+                outlined
+                className="mr-2"
+                onClick={() => openEditDialog(rowData)}
+            />
+            <Button
+                icon="pi pi-trash"
+                rounded
+                outlined
+                severity="danger"
+                onClick={(event) => handleDeleteConfirmation(event, rowData)}
+            />
+        </>
+    );
+
     return (
         <Layout>
+            <ConfirmPopup />
+            <Toast ref={toast} />
             <Dialog
-                visible={openDialogTambah}
+                visible={openDialogTambah || dialogEdit}
                 style={{ width: "32rem" }}
                 breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-                header="New Users"
+                header={user.id ? "Edit User" : "New User"}
                 modal
                 className="p-fluid"
-                footer={footerDialogTambah}
-                onHide={() => onHideDialog()}
+                footer={renderFooter()}
+                onHide={resetForm}
             >
                 <div className="field">
                     <label htmlFor="name" className="font-bold">
-                        Nama
+                        Name
                     </label>
                     <InputText
                         id="name"
                         required
                         autoFocus
-                        onChange={(e) => onInputChange(e, "name")}
+                        onChange={(e) => handleInputChange(e, "name")}
                         value={user.name}
-                        placeholder="Masukkan Nama..."
+                        placeholder="Enter Name..."
                     />
                     {errors.name && (
                         <small className="p-error">{errors.name}</small>
                     )}
                 </div>
                 <div className="field">
-                    <label htmlFor="username" className="font-bold">
-                        Username
+                    <label htmlFor="email" className="font-bold">
+                        Email
                     </label>
                     <InputText
-                        id="username"
+                        id="email"
+                        type="email"
                         required
-                        autoFocus
-                        onChange={(e) => onInputChange(e, "username")}
-                        value={user.username}
-                        placeholder="Masukkan Username..."
+                        onChange={(e) => handleInputChange(e, "email")}
+                        value={user.email}
+                        placeholder="Enter Email..."
                     />
-                    {errors.username && (
-                        <small className="p-error">{errors.username}</small>
+                    {errors.email && (
+                        <small className="p-error">{errors.email}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="ruangan" className="font-bold">
+                        Room
+                    </label>
+                    <Dropdown
+                        value={selectedRuangan}
+                        onChange={handleDropdownChange}
+                        options={ruangans}
+                        optionLabel="nama_ruangan"
+                        placeholder="Select a Room"
+                        filter
+                        valueTemplate={renderSelectedRuangan}
+                        itemTemplate={renderRuanganTemplate}
+                        className="w-full"
+                    />
+                    {errors.ruangan_id && (
+                        <small className="p-error">{errors.ruangan_id}</small>
                     )}
                 </div>
                 <div className="field">
@@ -112,11 +293,10 @@ export default function Index({ users }) {
                     </label>
                     <InputText
                         id="password"
-                        required
-                        autoFocus
-                        onChange={(e) => onInputChange(e, "password")}
+                        type="password"
+                        onChange={(e) => handleInputChange(e, "password")}
                         value={user.password}
-                        placeholder="Masukkan password..."
+                        placeholder="Enter Password..."
                     />
                     {errors.password && (
                         <small className="p-error">{errors.password}</small>
@@ -127,17 +307,16 @@ export default function Index({ users }) {
                         htmlFor="password_confirmation"
                         className="font-bold"
                     >
-                        Password Konfirmasi
+                        Confirm Password
                     </label>
                     <InputText
                         id="password_confirmation"
-                        required
-                        autoFocus
+                        type="password"
                         onChange={(e) =>
-                            onInputChange(e, "password_confirmation")
+                            handleInputChange(e, "password_confirmation")
                         }
                         value={user.password_confirmation}
-                        placeholder="Masukkan Password Konfirmasi..."
+                        placeholder="Confirm Password..."
                     />
                     {errors.password_confirmation && (
                         <small className="p-error">
@@ -151,9 +330,18 @@ export default function Index({ users }) {
                     <div className="card">
                         <Toolbar
                             className="mb-4"
-                            left={leftToolbarTemplate}
-                            // right={rightToolbarTemplate}
-                        ></Toolbar>
+                            left={() => (
+                                <div className="flex flex-wrap gap-2">
+                                    <Button
+                                        label="New"
+                                        icon="pi pi-plus"
+                                        severity="primary"
+                                        onClick={openNewDialog}
+                                        loading={btnNew}
+                                    />
+                                </div>
+                            )}
+                        />
                         <DataTable
                             value={dataUsers}
                             rowsPerPageOptions={[5, 10, 25]}
@@ -166,23 +354,27 @@ export default function Index({ users }) {
                                 header="Name"
                                 sortable
                                 filterPlaceholder="Search by name"
-                                headerStyle={{ width: "6rem" }}
+                                headerStyle={{ width: "20rem" }}
                             />
                             <Column
                                 headerClassName="fw-bold"
                                 field="email"
-                                header="Username"
+                                header="Email"
                                 sortable
-                                filterPlaceholder="Search by username"
-                                headerStyle={{ width: "6rem" }}
+                                filterPlaceholder="Search by email"
+                                headerStyle={{ width: "15rem" }}
                             />
                             <Column
                                 headerClassName="fw-bold"
                                 field="ruangan.nama_ruangan"
-                                header="Nama Ruangan"
+                                header="Room"
                                 sortable
-                                filterPlaceholder="Search by username"
-                                headerStyle={{ width: "6rem" }}
+                                filterPlaceholder="Search by room"
+                                headerStyle={{ width: "15rem" }}
+                            />
+                            <Column
+                                body={renderActionBody}
+                                exportable={false}
                             />
                         </DataTable>
                     </div>

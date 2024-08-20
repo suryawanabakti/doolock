@@ -68,6 +68,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['admin'])->group(function () {
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
+        Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
+        Route::patch('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+        Route::get('/admin/users/get-ruangan', [UserController::class, 'getRuangan'])->name('admin.users.get-ruangan');
 
         Route::get('/admin/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('admin.ruangan-hak-akses.index');
 
@@ -136,7 +140,6 @@ Route::get('/ambilpost', [DoorLockController::class, 'index']);
 Route::get('/ambilpostpin', [DoorLockController::class, 'index2']);
 Route::get('/ambilpin', [DoorLockController::class, 'index2']);
 
-Route::get('/ref/riwayat', [DoorLockController::class, 'getRiwayat']);
 
 Route::get('/uikit/button', function () {
     return Inertia::render('main/uikit/button/page');

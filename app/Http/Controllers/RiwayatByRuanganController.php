@@ -71,6 +71,9 @@ class RiwayatByRuanganController extends Controller
                 if ($data->status == 2) {
                     $status = "Tidak Terdaftar";
                 }
+                if ($data->status == 3) {
+                    $status = "No Akses";
+                }
                 return [
                     "id" => $data->id,
                     "kode" => $data->kode,
@@ -92,7 +95,7 @@ class RiwayatByRuanganController extends Controller
 
         return inertia("Admin/RiwayatByRuangan/Index", [
             "ruangan" => Ruangan::where('id', $request->ruangan_id)->first(),
-            "ruangans" => Ruangan::query()->get()->map(fn ($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
+            "ruangans" => Ruangan::query()->get()->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]),
             "riwayat" => $riwayat,
             "dataKosong" => $dataKosong ?? false,
             "mulai" => $mulai ?? Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'),
