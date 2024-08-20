@@ -13,6 +13,7 @@ use App\Http\Controllers\RuanganHakAksesController;
 use App\Http\Controllers\RuanganKelasController;
 use App\Http\Controllers\ScanerController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -66,6 +67,8 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::middleware(['admin'])->group(function () {
+        Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
+
         Route::get('/admin/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('admin.ruangan-hak-akses.index');
 
         Route::get('/admin/ruangan-kelas', [RuanganKelasController::class, 'index'])->name('admin.ruangan-kelas.index');

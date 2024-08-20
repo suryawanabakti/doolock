@@ -25,6 +25,11 @@ const AppMenu = () => {
                 label: "Master Data",
                 items: [
                     {
+                        label: "Admin",
+                        icon: "pi pi-users",
+                        to: route("admin.users.index"),
+                    },
+                    {
                         label: "Mahasiswa",
                         icon: "pi pi-users",
                         to: route("admin.mahasiswa.index"),
