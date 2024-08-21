@@ -407,7 +407,7 @@ const Scanner = ({ scanner, ruangans }) => {
                             />
                             <Column
                                 field="last"
-                                header="Last Update"
+                                header="Last Active"
                                 filter
                                 filterPlaceholder="Search by name"
                                 style={{ minWidth: "14rem" }}

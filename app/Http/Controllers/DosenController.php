@@ -4,11 +4,46 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DosenStoreRequest;
 use App\Http\Requests\DosenUpdateRequest;
+use App\Models\DosenRuangan;
 use App\Models\Mahasiswa;
+use App\Models\Ruangan;
 use Illuminate\Http\Request;
 
 class DosenController extends Controller
 {
+    public function getDosenRuangan($id)
+    {
+        // Ambil hanya kolom yang dibutuhkan dari Ruangan
+        $ruangans = Ruangan::select('id', 'nama_ruangan')->get();
+
+        // Ambil DosenRuangan dengan eager loading hanya kolom yang dibutuhkan
+        $dosenRuangan = DosenRuangan::where('mahasiswa_id', $id)
+            ->with(['ruangan:id,nama_ruangan']) // Load relasi ruangan dengan memilih kolom tertentu
+            ->get(['id', 'ruangan_id', 'mahasiswa_id'])->map(function ($data) {
+                return $data->ruangan;
+            }); // Pilih kolom yang dibutuhkan dari DosenRuangan
+        return [
+            "ruangans" => $ruangans,
+            "dosenRuangan" => $dosenRuangan,
+        ];
+    }
+
+    public function saveRuangan(Request $request)
+    {
+        // Hapus semua entri yang terkait dengan mahasiswa_id yang diberikan
+        DosenRuangan::where('mahasiswa_id', $request->id)->delete();
+
+        // Persiapkan data untuk dimasukkan ke dalam tabel DosenRuangan
+        $data = array_map(fn($row) => [
+            'ruangan_id' => $row['id'],
+            'mahasiswa_id' => $request->id,
+        ], $request->selectedRooms);
+
+        // Masukkan data ke dalam tabel DosenRuangan
+        DosenRuangan::insert($data);
+        return DosenRuangan::where('mahasiswa_id', $request->id)->get();
+    }
+
     public function index()
     {
         $mahasiswa = $this->getFormattedDosenList();

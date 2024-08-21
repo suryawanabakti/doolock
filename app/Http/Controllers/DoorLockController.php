@@ -29,6 +29,7 @@ class DoorLockController extends Controller
             ->whereHas('scanner', fn($query) => $query->where('kode', $request->kode))
             ->first();
 
+
         $now = Carbon::now('Asia/Makassar')->format('H:i:s');
         if (!$ruangan || $now < $ruangan->jam_buka || $now > $ruangan->jam_tutup) {
             echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
@@ -149,6 +150,11 @@ class DoorLockController extends Controller
 
         // Ambil data ruangan berdasarkan kode scanner
         $ruangan = Ruangan::with('scanner')->whereHas('scanner', fn($query) => $query->where('kode', $request->kode))->first();
+
+        // if ($ruangan->pin == $request->pin && $ruangan && $ruangan->pin_active) {
+        //     echo json_encode([$request->pin], JSON_UNESCAPED_UNICODE);
+        //     return;
+        // }
 
         $now = Carbon::now('Asia/Makassar')->format('H:i:s');
         // Cek apakah ruangan tersedia dan dalam jam buka

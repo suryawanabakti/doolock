@@ -107,7 +107,10 @@ const Dosen = ({ mahasiswa }) => {
     };
 
     const [customers, setCustomers] = useState(mahasiswa || []);
+    const [rooms, setRooms] = useState([]);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
+    const [selectedRooms, setSelectedRooms] = useState([]);
+
     const toast = useRef(null);
 
     const [filters, setFilters] = useState({
@@ -159,6 +162,29 @@ const Dosen = ({ mahasiswa }) => {
             },
             reject,
         });
+    };
+
+    const submitDosenRuangan = async () => {
+        setBtnLoading((prev) => ({ ...prev, ["submitDosenRuangan"]: true }));
+        try {
+            const res = await axios.post(route("admin.dosen.save-ruangan"), {
+                id: dosenRuangan.id,
+                selectedRooms,
+            });
+            console.log("RES DOSEN RUANGAN", res.data);
+            toast.current.show({
+                severity: "success",
+                summary: "Success",
+                detail:
+                    "You have success save data dosen ruangan " +
+                    dosenRuangan.nama,
+                life: 3000,
+            });
+        } catch (error) {
+            alert("error");
+            console.log("ERROR DOSEN RUANGAN", error);
+        }
+        setBtnLoading((prev) => ({ ...prev, ["submitDosenRuangan"]: false }));
     };
     const [ingredient, setIngredient] = useState("");
 
@@ -326,9 +352,47 @@ const Dosen = ({ mahasiswa }) => {
         );
     };
 
+    const [dialogRuangan, setDialogRuangan] = useState(false);
+    const emptyDosenRuangan = {
+        id: "",
+        nama: "",
+        selectedRooms,
+    };
+    const [dosenRuangan, setDosenRuangan] = useState(emptyDosenRuangan);
+
+    const [btnLoading, setBtnLoading] = useState({});
+    const openRuangan = async (rowData) => {
+        setBtnLoading((prev) => ({ ...prev, [rowData.id]: true }));
+        try {
+            const res = await axios.get(
+                route("admin.dosen.get-dosen-ruangan", rowData.id)
+            );
+            console.log(res);
+            setSelectedRooms(res.data?.dosenRuangan || []);
+            setDosenRuangan({
+                id: rowData.id,
+                nama: rowData.nama,
+                selectedRooms,
+            });
+            setRooms(res.data?.ruangans);
+            setDialogRuangan(true);
+        } catch (error) {
+            console.log(error);
+        }
+        setBtnLoading(false);
+    };
+
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
+                <Button
+                    icon="pi pi-key"
+                    rounded
+                    outlined
+                    className="mr-2"
+                    loading={btnLoading[rowData.id] || false}
+                    onClick={() => openRuangan(rowData)}
+                />
                 <Button
                     icon="pi pi-pencil"
                     rounded
@@ -650,6 +714,63 @@ const Dosen = ({ mahasiswa }) => {
                         </div>
                     </div>
                 </div>
+            </Dialog>
+
+            <Dialog
+                visible={dialogRuangan}
+                style={{ width: "90%" }}
+                breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+                header={`Beri Hak Akses Ruangan ${dosenRuangan.nama}`}
+                modal
+                className="p-fluid"
+                onHide={() => setDialogRuangan(false)}
+            >
+                <DataTable
+                    value={rooms || []}
+                    selection={selectedRooms}
+                    onSelectionChange={(e) => setSelectedRooms(e.value)}
+                    dataKey="id"
+                    paginator
+                    filters={filters}
+                    rows={10}
+                    rowsPerPageOptions={[5, 10, 25]}
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    globalFilter={globalFilter}
+                    header={() => (
+                        <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
+                            <h5>Dosen/Staff : {dosenRuangan.nama}</h5>
+                            <span className="p-input-icon-left">
+                                <i className="pi pi-search" />
+                                <InputText
+                                    type="search"
+                                    value={globalFilter}
+                                    onChange={(e) =>
+                                        setGlobalFilter(e.target.value)
+                                    }
+                                    placeholder="Global Search"
+                                />
+                            </span>
+                        </div>
+                    )}
+                >
+                    <Column
+                        selectionMode="multiple"
+                        headerStyle={{ width: "3rem" }}
+                    ></Column>
+                    <Column
+                        field="nama_ruangan"
+                        header="Nanma Ruangan"
+                        filterPlaceholder="Search by nama_ruangan"
+                        style={{ minWidth: "5rem" }}
+                        sortable
+                    />
+                </DataTable>
+                <Button
+                    loading={btnLoading["submitDosenRuangan"] || false}
+                    label="Klik untuk Simpan"
+                    onClick={submitDosenRuangan}
+                />
             </Dialog>
         </Layout>
     );

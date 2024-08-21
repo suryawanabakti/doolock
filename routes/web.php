@@ -94,7 +94,9 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/admin/mahasiswa/{mahasiswa}', [MahasiswaController::class, 'destroy'])->name('admin.mahasiswa.destroy');
 
         Route::get('/admin/dosen', [DosenController::class, 'index'])->name('admin.dosen.index');
+        Route::get('/admin/dosen/get-ruangan/{id}', [DosenController::class, 'getDosenRuangan'])->name('admin.dosen.get-dosen-ruangan');
         Route::post('/admin/dosen', [DosenController::class, 'store'])->name('admin.dosen.store');
+        Route::post('/admin/dosen/save-ruangan', [DosenController::class, 'saveRuangan'])->name('admin.dosen.save-ruangan');
         Route::post('/admin/dosen/active', [DosenController::class, 'active'])->name('admin.dosen.active');
         Route::post('/admin/dosen/block', [DosenController::class, 'block'])->name('admin.dosen.block');
         Route::patch('/admin/dosen/{mahasiswa}', [DosenController::class, 'update'])->name('admin.dosen.update');

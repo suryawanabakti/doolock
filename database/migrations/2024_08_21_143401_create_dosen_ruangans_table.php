@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ruangans', function (Blueprint $table) {
+        Schema::create('dosen_ruangans', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_ruangan')->nullable();
-            $table->enum('type', ['umum', 'kelas', 'lab']);
-            $table->boolean('open_api')->default(1);
-            $table->string('pin')->unique()->nullable();
-            $table->boolean('pin_active')->default(1);
+            $table->unsignedBigInteger('ruangan_id');
+            $table->foreign('ruangan_id')->references('id')->on('ruangans')->cascadeOnDelete();
+            $table->unsignedBigInteger('mahasiswa_id');
+            $table->foreign('mahasiswa_id')->references('id')->on('mahasiswa')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ruangans');
+        Schema::dropIfExists('dosen_ruangans');
     }
 };
