@@ -55,7 +55,8 @@ export default function Index({ users }) {
         setDialogTambah(true);
     };
 
-    const openEditDialog = (data) => {
+    const openEditDialog = async (data) => {
+        await fetchRuangans();
         setUser({
             id: data.id,
             name: data.name,
@@ -209,6 +210,7 @@ export default function Index({ users }) {
                 icon="pi pi-pencil"
                 rounded
                 outlined
+                loading={btnNew}
                 className="mr-2"
                 onClick={() => openEditDialog(rowData)}
             />

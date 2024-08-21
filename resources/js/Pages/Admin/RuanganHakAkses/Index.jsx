@@ -210,7 +210,7 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
         return (
             <div className="flex flex-wrap gap-2">
                 <Button
-                    disabled={loading}
+                    loading={loading}
                     label={`Save ${selectedRows.length} Mahasiswa`}
                     icon="pi pi-save"
                     severity="primary"
@@ -221,16 +221,20 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
     };
     const [dialogTambah, setDialogTambah] = useState(false);
     const [day, setDay] = useState(today);
+    const [btnLoading, setBtnLoading] = useState();
     const openNew = async () => {
+        setBtnLoading(true);
         const res = await axios.get(
             route("admin.ruangan-hak-akses.getMahasiswa", {
                 ruangan_id: ruangan.id,
                 day: day,
             })
         );
+
         console.log(res);
         setDataMahasiswa(res.data);
         setDialogTambah(true);
+        setBtnLoading(false);
     };
     const leftToolbarTemplate3 = () => {
         return (
@@ -239,6 +243,7 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
                     label={`Tambah Hak Akses ${ruangan.nama_ruangan}`}
                     icon="pi pi-save"
                     severity="primary"
+                    loading={btnLoading}
                     onClick={openNew}
                 />
             </div>

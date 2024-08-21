@@ -177,6 +177,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         kelas: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        tahun: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     });
     const [globalFilter, setGlobalFilter] = useState("");
     const onInputSearch = (e) => {
@@ -462,13 +463,15 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                                 header="Name"
                                 sortable
                                 filterPlaceholder="Search by name"
-                                style={{ minWidth: "14rem" }}
+                                style={{ minWidth: "13rem" }}
                             />
                             <Column
+                                filter
                                 field="tahun_masuk"
                                 header="Tahun"
                                 sortable
                                 filterPlaceholder="Search by tahun masuk"
+                                filterElement={() => <span>Tetst</span>}
                                 style={{ minWidth: "5rem" }}
                             />
                             <Column
