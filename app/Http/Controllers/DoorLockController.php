@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\StoreHistoryEvent;
 use App\Models\Absensi;
+use App\Models\DosenRuangan;
 use App\Models\HakAkses;
 use App\Models\HakAksesMahasiswa;
 use App\Models\Histori;
@@ -60,6 +61,16 @@ class DoorLockController extends Controller
 
             if (!$now->between($jamMasuk, $jamKeluar) && $scanner && $scanner->type === 'luar') {
                 $this->createHistoriAndBroadcast($mahasiswa, $request->id, $request->kode, 3, $ruangan);
+                echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+                return;
+            }
+        }
+
+        if ($mahasiswa && $mahasiswa->ket === 'dsn' && $scanner->type == 'luar') {
+            $ruanganAkses =   DosenRuangan::where('mahasiswa_id', $mahasiswa->id)->where('ruangan_id', $ruangan->id)->latest()
+                ->first();
+            if (!$ruanganAkses) {
+                $this->createHistoriAndBroadcast($mahasiswa, $mahasiswa->id_tag, $request->kode, 3, $ruangan);
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
                 return;
             }
@@ -192,7 +203,16 @@ class DoorLockController extends Controller
                 return;
             }
         }
-
+        // Jika mahasiswa adalah mahasiswa dosen
+        if ($mahasiswa->ket === 'dsn') {
+            $ruanganAkses =   DosenRuangan::where('mahasiswa_id', $mahasiswa->id)->where('ruangan_id', $ruangan->id)->latest()
+                ->first();
+            if (!$ruanganAkses) {
+                $this->createHistoriAndBroadcast($mahasiswa, $mahasiswa->id_tag, $request->kode, 3, $ruangan);
+                echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
+                return;
+            }
+        }
         // Membuat histori untuk mahasiswa
         $histori = Histori::create([
             'nim' => $mahasiswa->nim,
