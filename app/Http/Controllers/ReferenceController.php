@@ -26,12 +26,13 @@ class ReferenceController extends Controller
         }
 
         if ($scanner->ruangan->open_api == 1 || $scanner->ruangan->updated_at->format('Y-m-d') !== Carbon::now('Asia/Makassar')->format('Y-m-d')) {
-            $dataMahasiswa = json_encode(Mahasiswa::whereHas('ruanganAkses.hakAkses', function ($query) use ($scanner) {
+            $dataMahasiswa = json_encode(Mahasiswa::where('status', 1)->whereHas('ruanganAkses.hakAkses', function ($query) use ($scanner) {
                 $query->where('ruangan_id', $scanner->ruangan_id)->where('day', Carbon::now('Asia/Makassar')->format('D'));
             })->where('ket', 'mhs')->get()->map(fn($data) => $data->id_tag), JSON_UNESCAPED_UNICODE);
 
             $dataDosen = json_encode(Mahasiswa::where('ket', 'dsn')->get()->map(fn($data) => $data->id_tag), JSON_UNESCAPED_UNICODE);
             Ruangan::find($scanner->ruangan_id)->update(['open_api' =>  0]);
+            $scanner->update(['last' => Carbon::now('Asia/Makassar')->format('Y-m-d H:i:s')]);
             return  $dataMahasiswa . $dataDosen;
         }
 
