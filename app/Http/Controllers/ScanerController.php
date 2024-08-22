@@ -15,7 +15,7 @@ class ScanerController extends Controller
 
         $scanner = ScanerStatus::orderBy('created_at', 'DESC')->get()->map(function ($data) {
             $last = $data->last ? Carbon::parse($data->last) : Carbon::now('Asia/Makassar')->startOfDay();
-            if ($last->lt(Carbon::now('Asia/Makassar')->subHours(2))) {
+            if ($last->lt(Carbon::now('Asia/Makassar')->subHours(1))) {
                 $status = "Not Active";
             } else {
                 $status = "Active";
