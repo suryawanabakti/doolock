@@ -86,6 +86,11 @@ const AppMenu = () => {
                         icon: "pi pi-key",
                         to: route("penjaga.ruangan-hak-akses.index"),
                     },
+                    {
+                        label: "Pendaftaran Jadwal",
+                        icon: "pi pi-clock",
+                        to: route("penjaga.pendaftaran.index"),
+                    },
                 ],
             },
             {
@@ -101,6 +106,18 @@ const AppMenu = () => {
                         label: "Absensi",
                         icon: "pi pi-history",
                         to: route("penjaga.absensi.index"),
+                    },
+                ],
+            },
+        ],
+        mahasiswa: [
+            {
+                label: "Mahasiswa Menu",
+                items: [
+                    {
+                        label: "Pendaftaran Jadwal",
+                        icon: "pi pi-calendar-times",
+                        to: route("mahasiswa.register.index"),
                     },
                 ],
             },

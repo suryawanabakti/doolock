@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('mahasiswa', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users');
             $table->string('id_tag')->unique()->nullable();
             $table->string('nama');
             $table->string('nim')->unique();

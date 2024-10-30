@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoorLockController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\MahasiswaRegisterRuanganController;
+use App\Http\Controllers\PendaftaranJadwalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatByRuanganController;
 use App\Http\Controllers\RiwayatController;
@@ -55,15 +57,14 @@ Route::get('/dashboard', DashboardController::class)
 
 Route::middleware(['auth'])->group(function () {
 
-
+    Route::get('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'index'])->name('mahasiswa.register.index');
+    Route::post('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'store'])->name('mahasiswa.register.store');
+    Route::delete('/mahasiswa/register/{mahasiswaRegisterRuangan}', [MahasiswaRegisterRuanganController::class, 'destroy'])->name('mahasiswa.register.destroy');
 
 
     Route::get('/admin/ruangan-hak-akses/get-mahasiswa', [RuanganHakAksesController::class, 'getMahasiswa'])->name('admin.ruangan-hak-akses.getMahasiswa');
     Route::post('/admin/ruangan-hak-akses', [RuanganHakAksesController::class, 'store'])->name('admin.ruangan-hak-akses.store');
     Route::delete('/admin/ruangan-hak-akses/{hakAkses}', [RuanganHakAksesController::class, 'destroy'])->name('admin.ruangan-hak-akses.destroy');
-
-
-
 
 
     Route::middleware(['admin'])->group(function () {
@@ -126,6 +127,9 @@ Route::middleware(['auth'])->group(function () {
 
 
     // PENJAGA
+    Route::get('/penjaga/pendaftaran', [PendaftaranJadwalController::class, 'index'])->name('penjaga.pendaftaran.index');
+    Route::patch('/penjaga/pendaftaran/{registerRuangan}', [PendaftaranJadwalController::class, 'approve'])->name('penjaga.pendaftaran.approve');
+
     Route::get('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('penjaga.ruangan-hak-akses.index');
     Route::get('/penjaga/riwayat', [RiwayatController::class, 'indexPenjaga'])->name('penjaga.riwayat.index');
     Route::get('/penjaga/riwayat/mahasiswa', [RiwayatController::class, 'mahasiswaPenjaga'])->name('penjaga.riwayat.mahasiswa');

@@ -56,12 +56,12 @@ export default function Login({ status, canResetPassword }) {
                                     htmlFor="email"
                                     className="block text-900 font-medium mb-2"
                                 >
-                                    Email
+                                    Username
                                 </label>
                                 <InputText
                                     id="email"
                                     type="text"
-                                    placeholder="Email address"
+                                    placeholder="Enter your username"
                                     className="w-full"
                                     value={data.email}
                                     onChange={(e) =>

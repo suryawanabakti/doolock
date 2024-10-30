@@ -19,7 +19,7 @@ class DashboardController extends Controller
     protected function thisAdmin() {}
     public function __invoke(Request $request)
     {
-        if (auth()->user()->role == 'admin') {
+        if ($request->user()->role == 'admin') {
             $mahasiswaCount = Mahasiswa::where('ket', 'mhs')->count();
             $dosenCount = Mahasiswa::where('ket', 'dsn')->count();
             $ruanganCount = Ruangan::count();
@@ -55,8 +55,12 @@ class DashboardController extends Controller
             ]);
         }
 
-        if (auth()->user()->role == 'penjaga') {
+        if ($request->user()->role == 'penjaga') {
             return redirect()->route('penjaga.riwayat.index');
+        }
+
+        if ($request->user()->role == 'mahasiswa') {
+            return redirect()->route('mahasiswa.register.index');
         }
     }
 }
