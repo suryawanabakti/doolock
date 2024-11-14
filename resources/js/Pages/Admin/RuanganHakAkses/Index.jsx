@@ -37,7 +37,7 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
             case "wed":
                 return "Wednesday";
             case "thu":
-                return "Kami";
+                return "Kamis";
             case "fri":
                 return "Jum'at";
             case "sat":
@@ -169,6 +169,7 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
                 route("admin.ruangan-hak-akses.store"),
                 data
             );
+
             const updatedData = [res.data, ...dataHakAkses];
             setDataHakAkses(updatedData);
             toast.current.show({

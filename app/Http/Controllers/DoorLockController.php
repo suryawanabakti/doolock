@@ -40,9 +40,11 @@ class DoorLockController extends Controller
         $scanner = ScanerStatus::where('kode', $request->kode)->first();
 
         if ($mahasiswa && $mahasiswa->ket === 'mhs' && $scanner->type == 'luar') {
+
             $ruanganAkses = HakAksesMahasiswa::where('mahasiswa_id', $mahasiswa->id)
                 ->whereHas('hakAkses', function ($query) use ($ruangan) {
-                    $query->where('day', Carbon::now('Asia/Makassar')->format('D'))
+                    $query->where(fn($q) => $q->where('day', Carbon::now('Asia/Makassar')->format('D'))
+                        ->orWhere(str()->lower(Carbon::now('Asia/Makassar')->format('D')), true))
                         ->where('ruangan_id', $ruangan->id);
                 })
                 ->latest()
@@ -86,6 +88,7 @@ class DoorLockController extends Controller
         ]);
 
         if ($mahasiswa) {
+
             ScanerStatus::where('kode', $request->kode)->update(['last' => Carbon::now('Asia/Makassar')->format('Y-m-d H:i:s')]);
 
             if ($mahasiswa->status == 0) {
@@ -178,7 +181,10 @@ class DoorLockController extends Controller
         if ($mahasiswa->ket === 'mhs') {
             $ruanganAkses = HakAksesMahasiswa::where('mahasiswa_id', $mahasiswa->id)
                 ->whereHas('hakAkses', function ($query) use ($ruangan) {
-                    $query->where('day', Carbon::now('Asia/Makassar')->format('D'))
+                    $query->where(function ($query) {
+                        $query->where('day', Carbon::now('Asia/Makassar')->format('D'))
+                            ->orWhere(str()->lower(Carbon::now('Asia/Makassar')->format('D')), true);
+                    })
                         ->where('ruangan_id', $ruangan->id);
                 })
                 ->latest()

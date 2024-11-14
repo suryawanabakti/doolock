@@ -29,9 +29,16 @@ class MahasiswaRegisterRuanganController extends Controller
         $data = RegisterRuangan::create([
             'user_id' => $request->user()->id,
             'ruangan_id' => $request->ruangan_id,
-            'day' => $request->day,
+            'day' => $request->day[0],
             'jam_masuk' => $request->jam_masuk,
             'jam_keluar' => $request->jam_keluar,
+            'mon' => in_array('mon', $request->day) ? 1 : 0,
+            'tue' => in_array('tue', $request->day) ? 1 : 0,
+            'wed' => in_array('wed', $request->day) ? 1 : 0,
+            'thu' => in_array('thu', $request->day) ? 1 : 0,
+            'fri' => in_array('fri', $request->day) ? 1 : 0,
+            'sat' => in_array('sat', $request->day) ? 1 : 0,
+            'sun' => in_array('sun', $request->day) ? 1 : 0,
         ]);
         return $data->load('ruangan');
     }

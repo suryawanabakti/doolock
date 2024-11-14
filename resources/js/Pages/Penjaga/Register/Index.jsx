@@ -16,8 +16,17 @@ import { Badge } from "primereact/badge";
 import { useRef } from "react";
 import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { FilterMatchMode } from "primereact/api";
 
 export default function Index({ jadwals, ruangans }) {
+    const [filters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+    const [globalFilter, setGlobalFilter] = useState("");
+    const onInputSearch = (e) => {
+        var value = e.target.value;
+        setGlobalFilter(value);
+    };
     const [dataJadwals, setDataJadwals] = useState(jadwals);
     const { data, setData, errors } = useForm({
         ruangan_id: "",
@@ -137,6 +146,21 @@ export default function Index({ jadwals, ruangans }) {
                         rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        globalFilter={globalFilter}
+                        filters={filters}
+                        header={() => (
+                            <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
+                                <h5 className="mt-3">Pendaftaran Jadwal</h5>
+                                <span className="p-input-icon-left">
+                                    <i className="pi pi-search" />
+                                    <InputText
+                                        type="search"
+                                        onInput={(e) => onInputSearch(e)}
+                                        placeholder="Global Search"
+                                    />
+                                </span>
+                            </div>
+                        )}
                     >
                         <Column
                             headerClassName="fw-bold"
@@ -167,6 +191,39 @@ export default function Index({ jadwals, ruangans }) {
                             headerClassName="fw-bold"
                             field="day"
                             header="Hari"
+                            body={(jadwal) => {
+                                const days = [
+                                    { key: "mon", label: "Senin" },
+                                    { key: "tue", label: "Selasa" },
+                                    { key: "wed", label: "Rabu" },
+                                    { key: "thu", label: "Kamis" },
+                                    { key: "fri", label: "Jum'at" },
+                                    { key: "sat", label: "Sabtu" },
+                                    { key: "sun", label: "Minggu" },
+                                ];
+
+                                return (
+                                    <>
+                                        {days
+                                            .filter(
+                                                (day) => jadwal[day.key] === 1
+                                            )
+                                            .map((day, index) => (
+                                                <span key={day.key}>
+                                                    {day.label}
+                                                    {index <
+                                                        days.filter(
+                                                            (d) =>
+                                                                jadwal[
+                                                                    d.key
+                                                                ] === 1
+                                                        ).length -
+                                                            1 && ", "}
+                                                </span>
+                                            ))}
+                                    </>
+                                );
+                            }}
                             sortable
                             filterPlaceholder="Search by hari"
                             headerStyle={{ width: "10rem" }}

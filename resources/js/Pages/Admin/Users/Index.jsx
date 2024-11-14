@@ -10,8 +10,17 @@ import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { FilterMatchMode } from "primereact/api";
 
 export default function Index({ users }) {
+    const [filters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+    const [globalFilter, setGlobalFilter] = useState("");
+    const onInputSearch = (e) => {
+        var value = e.target.value;
+        setGlobalFilter(value);
+    };
     const [dataUsers, setDataUsers] = useState(users);
     const [openDialogTambah, setDialogTambah] = useState(false);
     const [ruangans, setRuangans] = useState([]);
@@ -349,6 +358,21 @@ export default function Index({ users }) {
                             rowsPerPageOptions={[5, 10, 25]}
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                            globalFilter={globalFilter}
+                            filters={filters}
+                            header={() => (
+                                <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
+                                    <h5>Admin Ruangan</h5>
+                                    <span className="p-input-icon-left">
+                                        <i className="pi pi-search" />
+                                        <InputText
+                                            type="search"
+                                            onInput={(e) => onInputSearch(e)}
+                                            placeholder="Global Search"
+                                        />
+                                    </span>
+                                </div>
+                            )}
                         >
                             <Column
                                 headerClassName="fw-bold"
@@ -369,7 +393,7 @@ export default function Index({ users }) {
                             <Column
                                 headerClassName="fw-bold"
                                 field="ruangan.nama_ruangan"
-                                header="Room"
+                                header="Ruangan"
                                 sortable
                                 filterPlaceholder="Search by room"
                                 headerStyle={{ width: "15rem" }}

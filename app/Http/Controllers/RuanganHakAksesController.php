@@ -28,8 +28,8 @@ class RuanganHakAksesController extends Controller
     }
     public function index(Request $request)
     {
-        if (auth()->user()->role == 'penjaga') {
-            $ruanganId = auth()->user()->ruangan_id;
+        if ($request->user()->role == 'penjaga') {
+            $ruanganId = $request->user()->ruangan_id;
         } else {
             $ruanganId = $request->id;
         }
@@ -51,7 +51,7 @@ class RuanganHakAksesController extends Controller
                 "name" => $data->nama_ruangan
             ];
         });
-        if (auth()->user()->role == 'penjaga') {
+        if ($request->user()->role == 'penjaga') {
             return inertia("Penjaga/RuanganHakAkses/Index", [
                 "hakAkses" => $hakAkses,
                 "kelas" => $kelas,
@@ -69,16 +69,18 @@ class RuanganHakAksesController extends Controller
 
     public function store(StoreHakAksesRequest $request)
     {
-        if (auth()->user()->role == 'penjaga') {
-            if (auth()->user()->ruangan_id !== $request->ruangan_id) {
+        if ($request->user()->role == 'penjaga') {
+            if ($request->user()->ruangan_id !== $request->ruangan_id) {
                 abort(403);
             }
         }
 
         Ruangan::find($request->ruangan_id)->update(['open_api' => 1]);
+
         if (!$request->mahasiswa) {
             return response()->json(["message" => "Mahasiswa harus di isi"], 400);
         }
+
         return DB::transaction(function () use ($request) {
             $checkHakAkses = HakAkses::where('ruangan_id', $request->ruangan_id)->where('day', $request->day)
                 ->where(function ($query) use ($request) {
@@ -95,10 +97,15 @@ class RuanganHakAksesController extends Controller
                 return response()->json(["message" => "Gagal simpan , sudah ada jadwal hari $request->day dari $checkHakAkses->jam_masuk sampai $checkHakAkses->jam_keluar"], 400);
             }
 
-
-
             $hakAkses = HakAkses::create([
                 "day" => $request->day,
+                "mon" => $request->day == 'Mon',
+                "tue" => $request->day == 'Tue',
+                "wed" => $request->day == 'Wed',
+                "thu" => $request->day == 'Thu',
+                "fri" => $request->day == 'Fri',
+                "sat" => $request->day == 'Sat',
+                "sun" => $request->day == 'Sun',
                 "ruangan_id" => $request->ruangan_id,
                 "jam_masuk" => $request->jam_masuk,
                 "jam_keluar" => $request->jam_keluar,

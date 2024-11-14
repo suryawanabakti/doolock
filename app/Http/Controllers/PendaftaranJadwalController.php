@@ -6,7 +6,6 @@ use App\Models\HakAkses;
 use App\Models\HakAksesMahasiswa;
 use App\Models\Mahasiswa;
 use App\Models\RegisterRuangan;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -25,33 +24,26 @@ class PendaftaranJadwalController extends Controller
 
             $mahasiswa = Mahasiswa::where('user_id', $registerRuangan->user_id)->first();
 
-            $hakAkses = HakAkses::where('ruangan_id', $registerRuangan->ruangan_id)
-                ->where('day', $registerRuangan->day)->where('jam_masuk', $registerRuangan->jam_masuk)->where('jam_keluar', $registerRuangan->jam_keluar)->first();
 
-            if (empty($hakAkses)) {
-                $hakAkses = HakAkses::create([
-                    'ruangan_id' => $registerRuangan->ruangan_id,
-                    'jam_masuk' => $registerRuangan->jam_masuk,
-                    'jam_keluar' => $registerRuangan->jam_keluar,
-                    'day' => $registerRuangan->day
-                ]);
+            $hakAkses = HakAkses::create([
+                'ruangan_id' => $registerRuangan->ruangan_id,
+                'jam_masuk' => $registerRuangan->jam_masuk,
+                'jam_keluar' => $registerRuangan->jam_keluar,
+                'day' => $registerRuangan->day,
+                'mon' => $registerRuangan->mon,
+                'tue' => $registerRuangan->tue,
+                'wed' => $registerRuangan->wed,
+                'thu' => $registerRuangan->thu,
+                'fri' => $registerRuangan->fri,
+                'sat' => $registerRuangan->sat,
+                'sun' => $registerRuangan->sun,
+            ]);
 
-                HakAksesMahasiswa::create([
-                    'mahasiswa_id' => $mahasiswa->id,
-                    'hak_akses_id' => $hakAkses->id,
-                ]);
-            } else {
-                $hakAksesMahasiswa = HakAksesMahasiswa::where('hak_akses_id', $hakAkses->id)->where('mahasiswa_id', $mahasiswa->id);
+            HakAksesMahasiswa::create([
+                'mahasiswa_id' => $mahasiswa->id,
+                'hak_akses_id' => $hakAkses->id,
+            ]);
 
-                if (!empty($hakAksesMahasiswa)) {
-                    return response()->json(['message' => 'Gagal ,mahasiswa ini sudah ada di ruangan'], 422);
-                }
-
-                HakAksesMahasiswa::create([
-                    'mahasiswa_id' => $mahasiswa->id,
-                    'hak_akses_id' => $hakAkses->id,
-                ]);
-            }
             $registerRuangan->update(['is_approve' =>  true]);
             return $registerRuangan->load('user', 'ruangan');
         });

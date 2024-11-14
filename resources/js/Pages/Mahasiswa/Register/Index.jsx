@@ -16,12 +16,13 @@ import { Badge } from "primereact/badge";
 import { useRef } from "react";
 import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { Checkbox } from "primereact/checkbox";
 
 export default function Index({ jadwals, ruangans }) {
     const [dataJadwals, setDataJadwals] = useState(jadwals);
     const { data, setData, errors } = useForm({
         ruangan_id: "",
-        day: "",
+        day: [],
         jam_masuk: "",
         jam_keluar: "",
     });
@@ -66,14 +67,24 @@ export default function Index({ jadwals, ruangans }) {
                 jam_masuk: data.jam_masuk,
                 jam_keluar: data.jam_keluar,
             });
+            console.log("RESPON", res);
+
             const updatedData = [res.data, ...dataJadwals];
             setDataJadwals(updatedData);
             setDialogNew(false);
         } catch (error) {
+            console.log(error);
             alert("Error");
         }
     };
     const toast = useRef(null);
+    const handleDayChange = (e) => {
+        const selectedDay = e.value;
+        const updatedDays = data.day.includes(selectedDay)
+            ? data.day.filter((day) => day !== selectedDay)
+            : [...data.day, selectedDay];
+        setData("day", updatedDays);
+    };
     const confirm2 = (event, rowData) => {
         confirmPopup({
             target: event.currentTarget,
@@ -155,90 +166,31 @@ export default function Index({ jadwals, ruangans }) {
                         Hari
                     </label>
                     <div className="flex flex-wrap gap-2">
-                        <div className="flex align-items-center">
-                            <RadioButton
-                                inputId="Mon"
-                                name="day"
-                                value="Mon"
-                                onChange={(e) => setData("day", e.value)}
-                                checked={data.day === "Mon"}
-                            />
-                            <label htmlFor="Mon" className="ml-2">
-                                Senin
-                            </label>
-                        </div>
-                        <div className="flex align-items-center">
-                            <RadioButton
-                                inputId="Tue"
-                                name="day"
-                                value="Tue"
-                                onChange={(e) => setData("day", e.value)}
-                                checked={data.day === "Tue"}
-                            />
-                            <label htmlFor="Tue" className="ml-2">
-                                Selasa
-                            </label>
-                        </div>
-                        <div className="flex align-items-center">
-                            <RadioButton
-                                inputId="Wed"
-                                name="day"
-                                value="Wed"
-                                onChange={(e) => setData("day", e.value)}
-                                checked={data.day === "Wed"}
-                            />
-                            <label htmlFor="Wed" className="ml-2">
-                                Rabu
-                            </label>
-                        </div>
-                        <div className="flex align-items-center">
-                            <RadioButton
-                                inputId="Thu"
-                                name="day"
-                                value="Thu"
-                                onChange={(e) => setData("day", e.value)}
-                                checked={data.day === "Thu"}
-                            />
-                            <label htmlFor="Thu" className="ml-2">
-                                Kamis
-                            </label>
-                        </div>
-                        <div className="flex align-items-center">
-                            <RadioButton
-                                inputId="Fri"
-                                name="day"
-                                value="Fri"
-                                onChange={(e) => setData("day", e.value)}
-                                checked={data.day === "Fri"}
-                            />
-                            <label htmlFor="Fri" className="ml-2">
-                                Jum'at
-                            </label>
-                        </div>
-                        <div className="flex align-items-center">
-                            <RadioButton
-                                inputId="Sat"
-                                name="day"
-                                value="Sat"
-                                onChange={(e) => setData("day", e.value)}
-                                checked={data.day === "Sat"}
-                            />
-                            <label htmlFor="Sat" className="ml-2">
-                                Sabtu
-                            </label>
-                        </div>
-                        <div className="flex align-items-center">
-                            <RadioButton
-                                inputId="Sun"
-                                name="day"
-                                value="Sun"
-                                onChange={(e) => setData("day", e.value)}
-                                checked={data.day === "Sun"}
-                            />
-                            <label htmlFor="Sun" className="ml-2">
-                                Minggu
-                            </label>
-                        </div>
+                        {[
+                            { label: "Senin", value: "mon" },
+                            { label: "Selasa", value: "tue" },
+                            { label: "Rabu", value: "wed" },
+                            { label: "Kamis", value: "thu" },
+                            { label: "Jum'at", value: "fri" },
+                            { label: "Sabtu", value: "sat" },
+                            { label: "Minggu", value: "sun" },
+                        ].map((day) => (
+                            <div
+                                key={day.value}
+                                className="flex align-items-center"
+                            >
+                                <Checkbox
+                                    inputId={day.value}
+                                    name="day"
+                                    value={day.value}
+                                    onChange={handleDayChange}
+                                    checked={data.day.includes(day.value)}
+                                />
+                                <label htmlFor={day.value} className="ml-2">
+                                    {day.label}
+                                </label>
+                            </div>
+                        ))}
                     </div>
                 </div>
                 <div className="field">
@@ -309,6 +261,39 @@ export default function Index({ jadwals, ruangans }) {
                             headerClassName="fw-bold"
                             field="day"
                             header="Hari"
+                            body={(jadwal) => {
+                                const days = [
+                                    { key: "mon", label: "Senin" },
+                                    { key: "tue", label: "Selasa" },
+                                    { key: "wed", label: "Rabu" },
+                                    { key: "thu", label: "Kamis" },
+                                    { key: "fri", label: "Jum'at" },
+                                    { key: "sat", label: "Sabtu" },
+                                    { key: "sun", label: "Minggu" },
+                                ];
+
+                                return (
+                                    <>
+                                        {days
+                                            .filter(
+                                                (day) => jadwal[day.key] === 1
+                                            )
+                                            .map((day, index) => (
+                                                <span key={day.key}>
+                                                    {day.label}
+                                                    {index <
+                                                        days.filter(
+                                                            (d) =>
+                                                                jadwal[
+                                                                    d.key
+                                                                ] === 1
+                                                        ).length -
+                                                            1 && ", "}
+                                                </span>
+                                            ))}
+                                    </>
+                                );
+                            }}
                             sortable
                             filterPlaceholder="Search by hari"
                             headerStyle={{ width: "10rem" }}
