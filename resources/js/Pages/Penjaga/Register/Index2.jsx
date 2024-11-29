@@ -18,7 +18,7 @@ import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { FilterMatchMode } from "primereact/api";
 
-export default function Index({ jadwals, ruangans }) {
+export default function Index2({ jadwals, ruangans }) {
     const [filters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
@@ -151,7 +151,7 @@ export default function Index({ jadwals, ruangans }) {
                         header={() => (
                             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
                                 <h5 className="mt-3">
-                                    Pendaftaran Jadwal Belum di approve
+                                    Pendaftaran Jadwal Sudah Di Approve
                                 </h5>
                                 <span className="p-input-icon-left">
                                     <i className="pi pi-search" />
@@ -246,47 +246,6 @@ export default function Index({ jadwals, ruangans }) {
                             sortable
                             filterPlaceholder="Search by keluar"
                             headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="is_approve"
-                            header="Approve"
-                            body={(jadwal) => {
-                                return jadwal.is_approve == 1 ? (
-                                    <Badge
-                                        severity="success"
-                                        value={"Approve"}
-                                    />
-                                ) : (
-                                    <Badge
-                                        severity="warning"
-                                        value="Not Approve"
-                                    />
-                                );
-                            }}
-                            sortable
-                            filterPlaceholder="Search by is_approve"
-                            headerStyle={{ width: "20rem" }}
-                        />
-
-                        <Column
-                            headerClassName="fw-bold"
-                            field="action"
-                            header="Approve"
-                            body={(rowData) => {
-                                return (
-                                    <Button
-                                        icon="pi pi-check"
-                                        rounded
-                                        outlined
-                                        severity="success"
-                                        onClick={(event) =>
-                                            confirm2(event, rowData)
-                                        }
-                                    />
-                                );
-                            }}
-                            headerStyle={{ width: "15rem" }}
                         />
                     </DataTable>
                 </div>

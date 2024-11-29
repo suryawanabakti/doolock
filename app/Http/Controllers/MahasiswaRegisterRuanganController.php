@@ -11,7 +11,8 @@ class MahasiswaRegisterRuanganController extends Controller
 {
     public function index(Request $request)
     {
-        $jadwals = RegisterRuangan::orderBy('created_at', 'DESC')->with('ruangan')->where('user_id', $request->user()->id)->get();
+        $jadwals = RegisterRuangan::orderBy('created_at', 'DESC')->with('ruangan')->where('user_id', $request->user()->id)
+            ->where('is_approve', 0)->get();
 
         $ruangans = Ruangan::whereIn('type', ['lab'])
             ->get()
@@ -46,5 +47,20 @@ class MahasiswaRegisterRuanganController extends Controller
     public function destroy(RegisterRuangan $mahasiswaRegisterRuangan)
     {
         $mahasiswaRegisterRuangan->delete();
+    }
+
+
+    public function index2(Request $request)
+    {
+        $jadwals = RegisterRuangan::where('is_approve', 1)->orderBy('created_at', 'DESC')->with('ruangan')->where('user_id', $request->user()->id)->get();
+
+        $ruangans = Ruangan::whereIn('type', ['lab'])
+            ->get()
+            ->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]);
+
+        return Inertia::render("Mahasiswa/Register/Index2", [
+            "jadwals" => $jadwals,
+            "ruangans" => $ruangans,
+        ]);
     }
 }

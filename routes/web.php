@@ -16,6 +16,8 @@ use App\Http\Controllers\RuanganKelasController;
 use App\Http\Controllers\ScanerController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
+use App\Models\Mahasiswa;
+use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -41,6 +43,7 @@ Route::get('/', function () {
     ]);
 });
 
+
 Route::get('/show-ip', function () {
     return request()->ip();
     return Inertia::render('Welcome', [
@@ -60,6 +63,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'index'])->name('mahasiswa.register.index');
     Route::post('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'store'])->name('mahasiswa.register.store');
     Route::delete('/mahasiswa/register/{mahasiswaRegisterRuangan}', [MahasiswaRegisterRuanganController::class, 'destroy'])->name('mahasiswa.register.destroy');
+
+    Route::get('/mahasiswa/register-approve', [MahasiswaRegisterRuanganController::class, 'index2'])->name('mahasiswa.register-approve.index');
 
 
     Route::get('/admin/ruangan-hak-akses/get-mahasiswa', [RuanganHakAksesController::class, 'getMahasiswa'])->name('admin.ruangan-hak-akses.getMahasiswa');
@@ -129,6 +134,7 @@ Route::middleware(['auth'])->group(function () {
     // PENJAGA
     Route::get('/penjaga/pendaftaran', [PendaftaranJadwalController::class, 'index'])->name('penjaga.pendaftaran.index');
     Route::patch('/penjaga/pendaftaran/{registerRuangan}', [PendaftaranJadwalController::class, 'approve'])->name('penjaga.pendaftaran.approve');
+    Route::get('/penjaga/pendaftaran-approve', [PendaftaranJadwalController::class, 'index2'])->name('penjaga.pendaftaran-approve.index');
 
     Route::get('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('penjaga.ruangan-hak-akses.index');
     Route::get('/penjaga/riwayat', [RiwayatController::class, 'indexPenjaga'])->name('penjaga.riwayat.index');

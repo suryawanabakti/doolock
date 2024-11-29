@@ -13,7 +13,7 @@ class PendaftaranJadwalController extends Controller
 {
     public function index(Request $request)
     {
-        $jadwals = RegisterRuangan::orderBy('created_at', 'DESC')->with('ruangan', 'user')->where('ruangan_id', $request->user()->ruangan_id)->get();
+        $jadwals = RegisterRuangan::where('is_approve', 0)->orderBy('created_at', 'DESC')->with('ruangan', 'user')->where('ruangan_id', $request->user()->ruangan_id)->get();
 
         return inertia("Penjaga/Register/Index", ["jadwals" => $jadwals]);
     }
@@ -47,5 +47,11 @@ class PendaftaranJadwalController extends Controller
             $registerRuangan->update(['is_approve' =>  true]);
             return $registerRuangan->load('user', 'ruangan');
         });
+    }
+    public function index2(Request $request)
+    {
+        $jadwals = RegisterRuangan::where('is_approve', 1)->orderBy('created_at', 'DESC')->with('ruangan', 'user')->where('ruangan_id', $request->user()->ruangan_id)->get();
+
+        return inertia("Penjaga/Register/Index2", ["jadwals" => $jadwals]);
     }
 }

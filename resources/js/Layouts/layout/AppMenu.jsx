@@ -87,9 +87,14 @@ const AppMenu = () => {
                         to: route("penjaga.ruangan-hak-akses.index"),
                     },
                     {
-                        label: "Pendaftaran Jadwal",
+                        label: "Daftar Jadwal belum di approve",
                         icon: "pi pi-clock",
                         to: route("penjaga.pendaftaran.index"),
+                    },
+                    {
+                        label: "Daftar Jadwal sudah di approve",
+                        icon: "pi pi-check",
+                        to: route("penjaga.pendaftaran-approve.index"),
                     },
                 ],
             },
@@ -115,9 +120,14 @@ const AppMenu = () => {
                 label: "Mahasiswa Menu",
                 items: [
                     {
-                        label: "Pendaftaran Jadwal",
-                        icon: "pi pi-calendar-times",
+                        label: "Daftar Jadwal belum di approve",
+                        icon: "pi pi-clock",
                         to: route("mahasiswa.register.index"),
+                    },
+                    {
+                        label: "Daftar Jadwal sudah di approve",
+                        icon: "pi pi-check",
+                        to: route("mahasiswa.register-approve.index"),
                     },
                 ],
             },

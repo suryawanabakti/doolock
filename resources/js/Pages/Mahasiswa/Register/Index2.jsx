@@ -16,21 +16,14 @@ import { Badge } from "primereact/badge";
 import { useRef } from "react";
 import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
-import { FilterMatchMode } from "primereact/api";
+import { Checkbox } from "primereact/checkbox";
 
-export default function Index({ jadwals, ruangans }) {
-    const [filters] = useState({
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    });
-    const [globalFilter, setGlobalFilter] = useState("");
-    const onInputSearch = (e) => {
-        var value = e.target.value;
-        setGlobalFilter(value);
-    };
+export default function Index2({ jadwals, ruangans }) {
+    const [dataRuangans, setDataRuangans] = useState(ruangans);
     const [dataJadwals, setDataJadwals] = useState(jadwals);
     const { data, setData, errors } = useForm({
         ruangan_id: "",
-        day: "",
+        day: [],
         jam_masuk: "",
         jam_keluar: "",
     });
@@ -75,57 +68,52 @@ export default function Index({ jadwals, ruangans }) {
                 jam_masuk: data.jam_masuk,
                 jam_keluar: data.jam_keluar,
             });
+            console.log("RESPON", res);
+
             const updatedData = [res.data, ...dataJadwals];
             setDataJadwals(updatedData);
             setDialogNew(false);
         } catch (error) {
+            console.log(error);
             alert("Error");
         }
     };
     const toast = useRef(null);
+    const handleDayChange = (e) => {
+        const selectedDay = e.value;
+        const updatedDays = data.day.includes(selectedDay)
+            ? data.day.filter((day) => day !== selectedDay)
+            : [...data.day, selectedDay];
+        setData("day", updatedDays);
+    };
     const confirm2 = (event, rowData) => {
         confirmPopup({
             target: event.currentTarget,
-            message: "Apakah anda yakin menyutujui pendaftaran jadwal ini?",
+            message: "Do you want to delete this record?",
             icon: "pi pi-info-circle",
             defaultFocus: "reject",
-            acceptClassName: "p-button-success",
+            acceptClassName: "p-button-danger",
             accept: async () => {
                 try {
-                    const res = await axios.patch(
-                        route("penjaga.pendaftaran.approve", rowData.id)
+                    await axios.delete(
+                        route("mahasiswa.register.destroy", rowData.id)
                     );
-                    console.log(res);
                     toast.current.show({
-                        severity: "success",
+                        severity: "info",
                         summary: "Confirmed",
-                        detail: "You have approve ",
+                        detail: "You have deleted " + rowData.nama,
                         life: 3000,
                     });
-
-                    setDataJadwals((prevItems) =>
-                        prevItems.map((item) =>
-                            item.id == res.data.id
-                                ? {
-                                      ...item,
-                                      user: res.data.user,
-                                      ruangan: res.data.ruangan,
-                                      day: res.data.day,
-                                      jam_masuk: res.data.jam_masuk,
-                                      jam_keluar: res.data.jam_keluar,
-                                  }
-                                : item
-                        )
+                    const updatedUsers = dataJadwals.filter(
+                        (user) => user.id !== rowData.id
                     );
-                    window.location.reload();
+                    // Update the state with the new array
+                    setDataJadwals(updatedUsers);
                 } catch (e) {
-                    console.log("ERROR", e);
                     toast.current.show({
                         severity: "error",
                         summary: "Error",
-                        detail:
-                            "You have error deleted " +
-                                e.response?.data?.message || e.message,
+                        detail: "You have error deleted " + e.message,
                         life: 3000,
                     });
                 }
@@ -137,7 +125,6 @@ export default function Index({ jadwals, ruangans }) {
     return (
         <Layout>
             <Toast ref={toast} />
-            <ConfirmPopup />
 
             <div className="grid">
                 <div className="col-12">
@@ -146,40 +133,7 @@ export default function Index({ jadwals, ruangans }) {
                         rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                        globalFilter={globalFilter}
-                        filters={filters}
-                        header={() => (
-                            <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
-                                <h5 className="mt-3">
-                                    Pendaftaran Jadwal Belum di approve
-                                </h5>
-                                <span className="p-input-icon-left">
-                                    <i className="pi pi-search" />
-                                    <InputText
-                                        type="search"
-                                        onInput={(e) => onInputSearch(e)}
-                                        placeholder="Global Search"
-                                    />
-                                </span>
-                            </div>
-                        )}
                     >
-                        <Column
-                            headerClassName="fw-bold"
-                            field="user.email"
-                            header="NIM"
-                            sortable
-                            filterPlaceholder="Search by  nim"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="user.name"
-                            header="Nama"
-                            sortable
-                            filterPlaceholder="Search by mahasiswa"
-                            headerStyle={{ width: "20rem" }}
-                        />
                         <Column
                             headerClassName="fw-bold"
                             field="ruangan.nama_ruangan"
@@ -267,26 +221,6 @@ export default function Index({ jadwals, ruangans }) {
                             sortable
                             filterPlaceholder="Search by is_approve"
                             headerStyle={{ width: "20rem" }}
-                        />
-
-                        <Column
-                            headerClassName="fw-bold"
-                            field="action"
-                            header="Approve"
-                            body={(rowData) => {
-                                return (
-                                    <Button
-                                        icon="pi pi-check"
-                                        rounded
-                                        outlined
-                                        severity="success"
-                                        onClick={(event) =>
-                                            confirm2(event, rowData)
-                                        }
-                                    />
-                                );
-                            }}
-                            headerStyle={{ width: "15rem" }}
                         />
                     </DataTable>
                 </div>

@@ -90,14 +90,38 @@ class RuanganAndScannerSeeder extends Seeder
         ]);
 
         ScanerStatus::create([
-            'kode' => 'R11A',
+            'kode' => 'R12A',
             'ruangan_id' => $anatomiBasah->id,
             'type' => 'dalam',
         ]);
 
         ScanerStatus::create([
-            'kode' => 'R11B',
+            'kode' => 'R12B',
             'ruangan_id' => $anatomiBasah->id,
+            'type' => 'luar',
+        ]);
+
+        ScanerStatus::create([
+            'kode' => 'R14A',
+            'ruangan_id' => $cslLantai1->id,
+            'type' => 'dalam',
+        ]);
+
+        ScanerStatus::create([
+            'kode' => 'R14B',
+            'ruangan_id' => $cslLantai1->id,
+            'type' => 'luar',
+        ]);
+
+        ScanerStatus::create([
+            'kode' => 'R11A',
+            'ruangan_id' => $cslLantai2->id,
+            'type' => 'dalam',
+        ]);
+
+        ScanerStatus::create([
+            'kode' => 'R11B',
+            'ruangan_id' => $cslLantai2->id,
             'type' => 'luar',
         ]);
     }

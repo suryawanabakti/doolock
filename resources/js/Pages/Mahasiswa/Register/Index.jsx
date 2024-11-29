@@ -19,6 +19,7 @@ import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { Checkbox } from "primereact/checkbox";
 
 export default function Index({ jadwals, ruangans }) {
+    const [dataRuangans, setDataRuangans] = useState(ruangans);
     const [dataJadwals, setDataJadwals] = useState(jadwals);
     const { data, setData, errors } = useForm({
         ruangan_id: "",
@@ -148,8 +149,8 @@ export default function Index({ jadwals, ruangans }) {
                             console.log(e.value);
                             setData("ruangan_id", e.value.code);
                         }}
-                        options={ruangans}
-                        optionLabel="Ruangan"
+                        options={dataRuangans}
+                        optionLabel="name"
                         placeholder="Pilih ruangan"
                         filter
                         valueTemplate={selectedCountryTemplate}

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ruangan_id');
             $table->foreign('ruangan_id')->references('id')->on('ruangans')->cascadeOnDelete();
-            $table->enum('day', ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
             $table->time('jam_masuk');
             $table->time('jam_keluar');
             $table->timestamps();

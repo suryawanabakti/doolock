@@ -3,10 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Mahasiswa;
-use App\Models\Ruangan;
-use App\Models\ScanerStatus;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class MahasiswaSeeder extends Seeder
@@ -54,6 +51,7 @@ class MahasiswaSeeder extends Seeder
             'ruangan_id' => 5,
             'tahun_masuk' => '2024'
         ]);
+
         $user3 =  User::create([
             'name' => 'Aphelios',
             'email' => '4445170909',
