@@ -43,8 +43,8 @@ class DoorLockController extends Controller
 
             $ruanganAkses = HakAksesMahasiswa::where('mahasiswa_id', $mahasiswa->id)
                 ->whereHas('hakAkses', function ($query) use ($ruangan) {
-                    $query->where(str()->lower(Carbon::now('Asia/Makassar')->format('D')), true)
-                        ->where('ruangan_id', $ruangan->id);
+                    $query->where('tanggal', Carbon::now('Asia/Makassar')->format('Y-m-d'))
+                        ->where('ruangan_id', $ruangan->id)->where('is_approve', 1);
                 })
                 ->latest()
                 ->first();
@@ -180,8 +180,8 @@ class DoorLockController extends Controller
         if ($mahasiswa->ket === 'mhs') {
             $ruanganAkses = HakAksesMahasiswa::where('mahasiswa_id', $mahasiswa->id)
                 ->whereHas('hakAkses', function ($query) use ($ruangan) {
-                    $query->where(str()->lower(Carbon::now('Asia/Makassar')->format('D')), true)
-                        ->where('ruangan_id', $ruangan->id);
+                    $query->where('tanggal', Carbon::now('Asia/Makassar')->format('Y-m-d'))
+                        ->where('ruangan_id', $ruangan->id)->where('is_approve', 1);
                 })
                 ->latest()
                 ->first();

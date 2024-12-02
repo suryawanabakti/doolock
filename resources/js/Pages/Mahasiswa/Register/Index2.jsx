@@ -9,7 +9,7 @@ import { useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
-import { useForm } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import { RadioButton } from "primereact/radiobutton";
 import axios from "axios";
 import { Badge } from "primereact/badge";
@@ -18,12 +18,11 @@ import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { Checkbox } from "primereact/checkbox";
 
-export default function Index2({ jadwals, ruangans }) {
-    const [dataRuangans, setDataRuangans] = useState(ruangans);
+export default function Index2({ jadwals }) {
     const [dataJadwals, setDataJadwals] = useState(jadwals);
     const { data, setData, errors } = useForm({
         ruangan_id: "",
-        day: [],
+        tanggal: "",
         jam_masuk: "",
         jam_keluar: "",
     });
@@ -129,6 +128,24 @@ export default function Index2({ jadwals, ruangans }) {
             <div className="grid">
                 <div className="col-12">
                     <DataTable
+                        className="mb-3"
+                        header={() => (
+                            <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
+                                <h5 className="mt-3">
+                                    Pendaftaran Jadwal{" "}
+                                    <b className="text-green-500">Sudah</b> di
+                                    approve
+                                </h5>
+                                <span className="p-input-icon-left">
+                                    <i className="pi pi-search" />
+                                    <InputText
+                                        type="search"
+                                        onInput={(e) => onInputSearch(e)}
+                                        placeholder="Global Search"
+                                    />
+                                </span>
+                            </div>
+                        )}
                         value={dataJadwals}
                         rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -136,7 +153,7 @@ export default function Index2({ jadwals, ruangans }) {
                     >
                         <Column
                             headerClassName="fw-bold"
-                            field="ruangan.nama_ruangan"
+                            field="hak_akses.ruangan.nama_ruangan"
                             header="Ruangan"
                             sortable
                             filterPlaceholder="Search by ruangan_id"
@@ -145,41 +162,8 @@ export default function Index2({ jadwals, ruangans }) {
 
                         <Column
                             headerClassName="fw-bold"
-                            field="day"
-                            header="Hari"
-                            body={(jadwal) => {
-                                const days = [
-                                    { key: "mon", label: "Senin" },
-                                    { key: "tue", label: "Selasa" },
-                                    { key: "wed", label: "Rabu" },
-                                    { key: "thu", label: "Kamis" },
-                                    { key: "fri", label: "Jum'at" },
-                                    { key: "sat", label: "Sabtu" },
-                                    { key: "sun", label: "Minggu" },
-                                ];
-
-                                return (
-                                    <>
-                                        {days
-                                            .filter(
-                                                (day) => jadwal[day.key] === 1
-                                            )
-                                            .map((day, index) => (
-                                                <span key={day.key}>
-                                                    {day.label}
-                                                    {index <
-                                                        days.filter(
-                                                            (d) =>
-                                                                jadwal[
-                                                                    d.key
-                                                                ] === 1
-                                                        ).length -
-                                                            1 && ", "}
-                                                </span>
-                                            ))}
-                                    </>
-                                );
-                            }}
+                            field="hak_akses.tanggal"
+                            header="Tanggal"
                             sortable
                             filterPlaceholder="Search by hari"
                             headerStyle={{ width: "10rem" }}
@@ -187,7 +171,7 @@ export default function Index2({ jadwals, ruangans }) {
 
                         <Column
                             headerClassName="fw-bold"
-                            field="jam_masuk"
+                            field="hak_akses.jam_masuk"
                             header="Jam Masuk"
                             sortable
                             filterPlaceholder="Search by Masuk"
@@ -195,34 +179,17 @@ export default function Index2({ jadwals, ruangans }) {
                         />
                         <Column
                             headerClassName="fw-bold"
-                            field="jam_keluar"
+                            field="hak_akses.jam_keluar"
                             header="Jam Keluar"
                             sortable
                             filterPlaceholder="Search by keluar"
                             headerStyle={{ width: "20rem" }}
                         />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="is_approve"
-                            header="Approve"
-                            body={(jadwal) => {
-                                return jadwal.is_approve == 1 ? (
-                                    <Badge
-                                        severity="success"
-                                        value={"Approve"}
-                                    />
-                                ) : (
-                                    <Badge
-                                        severity="warning"
-                                        value="Not Approve"
-                                    />
-                                );
-                            }}
-                            sortable
-                            filterPlaceholder="Search by is_approve"
-                            headerStyle={{ width: "20rem" }}
-                        />
                     </DataTable>
+
+                    <Link href={route("mahasiswa.register.index")}>
+                        Lihat Jadwal yang <b>belum</b> di approve
+                    </Link>
                 </div>
             </div>
         </Layout>

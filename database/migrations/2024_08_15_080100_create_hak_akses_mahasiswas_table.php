@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('hak_akses_mahasiswas', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('hak_akses_id');
-            $table->foreign('hak_akses_id')->references('id')->on('hak_akses')->cascadeOnDelete();
             $table->unsignedBigInteger('mahasiswa_id');
             $table->foreign('mahasiswa_id')->references('id')->on('mahasiswa')->cascadeOnDelete();
+            $table->unsignedBigInteger('hak_akses_id');
+            $table->foreign('hak_akses_id')->references('id')->on('hak_akses')->cascadeOnDelete();
             $table->timestamps();
         });
     }

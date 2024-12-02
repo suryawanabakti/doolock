@@ -133,7 +133,9 @@ Route::middleware(['auth'])->group(function () {
 
     // PENJAGA
     Route::get('/penjaga/pendaftaran', [PendaftaranJadwalController::class, 'index'])->name('penjaga.pendaftaran.index');
-    Route::patch('/penjaga/pendaftaran/{registerRuangan}', [PendaftaranJadwalController::class, 'approve'])->name('penjaga.pendaftaran.approve');
+    Route::patch('/penjaga/pendaftaran/{hakAksesMahasiswa}', [PendaftaranJadwalController::class, 'approve'])->name('penjaga.pendaftaran.approve');
+    Route::patch('/penjaga/pendaftaran/{hakAksesMahasiswa}/unapprove', [PendaftaranJadwalController::class, 'unapprove'])->name('penjaga.pendaftaran.unapprove');
+
     Route::get('/penjaga/pendaftaran-approve', [PendaftaranJadwalController::class, 'index2'])->name('penjaga.pendaftaran-approve.index');
 
     Route::get('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('penjaga.ruangan-hak-akses.index');

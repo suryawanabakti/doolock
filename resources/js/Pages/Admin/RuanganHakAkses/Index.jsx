@@ -473,11 +473,8 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
                         >
                             <Column
                                 headerClassName="fw-bold"
-                                field="day"
-                                header="Hari"
-                                body={(rowData) => {
-                                    return getDays(rowData);
-                                }}
+                                field="tanggal"
+                                header="Tanggal"
                                 sortable
                                 filterPlaceholder="ID TAG"
                                 style={{ minWidth: "10rem" }}

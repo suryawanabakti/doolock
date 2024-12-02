@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HakAkses;
+use App\Models\HakAksesMahasiswa;
 use App\Models\RegisterRuangan;
 use App\Models\Ruangan;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class MahasiswaRegisterRuanganController extends Controller
 {
     public function index(Request $request)
     {
-        $jadwals = RegisterRuangan::orderBy('created_at', 'DESC')->with('ruangan')->where('user_id', $request->user()->id)
-            ->where('is_approve', 0)->get();
+
+        $jadwals = HakAksesMahasiswa::with('hakAkses.ruangan')->orderBy('created_at', 'DESC')->where('mahasiswa_id', $request->user()->mahasiswa->id)
+            ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 0))->get();
 
         $ruangans = Ruangan::whereIn('type', ['lab'])
             ->get()
@@ -27,21 +32,30 @@ class MahasiswaRegisterRuanganController extends Controller
     public function store(Request $request)
     {
 
-        $data = RegisterRuangan::create([
-            'user_id' => $request->user()->id,
-            'ruangan_id' => $request->ruangan_id,
-            'day' => $request->day[0],
-            'jam_masuk' => $request->jam_masuk,
-            'jam_keluar' => $request->jam_keluar,
-            'mon' => in_array('mon', $request->day) ? 1 : 0,
-            'tue' => in_array('tue', $request->day) ? 1 : 0,
-            'wed' => in_array('wed', $request->day) ? 1 : 0,
-            'thu' => in_array('thu', $request->day) ? 1 : 0,
-            'fri' => in_array('fri', $request->day) ? 1 : 0,
-            'sat' => in_array('sat', $request->day) ? 1 : 0,
-            'sun' => in_array('sun', $request->day) ? 1 : 0,
+        $request->validate([
+            'ruangan_id' => ['required'],
+            'tanggal' => ['required', 'date', 'after_or_equal:today'],
+            "jam_keluar" => ['required', 'after_or_equal:jam_keluar'],
+            "jam_masuk" => ['required', 'before_or_equal:jam_keluar'],
         ]);
-        return $data->load('ruangan');
+
+        return  DB::transaction(function () use ($request) {
+            $hakAkses = HakAkses::create([
+                'ruangan_id' => $request->ruangan_id,
+                'tanggal' => $request->tanggal,
+                'jam_masuk' => $request->jam_masuk,
+                'jam_keluar' => $request->jam_keluar,
+                'is_approve' => 0
+            ]);
+
+            $hakAksesMahasiswa =  HakAksesMahasiswa::create([
+                'hak_akses_id' => $hakAkses->id,
+                'mahasiswa_id' => $request->user()->mahasiswa->id,
+            ]);
+
+
+            return $hakAksesMahasiswa->load('hakAkses.ruangan');
+        });
     }
 
     public function destroy(RegisterRuangan $mahasiswaRegisterRuangan)
@@ -52,15 +66,13 @@ class MahasiswaRegisterRuanganController extends Controller
 
     public function index2(Request $request)
     {
-        $jadwals = RegisterRuangan::where('is_approve', 1)->orderBy('created_at', 'DESC')->with('ruangan')->where('user_id', $request->user()->id)->get();
 
-        $ruangans = Ruangan::whereIn('type', ['lab'])
-            ->get()
-            ->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]);
+        $jadwals = HakAksesMahasiswa::with('hakAkses.ruangan')->orderBy('created_at', 'DESC')->where('mahasiswa_id', $request->user()->mahasiswa->id)
+            ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 1))->get();
+
 
         return Inertia::render("Mahasiswa/Register/Index2", [
             "jadwals" => $jadwals,
-            "ruangans" => $ruangans,
         ]);
     }
 }

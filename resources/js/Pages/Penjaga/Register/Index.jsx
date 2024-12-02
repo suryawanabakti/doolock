@@ -28,12 +28,7 @@ export default function Index({ jadwals, ruangans }) {
         setGlobalFilter(value);
     };
     const [dataJadwals, setDataJadwals] = useState(jadwals);
-    const { data, setData, errors } = useForm({
-        ruangan_id: "",
-        day: "",
-        jam_masuk: "",
-        jam_keluar: "",
-    });
+
     const reject = () => {
         toast.current.show({
             severity: "warn",
@@ -42,46 +37,7 @@ export default function Index({ jadwals, ruangans }) {
             life: 3000,
         });
     };
-    const [dialogNew, setDialogNew] = useState(false);
-    const selectedCountryTemplate = (option, props) => {
-        if (option) {
-            return (
-                <div className="flex align-items-center">
-                    <div>{option.name}</div>
-                </div>
-            );
-        }
 
-        return <span>{props.placeholder}</span>;
-    };
-    const countryOptionTemplate = (option) => {
-        return (
-            <div className="flex align-items-center">
-                <div>{option.name}</div>
-            </div>
-        );
-    };
-    const [selectedCountry, setSelectedCountry] = useState(null);
-    const openNewDialog = (e) => {
-        e.preventDefault();
-        setDialogNew(true);
-    };
-    const handleSave = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await axios.post(route("mahasiswa.register.store"), {
-                ruangan_id: data.ruangan_id,
-                day: data.day,
-                jam_masuk: data.jam_masuk,
-                jam_keluar: data.jam_keluar,
-            });
-            const updatedData = [res.data, ...dataJadwals];
-            setDataJadwals(updatedData);
-            setDialogNew(false);
-        } catch (error) {
-            alert("Error");
-        }
-    };
     const toast = useRef(null);
     const confirm2 = (event, rowData) => {
         confirmPopup({
@@ -103,21 +59,9 @@ export default function Index({ jadwals, ruangans }) {
                         life: 3000,
                     });
 
-                    setDataJadwals((prevItems) =>
-                        prevItems.map((item) =>
-                            item.id == res.data.id
-                                ? {
-                                      ...item,
-                                      user: res.data.user,
-                                      ruangan: res.data.ruangan,
-                                      day: res.data.day,
-                                      jam_masuk: res.data.jam_masuk,
-                                      jam_keluar: res.data.jam_keluar,
-                                  }
-                                : item
-                        )
+                    setDataJadwals((prevData) =>
+                        prevData.filter((user) => user.id !== rowData.id)
                     );
-                    window.location.reload();
                 } catch (e) {
                     console.log("ERROR", e);
                     toast.current.show({
@@ -151,7 +95,9 @@ export default function Index({ jadwals, ruangans }) {
                         header={() => (
                             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
                                 <h5 className="mt-3">
-                                    Pendaftaran Jadwal Belum di approve
+                                    Pendaftaran Jadwal{" "}
+                                    <b className="text-yellow-500">Belum</b> di
+                                    approve
                                 </h5>
                                 <span className="p-input-icon-left">
                                     <i className="pi pi-search" />
@@ -166,7 +112,7 @@ export default function Index({ jadwals, ruangans }) {
                     >
                         <Column
                             headerClassName="fw-bold"
-                            field="user.email"
+                            field="mahasiswa.nim"
                             header="NIM"
                             sortable
                             filterPlaceholder="Search by  nim"
@@ -174,7 +120,7 @@ export default function Index({ jadwals, ruangans }) {
                         />
                         <Column
                             headerClassName="fw-bold"
-                            field="user.name"
+                            field="mahasiswa.nama"
                             header="Nama"
                             sortable
                             filterPlaceholder="Search by mahasiswa"
@@ -182,7 +128,7 @@ export default function Index({ jadwals, ruangans }) {
                         />
                         <Column
                             headerClassName="fw-bold"
-                            field="ruangan.nama_ruangan"
+                            field="hak_akses.ruangan.nama_ruangan"
                             header="Ruangan"
                             sortable
                             filterPlaceholder="Search by ruangan_id"
@@ -191,49 +137,16 @@ export default function Index({ jadwals, ruangans }) {
 
                         <Column
                             headerClassName="fw-bold"
-                            field="day"
-                            header="Hari"
-                            body={(jadwal) => {
-                                const days = [
-                                    { key: "mon", label: "Senin" },
-                                    { key: "tue", label: "Selasa" },
-                                    { key: "wed", label: "Rabu" },
-                                    { key: "thu", label: "Kamis" },
-                                    { key: "fri", label: "Jum'at" },
-                                    { key: "sat", label: "Sabtu" },
-                                    { key: "sun", label: "Minggu" },
-                                ];
-
-                                return (
-                                    <>
-                                        {days
-                                            .filter(
-                                                (day) => jadwal[day.key] === 1
-                                            )
-                                            .map((day, index) => (
-                                                <span key={day.key}>
-                                                    {day.label}
-                                                    {index <
-                                                        days.filter(
-                                                            (d) =>
-                                                                jadwal[
-                                                                    d.key
-                                                                ] === 1
-                                                        ).length -
-                                                            1 && ", "}
-                                                </span>
-                                            ))}
-                                    </>
-                                );
-                            }}
+                            field="hak_akses.tanggal"
+                            header="Tanggal"
                             sortable
-                            filterPlaceholder="Search by hari"
+                            filterPlaceholder="Search by tanggal"
                             headerStyle={{ width: "10rem" }}
                         />
 
                         <Column
                             headerClassName="fw-bold"
-                            field="jam_masuk"
+                            field="hak_akses.jam_masuk"
                             header="Jam Masuk"
                             sortable
                             filterPlaceholder="Search by Masuk"
@@ -241,31 +154,10 @@ export default function Index({ jadwals, ruangans }) {
                         />
                         <Column
                             headerClassName="fw-bold"
-                            field="jam_keluar"
+                            field="hak_akses.jam_keluar"
                             header="Jam Keluar"
                             sortable
                             filterPlaceholder="Search by keluar"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="is_approve"
-                            header="Approve"
-                            body={(jadwal) => {
-                                return jadwal.is_approve == 1 ? (
-                                    <Badge
-                                        severity="success"
-                                        value={"Approve"}
-                                    />
-                                ) : (
-                                    <Badge
-                                        severity="warning"
-                                        value="Not Approve"
-                                    />
-                                );
-                            }}
-                            sortable
-                            filterPlaceholder="Search by is_approve"
                             headerStyle={{ width: "20rem" }}
                         />
 

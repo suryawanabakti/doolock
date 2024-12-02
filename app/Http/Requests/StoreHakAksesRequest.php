@@ -22,6 +22,7 @@ class StoreHakAksesRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "tanggal" => ['required'],
             "jam_masuk" => ['required', 'before_or_equal:jam_keluar'],
             "jam_keluar" => ['required', 'after_or_equal:jam_keluar']
         ];

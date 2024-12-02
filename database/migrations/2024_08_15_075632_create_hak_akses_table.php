@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ruangan_id');
             $table->foreign('ruangan_id')->references('id')->on('ruangans')->cascadeOnDelete();
+            $table->date('tanggal');
             $table->time('jam_masuk');
             $table->time('jam_keluar');
+            $table->boolean('is_approve')->default(true);
             $table->timestamps();
         });
     }

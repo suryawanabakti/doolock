@@ -13,44 +13,25 @@ class PendaftaranJadwalController extends Controller
 {
     public function index(Request $request)
     {
-        $jadwals = RegisterRuangan::where('is_approve', 0)->orderBy('created_at', 'DESC')->with('ruangan', 'user')->where('ruangan_id', $request->user()->ruangan_id)->get();
+        $jadwals = HakAksesMahasiswa::with('mahasiswa', 'hakAkses.ruangan')->orderBy('created_at', 'DESC')
+            ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 0)->where('ruangan_id', $request->user()->ruangan_id))->get();
 
         return inertia("Penjaga/Register/Index", ["jadwals" => $jadwals]);
     }
 
-    public function approve(RegisterRuangan $registerRuangan)
+    public function approve(HakAksesMahasiswa $hakAksesMahasiswa)
     {
-        return DB::transaction(function () use ($registerRuangan) {
+        return $hakAksesMahasiswa->hakAkses->update(['is_approve' => true]);
+    }
 
-            $mahasiswa = Mahasiswa::where('user_id', $registerRuangan->user_id)->first();
-
-
-            $hakAkses = HakAkses::create([
-                'ruangan_id' => $registerRuangan->ruangan_id,
-                'jam_masuk' => $registerRuangan->jam_masuk,
-                'jam_keluar' => $registerRuangan->jam_keluar,
-                'day' => $registerRuangan->day,
-                'mon' => $registerRuangan->mon,
-                'tue' => $registerRuangan->tue,
-                'wed' => $registerRuangan->wed,
-                'thu' => $registerRuangan->thu,
-                'fri' => $registerRuangan->fri,
-                'sat' => $registerRuangan->sat,
-                'sun' => $registerRuangan->sun,
-            ]);
-
-            HakAksesMahasiswa::create([
-                'mahasiswa_id' => $mahasiswa->id,
-                'hak_akses_id' => $hakAkses->id,
-            ]);
-
-            $registerRuangan->update(['is_approve' =>  true]);
-            return $registerRuangan->load('user', 'ruangan');
-        });
+    public function unapprove(HakAksesMahasiswa $hakAksesMahasiswa)
+    {
+        return $hakAksesMahasiswa->hakAkses->update(['is_approve' => false]);
     }
     public function index2(Request $request)
     {
-        $jadwals = RegisterRuangan::where('is_approve', 1)->orderBy('created_at', 'DESC')->with('ruangan', 'user')->where('ruangan_id', $request->user()->ruangan_id)->get();
+        $jadwals = HakAksesMahasiswa::with('mahasiswa', 'hakAkses.ruangan')->orderBy('created_at', 'DESC')
+            ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 1)->where('ruangan_id', $request->user()->ruangan_id))->get();
 
         return inertia("Penjaga/Register/Index2", ["jadwals" => $jadwals]);
     }

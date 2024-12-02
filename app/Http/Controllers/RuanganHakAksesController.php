@@ -24,7 +24,7 @@ class RuanganHakAksesController extends Controller
             return Mahasiswa::with(['ruangan'])->where('ket', 'mhs')->get();
         }
 
-        return Mahasiswa::with(['ruangan'])->whereDoesntHave('ruanganAkses.hakAkses', fn($query) => $query->where('ruangan_id', $request->ruangan_id)->where('day', $request->day))->where('ket', 'mhs')->get();
+        return Mahasiswa::with(['ruangan'])->where('status', 1)->where('ket', 'mhs')->get();
     }
     public function index(Request $request)
     {
@@ -36,14 +36,14 @@ class RuanganHakAksesController extends Controller
 
 
         // Filter mahasiswa yang memiliki ruanganAkses sesuai dengan ruangan yang dipilih
-        $today = Carbon::now('Asia/Makassar')->format('D');
+        $today = Carbon::now('Asia/Makassar')->format('Y-m-d');
         if ($request->has('today')) {
             $today = $request->today;
         }
         // Temukan ruangan yang dipilih
         $ruangan = Ruangan::find($ruanganId);
 
-        $hakAkses = HakAkses::with(['ruangan', 'hakAksesMahasiswa.mahasiswa'])->withCount('hakAksesMahasiswa')->where('ruangan_id', $ruanganId)->orderBy('created_at', 'DESC')->get();
+        $hakAkses = HakAkses::with(['ruangan', 'hakAksesMahasiswa.mahasiswa'])->withCount('hakAksesMahasiswa')->where('ruangan_id', $ruanganId)->orderBy('created_at', 'DESC')->where('is_approve', 1)->get();
 
         $kelas =  Ruangan::where('type', 'kelas')->get()->map(function ($data) {
             return [
@@ -82,30 +82,10 @@ class RuanganHakAksesController extends Controller
         }
 
         return DB::transaction(function () use ($request) {
-            $checkHakAkses = HakAkses::where('ruangan_id', $request->ruangan_id)->where('day', $request->day)
-                ->where(function ($query) use ($request) {
-                    $query->where(function ($q) use ($request) {
-                        $q->where('jam_masuk', '<=', $request->jam_masuk)
-                            ->where('jam_keluar', '>=', $request->jam_masuk);
-                    })->orWhere(function ($q) use ($request) {
-                        $q->where('jam_masuk', '<=', $request->jam_keluar)
-                            ->where('jam_keluar', '>=', $request->jam_keluar);
-                    });
-                })
-                ->first();
-            if ($checkHakAkses) {
-                return response()->json(["message" => "Gagal simpan , sudah ada jadwal hari $request->day dari $checkHakAkses->jam_masuk sampai $checkHakAkses->jam_keluar"], 400);
-            }
+
 
             $hakAkses = HakAkses::create([
-                "day" => $request->day,
-                "mon" => $request->day == 'Mon',
-                "tue" => $request->day == 'Tue',
-                "wed" => $request->day == 'Wed',
-                "thu" => $request->day == 'Thu',
-                "fri" => $request->day == 'Fri',
-                "sat" => $request->day == 'Sat',
-                "sun" => $request->day == 'Sun',
+                "tanggal" => $request->tanggal,
                 "ruangan_id" => $request->ruangan_id,
                 "jam_masuk" => $request->jam_masuk,
                 "jam_keluar" => $request->jam_keluar,
@@ -116,8 +96,8 @@ class RuanganHakAksesController extends Controller
                 $data[] = [
                     'hak_akses_id' => $hakAkses->id,
                     'mahasiswa_id' => $row['id'],
-                    'updated_at' => now(),
-                    'created_at' => now(),
+                    'updated_at' => now('Asia/Makassar'),
+                    'created_at' => now('Asia/Makassar'),
                 ];
             }
             HakAksesMahasiswa::insert($data);

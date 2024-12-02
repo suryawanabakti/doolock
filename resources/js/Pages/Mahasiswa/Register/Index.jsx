@@ -9,7 +9,7 @@ import { useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
-import { useForm } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import { RadioButton } from "primereact/radiobutton";
 import axios from "axios";
 import { Badge } from "primereact/badge";
@@ -23,7 +23,7 @@ export default function Index({ jadwals, ruangans }) {
     const [dataJadwals, setDataJadwals] = useState(jadwals);
     const { data, setData, errors } = useForm({
         ruangan_id: "",
-        day: [],
+        tanggal: "",
         jam_masuk: "",
         jam_keluar: "",
     });
@@ -64,7 +64,7 @@ export default function Index({ jadwals, ruangans }) {
         try {
             const res = await axios.post(route("mahasiswa.register.store"), {
                 ruangan_id: data.ruangan_id,
-                day: data.day,
+                tanggal: data.tanggal,
                 jam_masuk: data.jam_masuk,
                 jam_keluar: data.jam_keluar,
             });
@@ -135,9 +135,9 @@ export default function Index({ jadwals, ruangans }) {
                     setDialogNew(false);
                 }}
             >
-                <div className="field">
+                <div className="field w-5">
                     <label htmlFor="ruangan" className="font-bold">
-                        Ruangan
+                        Ruangan{" "}
                         <span className="text-danger" style={{ color: "red" }}>
                             *
                         </span>
@@ -149,6 +149,7 @@ export default function Index({ jadwals, ruangans }) {
                             console.log(e.value);
                             setData("ruangan_id", e.value.code);
                         }}
+                        required
                         options={dataRuangans}
                         optionLabel="name"
                         placeholder="Pilih ruangan"
@@ -162,41 +163,31 @@ export default function Index({ jadwals, ruangans }) {
                         <small className="p-error">{errors.ruangan_id}</small>
                     )}
                 </div>
-                <div className="field">
-                    <label htmlFor="day" className="font-bold">
-                        Hari
+                <div className="field w-5">
+                    <label htmlFor="tanggal" className="font-bold">
+                        Tanggal{" "}
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                        {[
-                            { label: "Senin", value: "mon" },
-                            { label: "Selasa", value: "tue" },
-                            { label: "Rabu", value: "wed" },
-                            { label: "Kamis", value: "thu" },
-                            { label: "Jum'at", value: "fri" },
-                            { label: "Sabtu", value: "sat" },
-                            { label: "Minggu", value: "sun" },
-                        ].map((day) => (
-                            <div
-                                key={day.value}
-                                className="flex align-items-center"
-                            >
-                                <Checkbox
-                                    inputId={day.value}
-                                    name="day"
-                                    value={day.value}
-                                    onChange={handleDayChange}
-                                    checked={data.day.includes(day.value)}
-                                />
-                                <label htmlFor={day.value} className="ml-2">
-                                    {day.label}
-                                </label>
-                            </div>
-                        ))}
-                    </div>
+                    <InputText
+                        className="w-full"
+                        id="tanggal"
+                        type="date"
+                        required
+                        onChange={(e) => setData("tanggal", e.target.value)}
+                        autoFocus
+                    />
+                    {errors.tanggal && (
+                        <small className="p-error">{errors.tanggal}</small>
+                    )}
                 </div>
-                <div className="field">
+                <div className="field w-5">
                     <label htmlFor="jam_masuk" className="font-bold">
-                        Jam Masuk
+                        Jam Masuk{" "}
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
                     </label>
                     <InputText
                         className="w-full"
@@ -206,10 +197,16 @@ export default function Index({ jadwals, ruangans }) {
                         onChange={(e) => setData("jam_masuk", e.target.value)}
                         autoFocus
                     />
+                    {errors.jam_masuk && (
+                        <small className="p-error">{errors.jam_masuk}</small>
+                    )}
                 </div>
-                <div className="field">
+                <div className="field w-5">
                     <label htmlFor="jam_keluar" className="font-bold">
-                        Jam Keluar
+                        Jam Keluar{" "}
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
                     </label>
                     <InputText
                         className="w-full"
@@ -219,6 +216,9 @@ export default function Index({ jadwals, ruangans }) {
                         onChange={(e) => setData("jam_keluar", e.target.value)}
                         autoFocus
                     />
+                    {errors.jam_keluar && (
+                        <small className="p-error">{errors.jam_keluar}</small>
+                    )}
                 </div>
                 <Button
                     label={`Simpan jadwal`}
@@ -235,7 +235,7 @@ export default function Index({ jadwals, ruangans }) {
                                 <div className="flex flex-wrap gap-2">
                                     <Button
                                         onClick={openNewDialog}
-                                        label="New"
+                                        label="Tambah Jadwal Baru"
                                         icon="pi pi-plus"
                                         severity="primary"
                                     />
@@ -244,6 +244,24 @@ export default function Index({ jadwals, ruangans }) {
                         />
                     </div>
                     <DataTable
+                        header={() => (
+                            <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
+                                <h5 className="mt-3">
+                                    Pendaftaran Jadwal{" "}
+                                    <b className="text-yellow-500">Belum</b> di
+                                    approve
+                                </h5>
+                                <span className="p-input-icon-left">
+                                    <i className="pi pi-search" />
+                                    <InputText
+                                        type="search"
+                                        onInput={(e) => onInputSearch(e)}
+                                        placeholder="Global Search"
+                                    />
+                                </span>
+                            </div>
+                        )}
+                        className="mb-3"
                         value={dataJadwals}
                         rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -251,7 +269,7 @@ export default function Index({ jadwals, ruangans }) {
                     >
                         <Column
                             headerClassName="fw-bold"
-                            field="ruangan.nama_ruangan"
+                            field="hak_akses.ruangan.nama_ruangan"
                             header="Ruangan"
                             sortable
                             filterPlaceholder="Search by ruangan_id"
@@ -260,41 +278,8 @@ export default function Index({ jadwals, ruangans }) {
 
                         <Column
                             headerClassName="fw-bold"
-                            field="day"
-                            header="Hari"
-                            body={(jadwal) => {
-                                const days = [
-                                    { key: "mon", label: "Senin" },
-                                    { key: "tue", label: "Selasa" },
-                                    { key: "wed", label: "Rabu" },
-                                    { key: "thu", label: "Kamis" },
-                                    { key: "fri", label: "Jum'at" },
-                                    { key: "sat", label: "Sabtu" },
-                                    { key: "sun", label: "Minggu" },
-                                ];
-
-                                return (
-                                    <>
-                                        {days
-                                            .filter(
-                                                (day) => jadwal[day.key] === 1
-                                            )
-                                            .map((day, index) => (
-                                                <span key={day.key}>
-                                                    {day.label}
-                                                    {index <
-                                                        days.filter(
-                                                            (d) =>
-                                                                jadwal[
-                                                                    d.key
-                                                                ] === 1
-                                                        ).length -
-                                                            1 && ", "}
-                                                </span>
-                                            ))}
-                                    </>
-                                );
-                            }}
+                            field="hak_akses.tanggal"
+                            header="Tanggal"
                             sortable
                             filterPlaceholder="Search by hari"
                             headerStyle={{ width: "10rem" }}
@@ -302,7 +287,7 @@ export default function Index({ jadwals, ruangans }) {
 
                         <Column
                             headerClassName="fw-bold"
-                            field="jam_masuk"
+                            field="hak_akses.jam_masuk"
                             header="Jam Masuk"
                             sortable
                             filterPlaceholder="Search by Masuk"
@@ -310,31 +295,10 @@ export default function Index({ jadwals, ruangans }) {
                         />
                         <Column
                             headerClassName="fw-bold"
-                            field="jam_keluar"
+                            field="hak_akses.jam_keluar"
                             header="Jam Keluar"
                             sortable
                             filterPlaceholder="Search by keluar"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="is_approve"
-                            header="Approve"
-                            body={(jadwal) => {
-                                return jadwal.is_approve == 1 ? (
-                                    <Badge
-                                        severity="success"
-                                        value={"Approve"}
-                                    />
-                                ) : (
-                                    <Badge
-                                        severity="warning"
-                                        value="Not Approve"
-                                    />
-                                );
-                            }}
-                            sortable
-                            filterPlaceholder="Search by is_approve"
                             headerStyle={{ width: "20rem" }}
                         />
 
@@ -358,6 +322,9 @@ export default function Index({ jadwals, ruangans }) {
                             headerStyle={{ width: "15rem" }}
                         />
                     </DataTable>
+                    <Link href={route("mahasiswa.register-approve.index")}>
+                        Lihat Jadwal yang <b>sudah</b> di approve
+                    </Link>
                 </div>
             </div>
         </Layout>

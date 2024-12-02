@@ -154,7 +154,12 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
 
     const rightToolbarTemplate = () => (
         <a
-            href={`/admin/riwayat/export?mulai=${dateRange[0]}&sampai=${dateRange[1]}`}
+            // moment(start).tz("Asia/Makassar").format("YYYY-MM-DD")
+            href={`/admin/riwayat/export?mulai=${moment(dateRange[0])
+                .tz("Asia/Makassar")
+                .format("YYYY-MM-DD")}&sampai=${moment(dateRange[1])
+                .tz("Asia/Makassar")
+                .format("YYYY-MM-DD")}`}
             rel="noopener noreferrer"
             className="p-button font-bold p-component"
         >
