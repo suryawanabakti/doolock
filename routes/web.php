@@ -59,12 +59,13 @@ Route::get('/dashboard', DashboardController::class)
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
+    Route::middleware(['role:mahasiswa'])->group(function () {
+        Route::get('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'index'])->name('mahasiswa.register.index');
+        Route::post('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'store'])->name('mahasiswa.register.store');
+        Route::delete('/mahasiswa/register/{mahasiswaRegisterRuangan}', [MahasiswaRegisterRuanganController::class, 'destroy'])->name('mahasiswa.register.destroy');
 
-    Route::get('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'index'])->name('mahasiswa.register.index');
-    Route::post('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'store'])->name('mahasiswa.register.store');
-    Route::delete('/mahasiswa/register/{mahasiswaRegisterRuangan}', [MahasiswaRegisterRuanganController::class, 'destroy'])->name('mahasiswa.register.destroy');
-
-    Route::get('/mahasiswa/register-approve', [MahasiswaRegisterRuanganController::class, 'index2'])->name('mahasiswa.register-approve.index');
+        Route::get('/mahasiswa/register-approve', [MahasiswaRegisterRuanganController::class, 'index2'])->name('mahasiswa.register-approve.index');
+    });
 
 
     Route::get('/admin/ruangan-hak-akses/get-mahasiswa', [RuanganHakAksesController::class, 'getMahasiswa'])->name('admin.ruangan-hak-akses.getMahasiswa');
@@ -72,7 +73,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/admin/ruangan-hak-akses/{hakAkses}', [RuanganHakAksesController::class, 'destroy'])->name('admin.ruangan-hak-akses.destroy');
 
 
-    Route::middleware(['admin'])->group(function () {
+    Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
         Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
         Route::patch('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
@@ -108,6 +109,14 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/admin/dosen/{mahasiswa}', [DosenController::class, 'update'])->name('admin.dosen.update');
         Route::delete('/admin/dosen/{mahasiswa}', [DosenController::class, 'destroy'])->name('admin.dosen.destroy');
 
+
+        Route::get('/admin/scaner', [ScanerController::class, 'index'])->name('admin.scaner.index');
+        Route::patch('/admin/scaner/{scanerStatus}', [ScanerController::class, 'update'])->name('admin.scanner.update');
+        Route::delete('/admin/scaner/{scanerStatus}', [ScanerController::class, 'destroy'])->name('admin.scanner.destroy');
+        Route::post('/admin/scaner', [ScanerController::class, 'store'])->name('admin.scanner.store');
+
+        Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
+
         Route::get('/admin/riwayat', [RiwayatController::class, 'index'])->name('admin.riwayat.index');
         Route::get('/admin/riwayat/mahasiswa', [RiwayatController::class, 'mahasiswa'])->name('admin.riwayat.mahasiswa');
         Route::get('/admin/riwayat/ruangan', [RiwayatController::class, 'ruangan'])->name('admin.riwayat.ruangan');
@@ -123,27 +132,23 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin/riwayat-by-ruangan/export', [RiwayatByRuanganController::class, 'export'])->name('admin.riwayat-by-ruangan.export');
 
-    Route::get('/admin/scaner', [ScanerController::class, 'index'])->name('admin.scaner.index');
-    Route::patch('/admin/scaner/{scanerStatus}', [ScanerController::class, 'update'])->name('admin.scanner.update');
-    Route::delete('/admin/scaner/{scanerStatus}', [ScanerController::class, 'destroy'])->name('admin.scanner.destroy');
-    Route::post('/admin/scaner', [ScanerController::class, 'store'])->name('admin.scanner.store');
-
-    Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
 
 
     // PENJAGA
-    Route::get('/penjaga/pendaftaran', [PendaftaranJadwalController::class, 'index'])->name('penjaga.pendaftaran.index');
-    Route::patch('/penjaga/pendaftaran/{hakAksesMahasiswa}', [PendaftaranJadwalController::class, 'approve'])->name('penjaga.pendaftaran.approve');
-    Route::patch('/penjaga/pendaftaran/{hakAksesMahasiswa}/unapprove', [PendaftaranJadwalController::class, 'unapprove'])->name('penjaga.pendaftaran.unapprove');
+    Route::middleware(['role:penjaga'])->group(function () {
+        Route::get('/penjaga/pendaftaran', [PendaftaranJadwalController::class, 'index'])->name('penjaga.pendaftaran.index');
+        Route::patch('/penjaga/pendaftaran/{hakAksesMahasiswa}', [PendaftaranJadwalController::class, 'approve'])->name('penjaga.pendaftaran.approve');
+        Route::patch('/penjaga/pendaftaran/{hakAksesMahasiswa}/unapprove', [PendaftaranJadwalController::class, 'unapprove'])->name('penjaga.pendaftaran.unapprove');
 
-    Route::get('/penjaga/pendaftaran-approve', [PendaftaranJadwalController::class, 'index2'])->name('penjaga.pendaftaran-approve.index');
+        Route::get('/penjaga/pendaftaran-approve', [PendaftaranJadwalController::class, 'index2'])->name('penjaga.pendaftaran-approve.index');
 
-    Route::get('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('penjaga.ruangan-hak-akses.index');
-    Route::get('/penjaga/riwayat', [RiwayatController::class, 'indexPenjaga'])->name('penjaga.riwayat.index');
-    Route::get('/penjaga/riwayat/mahasiswa', [RiwayatController::class, 'mahasiswaPenjaga'])->name('penjaga.riwayat.mahasiswa');
-    Route::get('/penjaga/riwayat/ruangan', [RiwayatController::class, 'ruanganPenjaga'])->name('penjaga.riwayat.ruangan');
+        Route::get('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('penjaga.ruangan-hak-akses.index');
+        Route::get('/penjaga/riwayat', [RiwayatController::class, 'indexPenjaga'])->name('penjaga.riwayat.index');
+        Route::get('/penjaga/riwayat/mahasiswa', [RiwayatController::class, 'mahasiswaPenjaga'])->name('penjaga.riwayat.mahasiswa');
+        Route::get('/penjaga/riwayat/ruangan', [RiwayatController::class, 'ruanganPenjaga'])->name('penjaga.riwayat.ruangan');
 
-    Route::get('/penjaga/absensi', [AbsensiController::class, 'indexPenjaga'])->name('penjaga.absensi.index');
+        Route::get('/penjaga/absensi', [AbsensiController::class, 'indexPenjaga'])->name('penjaga.absensi.index');
+    });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

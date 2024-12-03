@@ -18,8 +18,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'super', 'penjaga', 'mahasiswa']);
-            $table->unsignedBigInteger('ruangan_id')->nullable();
+            $table->unsignedBigInteger('ruangan_id')->nullable(); //untuk penjaga
             $table->foreign('ruangan_id')->references('id')->on('ruangans')->cascadeOnDelete();
+            $table->string('image')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

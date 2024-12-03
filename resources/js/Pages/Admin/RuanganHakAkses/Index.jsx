@@ -159,7 +159,7 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
         jam_masuk: "07:30",
         jam_keluar: "20:00",
         mahasiswa: [],
-        day: today,
+        tanggal: "",
     });
     const handleSave = async (e) => {
         e.preventDefault();
@@ -279,91 +279,14 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
     };
     const centerToolbar = () => {
         return (
-            <div className="flex flex-wrap gap-2">
-                <div className="flex align-items-center">
-                    <RadioButton
-                        inputId="Mon"
-                        name="day"
-                        value="Mon"
-                        onChange={(e) => handleDayChange(e.value)}
-                        checked={ingredient === "Mon"}
-                    />
-                    <label htmlFor="Mon" className="ml-2">
-                        Senin
-                    </label>
-                </div>
-                <div className="flex align-items-center">
-                    <RadioButton
-                        inputId="Tue"
-                        name="day"
-                        value="Tue"
-                        onChange={(e) => handleDayChange(e.value)}
-                        checked={ingredient === "Tue"}
-                    />
-                    <label htmlFor="Tue" className="ml-2">
-                        Selasa
-                    </label>
-                </div>
-                <div className="flex align-items-center">
-                    <RadioButton
-                        inputId="Wed"
-                        name="day"
-                        value="Wed"
-                        onChange={(e) => handleDayChange(e.value)}
-                        checked={ingredient === "Wed"}
-                    />
-                    <label htmlFor="Wed" className="ml-2">
-                        Rabu
-                    </label>
-                </div>
-                <div className="flex align-items-center">
-                    <RadioButton
-                        inputId="Thu"
-                        name="day"
-                        value="Thu"
-                        onChange={(e) => handleDayChange(e.value)}
-                        checked={ingredient === "Thu"}
-                    />
-                    <label htmlFor="Thu" className="ml-2">
-                        Kamis
-                    </label>
-                </div>
-                <div className="flex align-items-center">
-                    <RadioButton
-                        inputId="Fri"
-                        name="day"
-                        value="Fri"
-                        onChange={(e) => handleDayChange(e.value)}
-                        checked={ingredient === "Fri"}
-                    />
-                    <label htmlFor="Fri" className="ml-2">
-                        Jum'at
-                    </label>
-                </div>
-                <div className="flex align-items-center">
-                    <RadioButton
-                        inputId="Sat"
-                        name="day"
-                        value="Sat"
-                        onChange={(e) => handleDayChange(e.value)}
-                        checked={ingredient === "Sat"}
-                    />
-                    <label htmlFor="Sat" className="ml-2">
-                        Sabtu
-                    </label>
-                </div>
-                <div className="flex align-items-center">
-                    <RadioButton
-                        inputId="Sun"
-                        name="day"
-                        value="Sun"
-                        onChange={(e) => handleDayChange(e.value)}
-                        checked={ingredient === "Sun"}
-                    />
-                    <label htmlFor="Sun" className="ml-2">
-                        Minggu
-                    </label>
-                </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <label htmlFor="Tanggal">Tanggal:</label>
+                <InputText
+                    id="tanggal"
+                    type="date"
+                    value={data.tanggal}
+                    onChange={(e) => setData("tanggal", e.target.value)}
+                />
             </div>
         );
     };

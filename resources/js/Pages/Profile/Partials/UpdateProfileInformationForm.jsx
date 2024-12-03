@@ -33,7 +33,7 @@ export default function UpdateProfileInformation({
                 </p>
             </header>
 
-            {user.role !== "mahasiswa" && (
+            {/* {user.role !== "mahasiswa" && (
                 <form onSubmit={submit} className="mt-4 space-y-6">
                     <div className="mb-3">
                         <label
@@ -111,7 +111,7 @@ export default function UpdateProfileInformation({
                         </Transition>
                     </div>
                 </form>
-            )}
+            )} */}
         </section>
     );
 }
