@@ -39,7 +39,7 @@ class DoorLockController extends Controller
 
         $scanner = ScanerStatus::where('kode', $request->kode)->first();
 
-        if ($mahasiswa && $mahasiswa->ket === 'mhs' && $scanner->type == 'luar') {
+        if ($mahasiswa && $mahasiswa->ket === 'mhs' && $scanner->type == 'luar' && $ruangan->type !== 'umum') {
 
             $ruanganAkses = HakAksesMahasiswa::where('mahasiswa_id', $mahasiswa->id)
                 ->whereHas('hakAkses', function ($query) use ($ruangan) {
@@ -67,7 +67,7 @@ class DoorLockController extends Controller
             }
         }
 
-        if ($mahasiswa && $mahasiswa->ket === 'dsn' && $scanner->type == 'luar') {
+        if ($mahasiswa && $mahasiswa->ket === 'dsn' && $scanner->type == 'luar' && $ruangan->type !== 'umum') {
             $ruanganAkses =   DosenRuangan::where('mahasiswa_id', $mahasiswa->id)->where('ruangan_id', $ruangan->id)->latest()
                 ->first();
             if (!$ruanganAkses) {
