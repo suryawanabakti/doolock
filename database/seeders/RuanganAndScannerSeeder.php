@@ -62,25 +62,34 @@ class RuanganAndScannerSeeder extends Seeder
             'type' => 'lab',
             'pin' => '000119',
         ]);
-
-
         $museum = Ruangan::create([
             'nama_ruangan' => 'Museum Lt. 2 (Gedung International)',
             'type' => 'lab',
             'pin' => '000120',
         ]);
-
-
         $studentCenter = Ruangan::create([
             'nama_ruangan' => 'Student Center',
             'type' => 'umum',
             'pin' => '000121',
         ]);
 
+        $csl1a = Ruangan::create([
+            'nama_ruangan' => 'CSL 1A',
+            'type' => 'lab',
+            'pin' => '000199',
+            'parent_id' => $cslLantai1->id
+        ]);
+
         ScanerStatus::create([
-            'kode' => 'R13A',
-            'ruangan_id' => $perpustakaan->id,
+            'kode' => 'R99A',
+            'ruangan_id' => $csl1a->id,
             'type' => 'dalam',
+        ]);
+
+        ScanerStatus::create([
+            'kode' => 'R99B',
+            'ruangan_id' => $csl1a->id,
+            'type' => 'luar',
         ]);
 
         ScanerStatus::create([

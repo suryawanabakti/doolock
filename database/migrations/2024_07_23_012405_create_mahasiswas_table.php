@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('nim')->unique();
             $table->string('pin')->nullable()->unique();
             $table->unsignedBigInteger('ruangan_id')->nullable();
-            $table->foreign('ruangan_id')->references('id')->on('ruangans');
+            $table->foreign('ruangan_id')->references('id')->on('ruangans'); //
             $table->string('ket'); // role
             $table->tinyInteger('status');
             $table->integer('tahun_masuk')->default('2024');

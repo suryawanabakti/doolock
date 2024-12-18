@@ -31,7 +31,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::orderBy('created_at', 'DESC')->with('ruangan')->where('role', 'penjaga')->get();
+        $users = User::orderBy('created_at', 'DESC')->with(['ruangan.ruangan:id,nama_ruangan'])->where('role', 'penjaga')->get();
         return Inertia::render("Admin/Users/Index", ["users" => $users]);
     }
 

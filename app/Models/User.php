@@ -47,7 +47,7 @@ class User extends Authenticatable
 
     public function ruangan()
     {
-        return $this->belongsTo(Ruangan::class);
+        return $this->hasMany(PenjagaRuangan::class);
     }
 
     public function mahasiswa()

@@ -18,7 +18,7 @@ import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { FilterMatchMode } from "primereact/api";
 
-export default function Index({ jadwals, ruangans }) {
+export default function Index({ jadwals, ruangan }) {
     const [filters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
@@ -85,6 +85,7 @@ export default function Index({ jadwals, ruangans }) {
 
             <div className="grid">
                 <div className="col-12">
+                    <h4> {ruangan.nama_ruangan}</h4>
                     <DataTable
                         value={dataJadwals}
                         rowsPerPageOptions={[5, 10, 25]}

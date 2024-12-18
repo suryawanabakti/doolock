@@ -87,8 +87,8 @@ class RiwayatController extends Controller
         $dates = $this->parseDateRange($request->dates);
 
         $riwayat = Histori::with('scanner.ruangan', 'user')
-            ->whereHas('scanner', function ($query) {
-                $query->where('ruangan_id', auth()->user()->ruangan_id);
+            ->whereHas('scanner', function ($query) use ($request) {
+                $query->where('ruangan_id', $request->id);
             })
             ->orderBy('waktu', 'DESC')
             ->whereBetween(DB::raw('DATE(waktu)'), [$dates['mulai'], $dates['sampai']])

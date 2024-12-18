@@ -8,6 +8,7 @@ const AppMenu = () => {
     const { layoutConfig } = useContext(LayoutContext);
     const { auth } = usePage().props;
     const user = auth.user;
+    const daftarRuangan = auth.daftarRuangan;
 
     const menuItems = {
         admin: [
@@ -77,44 +78,7 @@ const AppMenu = () => {
                 ],
             },
         ],
-        penjaga: [
-            {
-                label: "Penjaga Menu",
-                items: [
-                    {
-                        label: "Hak Akses",
-                        icon: "pi pi-key",
-                        to: route("penjaga.ruangan-hak-akses.index"),
-                    },
-                    {
-                        label: "Daftar Jadwal belum di approve",
-                        icon: "pi pi-clock",
-                        to: route("penjaga.pendaftaran.index"),
-                    },
-                    {
-                        label: "Daftar Jadwal sudah di approve",
-                        icon: "pi pi-check",
-                        to: route("penjaga.pendaftaran-approve.index"),
-                    },
-                ],
-            },
-            {
-                label: "Laporan",
-                items: [
-                    {
-                        label: "Riwayat",
-                        icon: "pi pi-history",
-                        to: route("penjaga.riwayat.index"),
-                    },
-
-                    {
-                        label: "Absensi",
-                        icon: "pi pi-history",
-                        to: route("penjaga.absensi.index"),
-                    },
-                ],
-            },
-        ],
+        penjaga: daftarRuangan,
         mahasiswa: [
             {
                 label: "Mahasiswa Menu",

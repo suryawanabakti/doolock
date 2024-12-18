@@ -18,6 +18,7 @@ return new class extends Migration
             $table->boolean('open_api')->default(1);
             $table->string('pin')->unique()->nullable();
             $table->boolean('pin_active')->default(1);
+            $table->foreignId('parent_id')->nullable()->constrained('ruangans')->nullOnDelete();
             $table->timestamps();
         });
     }

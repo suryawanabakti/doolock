@@ -8,6 +8,7 @@ import { Column } from "primereact/column";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
+import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { RadioButton } from "primereact/radiobutton";
 import { Toast } from "primereact/toast";
@@ -18,6 +19,27 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 export default function Ruangan({ ruangans }) {
+    const [selectedCountry, setSelectedCountry] = useState(null);
+    const selectedCountryTemplate = (option, props) => {
+        if (option) {
+            return (
+                <div className="flex align-items-center">
+                    <div>{option.nama_ruangan}</div>
+                </div>
+            );
+        }
+
+        return <span>{props.placeholder}</span>;
+    };
+
+    const countryOptionTemplate = (option) => {
+        return (
+            <div className="flex align-items-center">
+                <div>{option.nama_ruangan}</div>
+            </div>
+        );
+    };
+
     const [dataRuangan, setDataRuangan] = useState([]);
     const [globalFilter, setGlobalFilter] = useState("");
     useEffect(() => {
@@ -39,6 +61,7 @@ export default function Ruangan({ ruangans }) {
         jam_buka: "00:01:00",
         jam_tutup: "23:58:00",
         open_api: "",
+        parent_id: "",
     };
 
     const [ruangan, setRuangan] = useState(emptyRuangan);
@@ -482,6 +505,35 @@ export default function Ruangan({ ruangans }) {
                     />
                     {errors.jam_tutup && (
                         <small className="p-error">{errors.jam_tutup}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="ruangan" className="font-bold">
+                        Parent Ruangan (Tidak usah di isi jika tidak ada)
+                    </label>
+                    <Dropdown
+                        value={selectedCountry}
+                        onChange={(e) => {
+                            setSelectedCountry(e.value);
+                            setRuangan({
+                                ...ruangan,
+                                parent_id: e.value.id,
+                            });
+                        }}
+                        options={[
+                            { id: null, nama_ruangan: "None", code: null },
+                            ...ruangans,
+                        ]}
+                        optionLabel="nama_ruangan"
+                        placeholder="Select a Room"
+                        filter
+                        valueTemplate={selectedCountryTemplate}
+                        itemTemplate={countryOptionTemplate}
+                        className="w-full "
+                    />
+
+                    {errors.ruangan && (
+                        <small className="p-error">{errors.ruangan}</small>
                     )}
                 </div>
             </Dialog>

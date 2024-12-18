@@ -6,6 +6,7 @@ use App\Http\Requests\StoreHakAksesRequest;
 use App\Models\HakAkses;
 use App\Models\HakAksesMahasiswa;
 use App\Models\Mahasiswa;
+use App\Models\PenjagaRuangan;
 use App\Models\Ruangan;
 use App\Models\RuanganAkses;
 use Carbon\Carbon;
@@ -28,12 +29,8 @@ class RuanganHakAksesController extends Controller
     }
     public function index(Request $request)
     {
-        if ($request->user()->role == 'penjaga') {
-            $ruanganId = $request->user()->ruangan_id;
-        } else {
-            $ruanganId = $request->id;
-        }
 
+        $ruanganId = $request->id;
 
         // Filter mahasiswa yang memiliki ruanganAkses sesuai dengan ruangan yang dipilih
         $today = Carbon::now('Asia/Makassar')->format('Y-m-d');

@@ -10,7 +10,10 @@ class RuanganController extends Controller
 {
     public function index()
     {
-        $ruangans = Ruangan::with('first_scanner')->whereNot('type', 'kelas')->orderBy('created_at', 'desc')->get();
+        $ruangans = Ruangan::with('first_scanner')->whereNot('type', 'kelas')->orderBy('created_at', 'desc')->get()->map(function ($data) {
+            $data['code'] = $data->id;
+            return $data;
+        });
         return Inertia::render("Admin/Ruangan/Index", ["ruangans" => $ruangans ?? []]);
     }
 
@@ -21,7 +24,8 @@ class RuanganController extends Controller
             'jam_buka' => ['required', 'before:jam_tutup'],
             'jam_tutup' => ['required', 'after:jam_buka'],
         ]);
-        return Ruangan::create(["nama_ruangan" => $request->nama_ruangan, "jam_buka" => $request->jam_buka, "jam_tutup" => $request->jam_tutup, "type" => "umum"]);
+
+        return Ruangan::create(["nama_ruangan" => $request->nama_ruangan, "jam_buka" => $request->jam_buka, "jam_tutup" => $request->jam_tutup, "type" => "umum", "parent_id" => $request->parent_id ?? null]);
     }
 
     public function update(Request $request, Ruangan $ruangan)

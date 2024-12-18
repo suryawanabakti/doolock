@@ -343,13 +343,13 @@ export default function Index({ users }) {
                             className="mb-4"
                             left={() => (
                                 <div className="flex flex-wrap gap-2">
-                                    <Button
+                                    {/* <Button
                                         label="New"
                                         icon="pi pi-plus"
                                         severity="primary"
                                         onClick={openNewDialog}
                                         loading={btnNew}
-                                    />
+                                    /> */}
                                 </div>
                             )}
                         />
@@ -396,6 +396,22 @@ export default function Index({ users }) {
                                 header="Ruangan"
                                 sortable
                                 filterPlaceholder="Search by room"
+                                body={(rowData) => {
+                                    return (
+                                        <span key={rowData.id}>
+                                            {rowData.ruangan.map((data) => {
+                                                return (
+                                                    <div key={data.id}>
+                                                        {
+                                                            data.ruangan
+                                                                .nama_ruangan
+                                                        }
+                                                    </div>
+                                                );
+                                            })}
+                                        </span>
+                                    );
+                                }}
                                 headerStyle={{ width: "15rem" }}
                             />
                             <Column

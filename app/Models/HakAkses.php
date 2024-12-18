@@ -14,6 +14,11 @@ class HakAkses extends Model
         return $this->hasMany(HakAksesMahasiswa::class);
     }
 
+    public function hakAksesMahasiswaOne()
+    {
+        return $this->hasOne(HakAksesMahasiswa::class);
+    }
+
     public function ruangan()
     {
         return $this->belongsTo(Ruangan::class);

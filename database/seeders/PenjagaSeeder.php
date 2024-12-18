@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\PenjagaRuangan;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,76 +13,110 @@ class PenjagaSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\User::factory()->create([
+        $perpus = \App\Models\User::factory()->create([
             'name' => 'Penjaga Perpustakaan',
             'role' => 'penjaga',
             'email' => 'perpustakaan@fkuh',
-            'ruangan_id' => 1,
             'password' => bcrypt('perpustakaan@fkuh')
         ]);
 
-        \App\Models\User::factory()->create([
+        PenjagaRuangan::create([
+            'user_id' => $perpus->id,
+            'ruangan_id' => 1
+        ]);
+
+        $anatomiBasah = \App\Models\User::factory()->create([
             'name' => 'Penjaga Anatomi Basah',
             'role' => 'penjaga',
             'email' => 'anatomibasah@fkuh',
-            'ruangan_id' => 2,
             'password' => bcrypt('anatomibasah@fkuh')
         ]);
 
-        \App\Models\User::factory()->create([
+        PenjagaRuangan::create([
+            'user_id' => $anatomiBasah->id,
+            'ruangan_id' => 2
+        ]);
+
+        $anatomiKomputer = \App\Models\User::factory()->create([
             'name' => 'Penjaga Anatomi Komputer',
             'role' => 'penjaga',
             'email' => 'anatomikomputer@fkuh',
-            'ruangan_id' => 3,
             'password' => bcrypt('anatomikomputer@fkuh')
         ]);
 
-        \App\Models\User::factory()->create([
+        PenjagaRuangan::create([
+            'user_id' => $anatomiKomputer->id,
+            'ruangan_id' => 3
+        ]);
+
+        $csllt1 = \App\Models\User::factory()->create([
             'name' => 'CSL Lantai 1',
             'role' => 'penjaga',
             'email' => 'csllantai1@fkuh',
-            'ruangan_id' => 4,
             'password' => bcrypt('csllantai1@fkuh')
         ]);
 
-        \App\Models\User::factory()->create([
+        PenjagaRuangan::create([
+            'user_id' => $csllt1->id,
+            'ruangan_id' => 4
+        ]);
+
+        PenjagaRuangan::create([
+            'user_id' => $csllt1->id,
+            'ruangan_id' => 11
+        ]);
+
+        $csllt2 = \App\Models\User::factory()->create([
             'name' => 'CSL Lantai 2',
             'role' => 'penjaga',
             'email' => 'csllantai2@fkuh',
-            'ruangan_id' => 6,
             'password' => bcrypt('csllantai2@fkuh')
         ]);
 
-        \App\Models\User::factory()->create([
+        PenjagaRuangan::create([
+            'user_id' => $csllt2->id,
+            'ruangan_id' => 6
+        ]);
+
+        $cslinventaris = \App\Models\User::factory()->create([
             'name' => 'CSL Inventaris',
             'role' => 'penjaga',
             'email' => 'cslinventaris@fkuh',
-            'ruangan_id' => 7,
             'password' => bcrypt('cslinventaris@fkuh')
         ]);
 
-        \App\Models\User::factory()->create([
+        PenjagaRuangan::create([
+            'user_id' => $cslinventaris->id,
+            'ruangan_id' => 7
+        ]);
+
+        $cbtkomputer = \App\Models\User::factory()->create([
             'name' => 'CBT Lab Komputer Lt.4',
             'role' => 'penjaga',
             'email' => 'cbtkomputer@fkuh',
-            'ruangan_id' => 8,
             'password' => bcrypt('cbtkomputer@fkuh')
         ]);
 
-        \App\Models\User::factory()->create([
-            'name' => 'Museum Lt. 2',
-            'role' => 'penjaga',
-            'email' => 'museum@fkuh',
-            'ruangan_id' => 9,
-            'password' => bcrypt('museum@fkuh')
+        PenjagaRuangan::create([
+            'user_id' => $cbtkomputer->id,
+            'ruangan_id' => 8
         ]);
 
-        \App\Models\User::factory()->create([
-            'name' => 'Student Center',
+        $adminCSL = \App\Models\User::factory()->create([
+            'name' => 'Admin CSL',
             'role' => 'penjaga',
-            'email' => 'studentcenter@fkuh',
-            'ruangan_id' => 10,
-            'password' => bcrypt('studentcenter@fkuh')
+            'email' => 'admincsl@fkuh',
+            'password' => bcrypt('admincsl@fkuh')
+        ]);
+
+        PenjagaRuangan::create([
+            'user_id' => $adminCSL->id,
+            'ruangan_id' => 4
+        ]);
+
+        PenjagaRuangan::create([
+            'user_id' => $adminCSL->id,
+            'ruangan_id' => 6
         ]);
     }
 }
