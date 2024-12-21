@@ -325,19 +325,28 @@ export default function Ruangan({ ruangans }) {
                                         : "-";
                                 }}
                                 filterPlaceholder="jam buka"
-                                style={{ minWidth: "7rem" }}
-                                headerStyle={{ width: "7rem" }}
+                                style={{ minWidth: "3rem" }}
+                                headerStyle={{ width: "3rem" }}
                             />
+
                             <Column
                                 headerClassName="fw-bold"
                                 field="nama_ruangan"
                                 header="Nama Ruangan"
                                 sortable
                                 filterPlaceholder="id"
-                                style={{ minWidth: "18rem" }}
-                                headerStyle={{ width: "18rem" }}
+                                style={{ minWidth: "15rem" }}
+                                headerStyle={{ width: "15rem" }}
                             />
-
+                            <Column
+                                headerClassName="fw-bold"
+                                field="type"
+                                header="Tipe"
+                                sortable
+                                filterPlaceholder="id"
+                                style={{ minWidth: "5rem" }}
+                                headerStyle={{ width: "5rem" }}
+                            />
                             <Column
                                 headerClassName="fw-bold"
                                 field="jam_buka"

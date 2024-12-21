@@ -14,7 +14,6 @@ class PendaftaranJadwalController extends Controller
 {
     public function index(Request $request)
     {
-
         $jadwals = HakAksesMahasiswa::with('mahasiswa', 'hakAkses.ruangan')->orderBy('created_at', 'DESC')
             ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 0)->where('ruangan_id', $request->id))->get();
         $ruangan = Ruangan::find($request->id);

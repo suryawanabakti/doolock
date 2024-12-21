@@ -43,7 +43,6 @@ class HandleInertiaRequests extends Middleware
                             "to" => route("penjaga.ruangan-hak-akses.index",  [
                                 "id" => $data->ruangan_id
                             ]),
-
                         ],
                         [
                             "label" => "Daftar jadwal belum di approve",
