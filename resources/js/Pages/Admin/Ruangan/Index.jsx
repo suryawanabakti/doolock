@@ -200,8 +200,23 @@ export default function Ruangan({ ruangans }) {
     // EDIT
 
     const openEdit = (data) => {
-        setDialogEdit(true);
+        console.log("coba", {
+            id: data.parent_id,
+            name: data.parent?.nama_ruangan,
+            nama_ruangan: data.parent?.nama_ruangan,
+            code: data.parent_id,
+        });
+
+        setSelectedCountry({
+            id: data.parent_id,
+            name: data.parent?.nama_ruangan,
+            nama_ruangan: data.parent?.nama_ruangan,
+            code: data.parent_id,
+        });
+
         setRuangan(data);
+
+        setDialogEdit(true);
     };
     const [dialogAccess, setDialogAccess] = useState(false);
     const openAccess = (data) => {
@@ -225,6 +240,7 @@ export default function Ruangan({ ruangans }) {
                     item.id === res.data.id
                         ? {
                               ...item,
+                              parent: res.data.parent,
                               nama_ruangan: res.data.nama_ruangan,
                               jam_buka: res.data.jam_buka,
                               jam_tutup: res.data.jam_tutup,
@@ -461,6 +477,35 @@ export default function Ruangan({ ruangans }) {
                     />
                     {errors.jam_tutup && (
                         <small className="p-error">{errors.jam_tutup}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="ruangan" className="font-bold">
+                        Parent Ruangan (Tidak usah di isi jika tidak ada)
+                    </label>
+                    <Dropdown
+                        value={selectedCountry}
+                        onChange={(e) => {
+                            setSelectedCountry(e.value);
+                            setRuangan({
+                                ...ruangan,
+                                parent_id: e.value.id,
+                            });
+                        }}
+                        options={[
+                            { id: null, nama_ruangan: "None", code: null },
+                            ...ruangans,
+                        ]}
+                        optionLabel="nama_ruangan"
+                        placeholder="Select a Room"
+                        filter
+                        valueTemplate={selectedCountryTemplate}
+                        itemTemplate={countryOptionTemplate}
+                        className="w-full "
+                    />
+
+                    {errors.parent_id && (
+                        <small className="p-error">{errors.parent_id}</small>
                     )}
                 </div>
             </Dialog>

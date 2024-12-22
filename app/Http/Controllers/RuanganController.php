@@ -36,9 +36,9 @@ class RuanganController extends Controller
             'jam_tutup' => ['required', 'after:jam_buka'],
         ]);
 
-        $ruangan->update(["nama_ruangan" => $request->nama_ruangan, "jam_buka" => $request->jam_buka, "jam_tutup" => $request->jam_tutup, "open_api" => 1]);
+        $ruangan->update(["nama_ruangan" => $request->nama_ruangan, "jam_buka" => $request->jam_buka, "jam_tutup" => $request->jam_tutup, "open_api" => 1, "parent_id" => $request->parent_id]);
 
-        return $ruangan;
+        return $ruangan->load('parent');
     }
 
     public function destroy(Ruangan $ruangan)
