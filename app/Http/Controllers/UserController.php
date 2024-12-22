@@ -30,9 +30,11 @@ class UserController extends Controller
 
         return $user->load('ruangan.ruangan:id,nama_ruangan');
     }
+
     public function  update(UserUpdateRequest $request, User $user)
     {
         $data = $request->validated();
+        unset($data['ruangan_id']);
         $user->update($data);
         return $user->load('ruangan.ruangan:id,nama_ruangan');
     }
