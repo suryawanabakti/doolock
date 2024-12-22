@@ -129,13 +129,13 @@ export default function Index({ jadwals, ruangans }) {
             <Dialog
                 header="Tambah Jadwal"
                 visible={dialogNew}
-                style={{ width: "50vw" }}
+                style={{ width: "30vw" }}
                 onHide={() => {
                     if (!dialogNew) return;
                     setDialogNew(false);
                 }}
             >
-                <div className="field w-5">
+                <div className="field ">
                     <label htmlFor="ruangan" className="font-bold">
                         Ruangan{" "}
                         <span className="text-danger" style={{ color: "red" }}>
@@ -163,7 +163,7 @@ export default function Index({ jadwals, ruangans }) {
                         <small className="p-error">{errors.ruangan_id}</small>
                     )}
                 </div>
-                <div className="field w-5">
+                <div className="field ">
                     <label htmlFor="tanggal" className="font-bold">
                         Tanggal{" "}
                         <span className="text-danger" style={{ color: "red" }}>
@@ -182,44 +182,65 @@ export default function Index({ jadwals, ruangans }) {
                         <small className="p-error">{errors.tanggal}</small>
                     )}
                 </div>
-                <div className="field w-5">
-                    <label htmlFor="jam_masuk" className="font-bold">
-                        Jam Masuk{" "}
-                        <span className="text-danger" style={{ color: "red" }}>
-                            *
-                        </span>
-                    </label>
-                    <InputText
-                        className="w-full"
-                        id="jam_masuk"
-                        type="time"
-                        required
-                        onChange={(e) => setData("jam_masuk", e.target.value)}
-                        autoFocus
-                    />
-                    {errors.jam_masuk && (
-                        <small className="p-error">{errors.jam_masuk}</small>
-                    )}
+                <div class="grid">
+                    <div class="col">
+                        <div className="field ">
+                            <label htmlFor="jam_masuk" className="font-bold">
+                                Jam Masuk{" "}
+                                <span
+                                    className="text-danger"
+                                    style={{ color: "red" }}
+                                >
+                                    *
+                                </span>
+                            </label>
+                            <InputText
+                                className="w-full"
+                                id="jam_masuk"
+                                type="time"
+                                required
+                                onChange={(e) =>
+                                    setData("jam_masuk", e.target.value)
+                                }
+                                autoFocus
+                            />
+                            {errors.jam_masuk && (
+                                <small className="p-error">
+                                    {errors.jam_masuk}
+                                </small>
+                            )}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div className="field ">
+                            <label htmlFor="jam_keluar" className="font-bold">
+                                Jam Keluar{" "}
+                                <span
+                                    className="text-danger"
+                                    style={{ color: "red" }}
+                                >
+                                    *
+                                </span>
+                            </label>
+                            <InputText
+                                className="w-full"
+                                id="jam_keluar"
+                                type="time"
+                                required
+                                onChange={(e) =>
+                                    setData("jam_keluar", e.target.value)
+                                }
+                                autoFocus
+                            />
+                            {errors.jam_keluar && (
+                                <small className="p-error">
+                                    {errors.jam_keluar}
+                                </small>
+                            )}
+                        </div>
+                    </div>
                 </div>
-                <div className="field w-5">
-                    <label htmlFor="jam_keluar" className="font-bold">
-                        Jam Keluar{" "}
-                        <span className="text-danger" style={{ color: "red" }}>
-                            *
-                        </span>
-                    </label>
-                    <InputText
-                        className="w-full"
-                        id="jam_keluar"
-                        required
-                        type="time"
-                        onChange={(e) => setData("jam_keluar", e.target.value)}
-                        autoFocus
-                    />
-                    {errors.jam_keluar && (
-                        <small className="p-error">{errors.jam_keluar}</small>
-                    )}
-                </div>
+
                 <Button
                     label={`Simpan jadwal`}
                     icon="pi pi-save"

@@ -15,10 +15,8 @@ class MahasiswaRegisterRuanganController extends Controller
 {
     public function index(Request $request)
     {
-
         $jadwals = HakAksesMahasiswa::with('hakAkses.ruangan')->orderBy('created_at', 'DESC')->where('mahasiswa_id', $request->user()->mahasiswa->id)
             ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 0))->get();
-
         $ruangans = Ruangan::whereIn('type', ['lab'])
             ->get()
             ->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]);
@@ -31,7 +29,6 @@ class MahasiswaRegisterRuanganController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
             'ruangan_id' => ['required'],
             'tanggal' => ['required', 'date', 'after_or_equal:today'],
@@ -66,10 +63,8 @@ class MahasiswaRegisterRuanganController extends Controller
 
     public function index2(Request $request)
     {
-
         $jadwals = HakAksesMahasiswa::with('hakAkses.ruangan')->orderBy('created_at', 'DESC')->where('mahasiswa_id', $request->user()->mahasiswa->id)
             ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 1))->get();
-
 
         return Inertia::render("Mahasiswa/Register/Index2", [
             "jadwals" => $jadwals,

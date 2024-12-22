@@ -66,11 +66,6 @@ class RuanganHakAksesController extends Controller
 
     public function store(StoreHakAksesRequest $request)
     {
-        if ($request->user()->role == 'penjaga') {
-            if ($request->user()->ruangan_id !== $request->ruangan_id) {
-                abort(403);
-            }
-        }
 
         Ruangan::find($request->ruangan_id)->update(['open_api' => 1]);
 

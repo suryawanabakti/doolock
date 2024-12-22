@@ -164,9 +164,10 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
     const handleSave = async (e) => {
         e.preventDefault();
         setLoading(true);
+        alert("ok");
         try {
             const res = await axios.post(
-                route("admin.ruangan-hak-akses.store"),
+                route("penjaga.ruangan-hak-akses.store"),
                 data
             );
             const updatedData = [res.data, ...dataHakAkses];

@@ -58,6 +58,7 @@ Route::get('/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
 
+
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:mahasiswa'])->group(function () {
         Route::get('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'index'])->name('mahasiswa.register.index');
@@ -66,12 +67,6 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/mahasiswa/register-approve', [MahasiswaRegisterRuanganController::class, 'index2'])->name('mahasiswa.register-approve.index');
     });
-
-
-    Route::get('/admin/ruangan-hak-akses/get-mahasiswa', [RuanganHakAksesController::class, 'getMahasiswa'])->name('admin.ruangan-hak-akses.getMahasiswa');
-    Route::post('/admin/ruangan-hak-akses', [RuanganHakAksesController::class, 'store'])->name('admin.ruangan-hak-akses.store');
-    Route::delete('/admin/ruangan-hak-akses/{hakAkses}', [RuanganHakAksesController::class, 'destroy'])->name('admin.ruangan-hak-akses.destroy');
-
 
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
@@ -130,8 +125,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/riwayat/export', [RiwayatController::class, 'export'])->name('admin.riwayat.export');
 
 
+    Route::post('/admin/ruangan-hak-akses', [RuanganHakAksesController::class, 'store'])->name('admin.ruangan-hak-akses.store');
     Route::get('/admin/riwayat-by-ruangan/export', [RiwayatByRuanganController::class, 'export'])->name('admin.riwayat-by-ruangan.export');
-
+    Route::get('/admin/ruangan-hak-akses/get-mahasiswa', [RuanganHakAksesController::class, 'getMahasiswa'])->name('admin.ruangan-hak-akses.getMahasiswa');
+    Route::delete('/admin/ruangan-hak-akses/{hakAkses}', [RuanganHakAksesController::class, 'destroy'])->name('admin.ruangan-hak-akses.destroy');
 
 
     // PENJAGA
@@ -143,6 +140,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/penjaga/pendaftaran-approve', [PendaftaranJadwalController::class, 'index2'])->name('penjaga.pendaftaran-approve.index');
 
         Route::get('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('penjaga.ruangan-hak-akses.index');
+        Route::post('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'store'])->name('penjaga.ruangan-hak-akses.store');
         Route::get('/penjaga/riwayat', [RiwayatController::class, 'indexPenjaga'])->name('penjaga.riwayat.index');
         Route::get('/penjaga/riwayat/mahasiswa', [RiwayatController::class, 'mahasiswaPenjaga'])->name('penjaga.riwayat.mahasiswa');
         Route::get('/penjaga/riwayat/ruangan', [RiwayatController::class, 'ruanganPenjaga'])->name('penjaga.riwayat.ruangan');
