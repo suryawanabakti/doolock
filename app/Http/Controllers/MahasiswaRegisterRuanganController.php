@@ -16,7 +16,7 @@ class MahasiswaRegisterRuanganController extends Controller
     public function index(Request $request)
     {
         $jadwals = HakAksesMahasiswa::with('hakAkses.ruangan')->orderBy('created_at', 'DESC')->where('mahasiswa_id', $request->user()->mahasiswa->id)
-            ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 0))->get();
+            ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 0)->where('is_by_admin', 0))->get();
         $ruangans = Ruangan::whereIn('type', ['lab'])
             ->get()
             ->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]);
@@ -42,7 +42,8 @@ class MahasiswaRegisterRuanganController extends Controller
                 'tanggal' => $request->tanggal,
                 'jam_masuk' => $request->jam_masuk,
                 'jam_keluar' => $request->jam_keluar,
-                'is_approve' => 0
+                'is_approve' => 0,
+                'is_by_admin' => 0,
             ]);
 
             $hakAksesMahasiswa =  HakAksesMahasiswa::create([
@@ -64,7 +65,7 @@ class MahasiswaRegisterRuanganController extends Controller
     public function index2(Request $request)
     {
         $jadwals = HakAksesMahasiswa::with('hakAkses.ruangan')->orderBy('created_at', 'DESC')->where('mahasiswa_id', $request->user()->mahasiswa->id)
-            ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 1))->get();
+            ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 1)->where('is_by_admin', 0))->get();
 
         return Inertia::render("Mahasiswa/Register/Index2", [
             "jadwals" => $jadwals,

@@ -28,6 +28,7 @@ export default function Index({ jadwals, ruangan }) {
         setGlobalFilter(value);
     };
     const [dataJadwals, setDataJadwals] = useState(jadwals);
+    const [selectedCustomers, setSelectedCustomers] = useState([]);
 
     const reject = () => {
         toast.current.show({
@@ -39,6 +40,7 @@ export default function Index({ jadwals, ruangan }) {
     };
 
     const toast = useRef(null);
+
     const confirm2 = (event, rowData) => {
         confirmPopup({
             target: event.currentTarget,
@@ -77,7 +79,39 @@ export default function Index({ jadwals, ruangan }) {
             reject,
         });
     };
-
+    const multiApprove = (e) => {
+        e.preventDefault();
+        confirmPopup({
+            target: event.currentTarget,
+            message: "Apakah anda yakin menyutujui pendaftaran jadwal ini?",
+            icon: "pi pi-info-circle",
+            defaultFocus: "reject",
+            acceptClassName: "p-button-success",
+            accept: async () => {
+                try {
+                    const res = await axios.post(
+                        route("penjaga.pendaftaran.multi-approve"),
+                        {
+                            selectedCustomers: selectedCustomers,
+                        }
+                    );
+                    console.log(res.data);
+                    toast.current.show({
+                        severity: "success",
+                        summary: "Confirmed",
+                        detail: "You have approve ",
+                        life: 3000,
+                    });
+                    alert("Berhasil multi approve");
+                    location.reload();
+                } catch (e) {
+                    alert("error");
+                    console.log("ERROR", e);
+                }
+            },
+            reject,
+        });
+    };
     return (
         <Layout>
             <Toast ref={toast} />
@@ -85,8 +119,28 @@ export default function Index({ jadwals, ruangan }) {
 
             <div className="grid">
                 <div className="col-12">
-                    <h4> {ruangan.nama_ruangan}</h4>
+                    <div className="flex justify-between">
+                        <h4> {ruangan.nama_ruangan}</h4>
+                    </div>
+                    <Toolbar
+                        className="mb-2"
+                        left={() => (
+                            <Button
+                                label={`Terima`}
+                                icon="pi pi-check"
+                                severity="success"
+                                disabled={selectedCustomers.length <= 0}
+                                onClick={multiApprove}
+                                className="mb-2"
+                            />
+                        )}
+                    />
                     <DataTable
+                        dataKey="hak_akses_id"
+                        selection={selectedCustomers}
+                        onSelectionChange={(e) => {
+                            setSelectedCustomers(e.value);
+                        }}
                         value={dataJadwals}
                         rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -111,6 +165,10 @@ export default function Index({ jadwals, ruangan }) {
                             </div>
                         )}
                     >
+                        <Column
+                            selectionMode="multiple"
+                            headerStyle={{ width: "3rem" }}
+                        ></Column>
                         <Column
                             headerClassName="fw-bold"
                             field="mahasiswa.nim"

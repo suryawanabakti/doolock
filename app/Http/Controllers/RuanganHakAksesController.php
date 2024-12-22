@@ -40,7 +40,7 @@ class RuanganHakAksesController extends Controller
         // Temukan ruangan yang dipilih
         $ruangan = Ruangan::find($ruanganId);
 
-        $hakAkses = HakAkses::with(['ruangan', 'hakAksesMahasiswa.mahasiswa'])->withCount('hakAksesMahasiswa')->where('ruangan_id', $ruanganId)->orderBy('created_at', 'DESC')->where('is_approve', 1)->get();
+        $hakAkses = HakAkses::with(['ruangan', 'hakAksesMahasiswa.mahasiswa'])->withCount('hakAksesMahasiswa')->where('ruangan_id', $ruanganId)->orderBy('created_at', 'DESC')->where('is_approve', 1)->where('is_by_admin', 1)->get();
 
         $kelas =  Ruangan::where('type', 'kelas')->get()->map(function ($data) {
             return [
@@ -81,6 +81,7 @@ class RuanganHakAksesController extends Controller
                 "ruangan_id" => $request->ruangan_id,
                 "jam_masuk" => $request->jam_masuk,
                 "jam_keluar" => $request->jam_keluar,
+                'is_by_admin' => 1
             ]);
 
             $data = [];

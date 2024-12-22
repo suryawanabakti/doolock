@@ -20,6 +20,11 @@ class Ruangan extends Model
         return $this->hasMany(Ruangan::class, 'parent_id', 'id');
     }
 
+    public function parent()
+    {
+        return $this->belongsTo(Ruangan::class, 'parent_id', 'id');
+    }
+
     public function first_scanner()
     {
         return $this->hasOne(ScanerStatus::class, 'ruangan_id', 'id');

@@ -333,6 +333,15 @@ export default function Ruangan({ ruangans }) {
                                 headerClassName="fw-bold"
                                 field="nama_ruangan"
                                 header="Nama Ruangan"
+                                body={(rowData) => {
+                                    return (
+                                        <div>
+                                            {rowData.nama_ruangan} <br />
+                                            {rowData.parent &&
+                                                `Parent : ${rowData.parent?.nama_ruangan}`}
+                                        </div>
+                                    );
+                                }}
                                 sortable
                                 filterPlaceholder="id"
                                 style={{ minWidth: "15rem" }}
