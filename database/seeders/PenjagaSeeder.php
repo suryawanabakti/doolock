@@ -61,11 +61,6 @@ class PenjagaSeeder extends Seeder
             'ruangan_id' => 4
         ]);
 
-        PenjagaRuangan::create([
-            'user_id' => $csllt1->id,
-            'ruangan_id' => 11
-        ]);
-
         $csllt2 = \App\Models\User::factory()->create([
             'name' => 'CSL Lantai 2',
             'role' => 'penjaga',
@@ -76,6 +71,11 @@ class PenjagaSeeder extends Seeder
         PenjagaRuangan::create([
             'user_id' => $csllt2->id,
             'ruangan_id' => 6
+        ]);
+
+        PenjagaRuangan::create([
+            'user_id' => $csllt2->id,
+            'ruangan_id' => 11
         ]);
 
         $cslinventaris = \App\Models\User::factory()->create([

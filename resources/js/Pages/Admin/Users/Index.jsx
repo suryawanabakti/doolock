@@ -121,6 +121,7 @@ export default function Index({ users }) {
             // Create new user
             try {
                 const res = await axios.post(route("admin.users.store"), user);
+                console.log("RES", res);
                 setDataUsers((prevData) => [res.data, ...prevData]);
                 toast.current.show({
                     severity: "success",
@@ -241,7 +242,7 @@ export default function Index({ users }) {
                 visible={openDialogTambah || dialogEdit}
                 style={{ width: "32rem" }}
                 breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-                header={user.id ? "Edit User" : "New User"}
+                header={user.id ? "Edit Penjaga" : "New Penjaga"}
                 modal
                 className="p-fluid"
                 footer={renderFooter()}
@@ -281,14 +282,14 @@ export default function Index({ users }) {
                 </div>
                 <div className="field">
                     <label htmlFor="ruangan" className="font-bold">
-                        Room
+                        Ruangan
                     </label>
                     <Dropdown
                         value={selectedRuangan}
                         onChange={handleDropdownChange}
                         options={ruangans}
                         optionLabel="nama_ruangan"
-                        placeholder="Select a Room"
+                        placeholder="Pilih Ruangan"
                         filter
                         valueTemplate={renderSelectedRuangan}
                         itemTemplate={renderRuanganTemplate}
@@ -343,13 +344,13 @@ export default function Index({ users }) {
                             className="mb-4"
                             left={() => (
                                 <div className="flex flex-wrap gap-2">
-                                    {/* <Button
+                                    <Button
                                         label="New"
                                         icon="pi pi-plus"
                                         severity="primary"
                                         onClick={openNewDialog}
                                         loading={btnNew}
-                                    /> */}
+                                    />
                                 </div>
                             )}
                         />

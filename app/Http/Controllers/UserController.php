@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Models\PenjagaRuangan;
 use App\Models\Ruangan;
 use App\Models\User;
 use Inertia\Inertia;
@@ -19,14 +20,21 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $data['role'] = 'penjaga';
+        unset($data['ruangan_id']);
         $user = User::create($data);
-        return $user->load('ruangan');
+
+        PenjagaRuangan::create([
+            'user_id' => $user->id,
+            'ruangan_id' => $request->ruangan_id
+        ]);
+
+        return $user->load('ruangan.ruangan:id,nama_ruangan');
     }
     public function  update(UserUpdateRequest $request, User $user)
     {
         $data = $request->validated();
         $user->update($data);
-        return $user->load('ruangan');
+        return $user->load('ruangan.ruangan:id,nama_ruangan');
     }
 
     public function index()
