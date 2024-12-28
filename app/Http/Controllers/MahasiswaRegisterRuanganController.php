@@ -56,9 +56,9 @@ class MahasiswaRegisterRuanganController extends Controller
         });
     }
 
-    public function destroy(RegisterRuangan $mahasiswaRegisterRuangan)
+    public function destroy(HakAkses $hakAkses)
     {
-        $mahasiswaRegisterRuangan->delete();
+        $hakAkses->delete();
     }
 
 

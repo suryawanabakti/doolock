@@ -96,7 +96,10 @@ export default function Index({ jadwals, ruangans }) {
             accept: async () => {
                 try {
                     await axios.delete(
-                        route("mahasiswa.register.destroy", rowData.id)
+                        route(
+                            "mahasiswa.register.destroy",
+                            rowData.hak_akses_id
+                        )
                     );
                     toast.current.show({
                         severity: "info",
@@ -110,6 +113,7 @@ export default function Index({ jadwals, ruangans }) {
                     // Update the state with the new array
                     setDataJadwals(updatedUsers);
                 } catch (e) {
+                    console.log("ERROR", e);
                     toast.current.show({
                         severity: "error",
                         summary: "Error",

@@ -63,7 +63,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:mahasiswa'])->group(function () {
         Route::get('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'index'])->name('mahasiswa.register.index');
         Route::post('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'store'])->name('mahasiswa.register.store');
-        Route::delete('/mahasiswa/register/{mahasiswaRegisterRuangan}', [MahasiswaRegisterRuanganController::class, 'destroy'])->name('mahasiswa.register.destroy');
+        Route::delete('/mahasiswa/register/{hakAkses}', [MahasiswaRegisterRuanganController::class, 'destroy'])->name('mahasiswa.register.destroy');
 
         Route::get('/mahasiswa/register-approve', [MahasiswaRegisterRuanganController::class, 'index2'])->name('mahasiswa.register-approve.index');
     });
