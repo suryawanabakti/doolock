@@ -249,6 +249,7 @@ export default function Ruangan({ ruangans }) {
                               jam_buka: res.data.jam_buka,
                               jam_tutup: res.data.jam_tutup,
                               open_api: res.data.open_api,
+                              type: res.data.type,
                           }
                         : item
                 )

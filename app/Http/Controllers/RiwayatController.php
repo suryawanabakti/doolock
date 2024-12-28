@@ -23,7 +23,7 @@ class RiwayatController extends Controller
         }
 
         return [
-            'mulai' => Carbon::now('GMT+8')->subDays(3)->format('Y-m-d'),
+            'mulai' => Carbon::now('GMT+8')->startOfMonth()->format('Y-m-d'),
             'sampai' => Carbon::now('GMT+8')->format('Y-m-d')
         ];
     }

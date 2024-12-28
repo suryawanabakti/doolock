@@ -51,6 +51,26 @@ class RuanganAndScannerSeeder extends Seeder
             'pin' => '000117',
         ]);
 
+        $csl2kmr22 = Ruangan::create([
+            'nama_ruangan' => 'CSL Lt. 2 - 22',
+            'type' => 'lab',
+            'pin' => null,
+            'parent_id' => $cslLantai2->id
+        ]);
+
+        $csl1kmr5B = Ruangan::create([
+            'nama_ruangan' => 'CSL Lt. 1 - 5B',
+            'type' => 'lab',
+            'pin' => null,
+            'parent_id' => $cslLantai1->id
+        ]);
+
+        $csl1Manikin = Ruangan::create([
+            'nama_ruangan' => 'CSL Lt.1 - Manikin',
+            'type' => 'lab',
+            'pin' => null,
+        ]);
+
         $cslInventaris = Ruangan::create([
             'nama_ruangan' => 'CSL Inventaris',
             'type' => 'lab',

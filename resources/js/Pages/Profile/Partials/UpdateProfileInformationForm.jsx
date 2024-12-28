@@ -2,7 +2,7 @@ import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { Link, useForm, usePage } from "@inertiajs/react";
 import { Transition } from "@headlessui/react";
-import { InputText } from "primereact/inputtext";
+import { useState } from "react";
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -11,16 +11,35 @@ export default function UpdateProfileInformation({
 }) {
     const user = usePage().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
+    const { data, setData, post, errors, processing, recentlySuccessful } =
         useForm({
             name: user.name,
             email: user.email,
+            image: null,
         });
+    const [preview, setPreview] = useState(
+        user.image ? `/storage/${user.image}` : null
+    );
 
     const submit = (e) => {
         e.preventDefault();
+        console.log(data);
+        // Submit form with the updated image
+        post(route("profile.update"), {
+            onSuccess: () => {
+                if (data.image) {
+                    setPreview(URL.createObjectURL(data.image));
+                }
+            },
+        });
+    };
 
-        patch(route("profile.update"));
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData("image", file);
+            setPreview(URL.createObjectURL(file));
+        }
     };
 
     return (
@@ -33,85 +52,43 @@ export default function UpdateProfileInformation({
                 </p>
             </header>
 
-            {/* {user.role !== "mahasiswa" && (
-                <form onSubmit={submit} className="mt-4 space-y-6">
-                    <div className="mb-3">
-                        <label
-                            htmlFor="name"
-                            className="block text-900 font-medium mb-2"
-                        >
-                            Name
-                        </label>
-                        <InputText
-                            id="name"
-                            type="text"
-                            placeholder="Name"
-                            className="w-full"
-                            value={data.name}
-                            onChange={(e) => setData("name", e.target.value)}
+            <form onSubmit={submit} className="mt-4 space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Profile Picture
+                    </label>
+                    <div className="mt-2 flex items-center gap-4">
+                        {preview && (
+                            <img
+                                src={preview}
+                                alt="Profile Preview"
+                                className="h-5 w-5 rounded-full object-cover"
+                            />
+                        )}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="block w-full text-sm text-gray-500"
                         />
-                        <InputError message={errors.email} className="" />
                     </div>
+                    <InputError message={errors.image} className="mt-2" />
+                </div>
 
-                    <div className="mb-3">
-                        <label
-                            htmlFor="email"
-                            className="block text-900 font-medium mb-2"
-                        >
-                            Email
-                        </label>
-                        <InputText
-                            id="email"
-                            type="text"
-                            placeholder="Email address"
-                            className="w-full"
-                            value={data.email}
-                            onChange={(e) => setData("email", e.target.value)}
-                        />
-                        <InputError message={errors.email} className="" />
-                    </div>
+                <div className="flex items-center gap-4 mt-3">
+                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
 
-                    {mustVerifyEmail && user.email_verified_at === null && (
-                        <div>
-                            <p className="text-sm mt-2 text-gray-800">
-                                Your email address is unverified.
-                                <Link
-                                    href={route("verification.send")}
-                                    method="post"
-                                    as="button"
-                                    className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                >
-                                    Click here to re-send the verification
-                                    email.
-                                </Link>
-                            </p>
-
-                            {status === "verification-link-sent" && (
-                                <div className="mt-2 font-medium text-sm text-green-600">
-                                    A new verification link has been sent to
-                                    your email address.
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <div className="flex items-center gap-4">
-                        <PrimaryButton disabled={processing}>
-                            Save
-                        </PrimaryButton>
-
-                        <Transition
-                            show={recentlySuccessful}
-                            enter="transition ease-in-out"
-                            enterFrom="opacity-0"
-                            leave="transition ease-in-out"
-                            leaveTo="opacity-0"
-                        >
-                            <p className="text-sm text-gray-600">Saved.</p>
-                        </Transition>
-                    </div>
-                </form>
-            )} */}
+                    <Transition
+                        show={recentlySuccessful}
+                        enter="transition ease-in-out"
+                        enterFrom="opacity-0"
+                        leave="transition ease-in-out"
+                        leaveTo="opacity-0"
+                    >
+                        <p className="text-sm text-gray-600">Saved.</p>
+                    </Transition>
+                </div>
+            </form>
         </section>
     );
 }
