@@ -20,6 +20,7 @@ class RuanganController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'type' => ['required'],
             'nama_ruangan' => ['required', 'max:100'],
             'jam_buka' => ['required', 'before:jam_tutup'],
             'jam_tutup' => ['required', 'after:jam_buka'],
@@ -32,11 +33,12 @@ class RuanganController extends Controller
     {
         $request->validate([
             'nama_ruangan' => ['required', 'max:100'],
+            'type' => ['required'],
             'jam_buka' => ['required', 'before:jam_tutup'],
             'jam_tutup' => ['required', 'after:jam_buka'],
         ]);
 
-        $ruangan->update(["nama_ruangan" => $request->nama_ruangan, "jam_buka" => $request->jam_buka, "jam_tutup" => $request->jam_tutup, "open_api" => 1, "parent_id" => $request->parent_id]);
+        $ruangan->update(["nama_ruangan" => $request->nama_ruangan, "jam_buka" => $request->jam_buka, "jam_tutup" => $request->jam_tutup, "open_api" => 1, "parent_id" => $request->parent_id, "type" => $request->type]);
 
         return $ruangan->load('parent');
     }
