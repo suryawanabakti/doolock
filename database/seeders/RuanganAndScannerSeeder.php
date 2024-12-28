@@ -73,7 +73,7 @@ class RuanganAndScannerSeeder extends Seeder
             'pin' => '000121',
         ]);
 
-        $cslLantai2 = Ruangan::create([
+        $cslLantai2R24 = Ruangan::create([
             'nama_ruangan' => 'CSL Lt. 2 - 24',
             'type' => 'umum',
             'pin' => '000130',
@@ -81,13 +81,13 @@ class RuanganAndScannerSeeder extends Seeder
 
         ScanerStatus::create([
             'kode' => 'R15A',
-            'ruangan_id' => $cslLantai2->id,
+            'ruangan_id' => $cslLantai2R24->id,
             'type' => 'dalam',
         ]);
 
         ScanerStatus::create([
             'kode' => 'R15B',
-            'ruangan_id' => $cslLantai2->id,
+            'ruangan_id' => $cslLantai2R24->id,
             'type' => 'luar',
         ]);
 

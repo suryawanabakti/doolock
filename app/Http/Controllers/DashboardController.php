@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Absensi;
 use App\Models\Mahasiswa;
+use App\Models\PenjagaRuangan;
 use App\Models\Ruangan;
 use App\Models\ScanerStatus;
 use Carbon\Carbon;
@@ -56,7 +57,8 @@ class DashboardController extends Controller
         }
 
         if ($request->user()->role == 'penjaga') {
-            return redirect()->route('penjaga.riwayat.index');
+            $ruangan_id = PenjagaRuangan::where('user_id', $request->user()->id)->first()->ruangan_id;
+            return redirect()->route('penjaga.riwayat.index', ['id' => $ruangan_id]);
         }
 
         if ($request->user()->role == 'mahasiswa') {

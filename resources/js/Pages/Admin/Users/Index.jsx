@@ -11,6 +11,7 @@ import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { FilterMatchMode } from "primereact/api";
+import { MultiSelect } from "primereact/multiselect";
 
 export default function Index({ users }) {
     const [filters] = useState({
@@ -29,12 +30,12 @@ export default function Index({ users }) {
     const [user, setUser] = useState({
         id: null, // Add ID for editing
         name: "",
-        ruangan_id: "",
+        ruangan_id: [],
         email: "",
         password: "",
         password_confirmation: "",
     });
-    const [selectedRuangan, setSelectedRuangan] = useState(null);
+
     const [dialogEdit, setDialogEdit] = useState(false);
 
     const toast = useRef(null);
@@ -56,11 +57,12 @@ export default function Index({ users }) {
         setUser({
             id: null,
             name: "",
-            ruangan_id: "",
+            ruangan_id: [],
             email: "",
             password: "",
             password_confirmation: "",
         });
+        setSelectedCities(null);
         setDialogTambah(true);
     };
 
@@ -69,12 +71,22 @@ export default function Index({ users }) {
         setUser({
             id: data.id,
             name: data.name,
-            ruangan_id: data.ruangan_id,
+            ruangan_id: data.ruangan,
             email: data.email,
             password: "",
             password_confirmation: "",
         });
-        setSelectedRuangan(ruangans.find((r) => r.id === data.ruangan_id));
+
+        const transform = data.ruangan.map((data) => {
+            return {
+                id: data.ruangan.id,
+                name: data.ruangan.nama_ruangan,
+                code: data.ruangan.id,
+                nama_ruangan: data.ruangan.nama_ruangan,
+            };
+        });
+        console.log(transform);
+        setSelectedCities(transform);
         setDialogEdit(true);
     };
 
@@ -83,10 +95,8 @@ export default function Index({ users }) {
         setUser((prevUser) => ({ ...prevUser, [field]: value }));
     };
 
-    const handleDropdownChange = (e) => {
-        setSelectedRuangan(e.value);
-        setUser((prevUser) => ({ ...prevUser, ruangan_id: e.value.id }));
-    };
+    const [selectedCities, setSelectedCities] = useState(null);
+    const cities = ruangans;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -132,6 +142,7 @@ export default function Index({ users }) {
                 resetForm();
             } catch (error) {
                 setErrors(error.response?.data?.errors || []);
+                console.log("ERROR", error);
                 toast.current.show({
                     severity: "error",
                     summary: "Error",
@@ -200,18 +211,6 @@ export default function Index({ users }) {
             />
             <Button label="Save" icon="pi pi-check" onClick={handleSubmit} />
         </>
-    );
-
-    const renderSelectedRuangan = (option) => (
-        <div className="flex align-items-center">
-            <div>{option?.nama_ruangan || "Select a Room"}</div>
-        </div>
-    );
-
-    const renderRuanganTemplate = (option) => (
-        <div className="flex align-items-center">
-            <div>{option.nama_ruangan}</div>
-        </div>
     );
 
     const renderActionBody = (rowData) => (
@@ -284,17 +283,22 @@ export default function Index({ users }) {
                     <label htmlFor="ruangan" className="font-bold">
                         Ruangan
                     </label>
-                    <Dropdown
-                        value={selectedRuangan}
-                        onChange={handleDropdownChange}
-                        options={ruangans}
-                        optionLabel="nama_ruangan"
+                    <MultiSelect
+                        value={selectedCities}
+                        onChange={(e) => {
+                            setUser((prevUser) => ({
+                                ...prevUser,
+                                ruangan_id: e.value,
+                            }));
+                            setSelectedCities(e.value);
+                        }}
+                        options={cities}
+                        optionLabel="name"
                         placeholder="Pilih Ruangan"
-                        filter
-                        valueTemplate={renderSelectedRuangan}
-                        itemTemplate={renderRuanganTemplate}
-                        className="w-full"
+                        maxSelectedLabels={3}
+                        className="w-full md:w-20rem"
                     />
+
                     {errors.ruangan_id && (
                         <small className="p-error">{errors.ruangan_id}</small>
                     )}
