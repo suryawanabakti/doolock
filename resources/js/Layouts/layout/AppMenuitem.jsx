@@ -14,7 +14,7 @@ const AppMenuitem = (props) => {
     const key = props.parentKey
         ? props.parentKey + "-" + props.index
         : String(props.index);
-    console.log(`pathname : ${pathname} , item.to : ${item.to}`);
+
     const isActiveRoute = item.to && pathname === item.to;
     const active = activeMenu === key || activeMenu.startsWith(key + "-");
 

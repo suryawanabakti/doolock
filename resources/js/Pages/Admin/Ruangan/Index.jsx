@@ -58,6 +58,7 @@ export default function Ruangan({ ruangans }) {
     let emptyRuangan = {
         id: "",
         nama_ruangan: "",
+        type: "lab",
         jam_buka: "00:01:00",
         jam_tutup: "23:58:00",
         open_api: "",
@@ -205,6 +206,7 @@ export default function Ruangan({ ruangans }) {
             name: data.parent?.nama_ruangan,
             nama_ruangan: data.parent?.nama_ruangan,
             code: data.parent_id,
+            type: data.type,
         });
 
         setSelectedCountry({
@@ -213,6 +215,8 @@ export default function Ruangan({ ruangans }) {
             nama_ruangan: data.parent?.nama_ruangan,
             code: data.parent_id,
         });
+
+        setSelectedType({ name: data.type, code: data.type });
 
         setRuangan(data);
 
@@ -303,6 +307,21 @@ export default function Ruangan({ ruangans }) {
             </div>
         );
     };
+    const [selectedType, setSelectedType] = useState({
+        name: "",
+        code: "",
+    });
+    const types = [
+        {
+            name: "umum",
+            code: "umum",
+        },
+        {
+            name: "lab",
+            code: "lab",
+        },
+    ];
+
     const header = renderHeader();
     return (
         <Layout>
@@ -446,6 +465,26 @@ export default function Ruangan({ ruangans }) {
                     )}
                 </div>
                 <div className="field">
+                    <label htmlFor="name" className="font-bold">
+                        Tipe Ruangan
+                    </label>
+                    <Dropdown
+                        value={selectedType}
+                        onChange={(e) => {
+                            setRuangan({ ...ruangan, type: e.value.code });
+                            setSelectedType(e.value);
+                        }}
+                        options={types}
+                        optionLabel="name"
+                        placeholder="Select a Type"
+                        className="w-full md:w-14rem"
+                    />
+
+                    {errors.type && (
+                        <small className="p-error">{errors.type}</small>
+                    )}
+                </div>
+                <div className="field">
                     <label htmlFor="jam_buka" className="font-bold">
                         Jam Buka
                     </label>
@@ -534,6 +573,26 @@ export default function Ruangan({ ruangans }) {
                     />
                     {errors.nama_ruangan && (
                         <small className="p-error">{errors.nama_ruangan}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="name" className="font-bold">
+                        Tipe Ruangan
+                    </label>
+                    <Dropdown
+                        value={selectedType}
+                        onChange={(e) => {
+                            setRuangan({ ...ruangan, type: e.value.code });
+                            setSelectedType(e.value);
+                        }}
+                        options={types}
+                        optionLabel="name"
+                        placeholder="Select a Type"
+                        className="w-full md:w-14rem"
+                    />
+
+                    {errors.type && (
+                        <small className="p-error">{errors.type}</small>
                     )}
                 </div>
                 <div className="field">

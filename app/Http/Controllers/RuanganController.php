@@ -25,7 +25,7 @@ class RuanganController extends Controller
             'jam_tutup' => ['required', 'after:jam_buka'],
         ]);
 
-        return Ruangan::create(["nama_ruangan" => $request->nama_ruangan, "jam_buka" => $request->jam_buka, "jam_tutup" => $request->jam_tutup, "type" => "umum", "parent_id" => $request->parent_id ?? null]);
+        return Ruangan::create(["nama_ruangan" => $request->nama_ruangan, "jam_buka" => $request->jam_buka, "jam_tutup" => $request->jam_tutup, "type" => "umum", "parent_id" => $request->parent_id ?? null, "type" => $request->type]);
     }
 
     public function update(Request $request, Ruangan $ruangan)
