@@ -20,9 +20,10 @@ const Absensi = ({
     sampai,
     ruangan,
     riwayat,
-    ruangans,
+
     dataKosong,
 }) => {
+    console.log("RUANGNA", ruangan);
     const [customers, setCustomers] = useState(riwayat);
     const [selectedCountry, setSelectedCountry] = useState(null);
     const [selectedCustomers, setSelectedCustomers] = useState([]);

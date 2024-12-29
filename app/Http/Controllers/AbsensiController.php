@@ -36,9 +36,10 @@ class AbsensiController extends Controller
 
         $dataKosong = $idRuangan ? $riwayat->isEmpty() : false;
 
+        $ruangan = Ruangan::where('id', $idRuangan)->first();
+
         return inertia("Penjaga/Absensi/Index", [
-            "ruangan" => Ruangan::find($request->id ?? $request->ruangan_id),
-            "ruangans" => $this->getRuanganList(),
+            "ruangan" => $ruangan,
             "riwayat" => $riwayat,
             "dataKosong" => $dataKosong,
             "mulai" => $dates['mulai'],
