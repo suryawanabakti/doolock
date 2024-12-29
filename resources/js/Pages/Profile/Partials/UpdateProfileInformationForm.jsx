@@ -48,7 +48,7 @@ export default function UpdateProfileInformation({
                 <h2 className="text-lg font-medium">Profile Information</h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Hi 👋 . {user.name}
+                    Hi 👋 . {user.name} <br />
                 </p>
             </header>
 
