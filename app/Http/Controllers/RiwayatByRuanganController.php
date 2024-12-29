@@ -51,7 +51,9 @@ class RiwayatByRuanganController extends Controller
 
     public function index(Request $request)
     {
-        $sampai = null;
+        $mulai = Carbon::now('GMT+8')->startOfMonth()->format('Y-m-d');
+        $sampai = Carbon::now('GMT+8')->format('Y-m-d');
+
         if ($request->dates) {
             $mulai = Carbon::createFromDate($request->dates[0])->format('Y-m-d');
             $sampai = Carbon::createFromDate($request->dates[1])->format('Y-m-d');
@@ -61,7 +63,7 @@ class RiwayatByRuanganController extends Controller
             ->whereHas('scanner.ruangan', function ($query) use ($request) {
                 $query->where('id', $request->ruangan_id);
             })
-            ->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), $request->dates ? [$mulai, $sampai] : [Carbon::now('GMT+8')->addDay(-3)->format('Y-m-d'), Carbon::now('GMT+8')->format('Y-m-d')])->get()->map(function ($data) {
+            ->orderBy('waktu', 'DESC')->whereBetween(DB::raw('DATE(waktu)'), [$mulai, $sampai])->get()->map(function ($data) {
                 if ($data->status == 0) {
                     $status = "Blok";
                 }
