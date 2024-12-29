@@ -1,5 +1,5 @@
 import Layout from "@/Layouts/layout/layout.jsx";
-import { Link, router } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
@@ -15,6 +15,9 @@ import React, { useEffect, useRef, useState } from "react";
 import moment from "moment-timezone";
 import { FilterMatchMode } from "primereact/api";
 const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const id = searchParams.get("id");
+
     const [customers, setCustomers] = useState(riwayat);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
     const toast = useRef(null);
@@ -169,7 +172,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
         e.preventDefault();
         router.get(
             route("penjaga.riwayat.index"),
-            { dates: dates },
+            { dates: dates, id: id },
             {
                 onSuccess: () => {},
             }

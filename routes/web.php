@@ -132,7 +132,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     // PENJAGA
-    Route::middleware(['role:penjaga'])->group(function () {
+    Route::middleware(['role:penjaga', 'penjagaruangan'])->group(function () {
         Route::get('/penjaga/pendaftaran', [PendaftaranJadwalController::class, 'index'])->name('penjaga.pendaftaran.index');
         Route::patch('/penjaga/pendaftaran/{hakAksesMahasiswa}', [PendaftaranJadwalController::class, 'approve'])->name('penjaga.pendaftaran.approve');
         Route::post('/penjaga/pendaftaran/multi-approve', [PendaftaranJadwalController::class, 'multiApprove'])->name('penjaga.pendaftaran.multi-approve');
