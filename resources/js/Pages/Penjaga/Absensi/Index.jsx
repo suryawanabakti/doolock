@@ -146,13 +146,10 @@ const Absensi = ({
     // TEST
     const filterByDate = (e) => {
         e.preventDefault();
-        router.get(
-            route("admin.absensi.index"),
-            { dates, ruangan_id: ruangan.id },
-            {
-                onSuccess: () => {},
-            }
-        );
+        router.get(route("penjaga.absensi.index"), {
+            dates: dates,
+            ruangan_id: ruangan,
+        });
     };
 
     useEffect(() => {

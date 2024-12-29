@@ -19,6 +19,9 @@ import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { FilterMatchMode } from "primereact/api";
 
 export default function Index({ jadwals, ruangan }) {
+    const searchParams = new URLSearchParams(window.location.search);
+    const ruangan_id = searchParams.get("id");
+
     const [filters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
@@ -51,7 +54,10 @@ export default function Index({ jadwals, ruangan }) {
             accept: async () => {
                 try {
                     const res = await axios.patch(
-                        route("penjaga.pendaftaran.approve", rowData.id)
+                        route("penjaga.pendaftaran.approve", rowData.id),
+                        {
+                            ruangan_id: ruangan_id,
+                        }
                     );
                     console.log(res);
                     toast.current.show({
@@ -93,6 +99,7 @@ export default function Index({ jadwals, ruangan }) {
                         route("penjaga.pendaftaran.multi-approve"),
                         {
                             selectedCustomers: selectedCustomers,
+                            ruangan_id: ruangan_id,
                         }
                     );
                     console.log(res.data);

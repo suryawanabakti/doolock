@@ -30,12 +30,14 @@ class AbsensiController extends Controller
     public function indexPenjaga(Request $request)
     {
         $dates = $this->getDates($request->dates);
-        $riwayat = $this->getRiwayatAbsensi($request->id, $dates);
 
-        $dataKosong = $request->id ? $riwayat->isEmpty() : false;
+        $idRuangan = $request->ruangan_id ?? $request->id;
+        $riwayat = $this->getRiwayatAbsensi($idRuangan, $dates);
+
+        $dataKosong = $idRuangan ? $riwayat->isEmpty() : false;
 
         return inertia("Penjaga/Absensi/Index", [
-            "ruangan" => Ruangan::find($request->id),
+            "ruangan" => Ruangan::find($request->id ?? $request->ruangan_id),
             "ruangans" => $this->getRuanganList(),
             "riwayat" => $riwayat,
             "dataKosong" => $dataKosong,
