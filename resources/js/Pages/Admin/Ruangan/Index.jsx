@@ -176,6 +176,8 @@ export default function Ruangan({ ruangans }) {
             setRuangan(emptyRuangan);
         } catch (error) {
             console.log(error);
+            alert(error.response?.data?.message || error.message);
+            setErrors(error.response?.data?.errors || []);
         }
     };
     const footerDialogTambah = (e) => {
@@ -265,6 +267,8 @@ export default function Ruangan({ ruangans }) {
             setDialogEdit(false);
         } catch (error) {
             console.log(error);
+            alert(error.response?.data?.message || error.message);
+            setErrors(error.response?.data?.errors || []);
         }
     };
     const footerDialogEdit = (e) => {
