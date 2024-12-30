@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmailToMahasiswa;
+use App\Mail\NotificationRegisterToMahasiswa;
 use App\Models\HakAkses;
 use App\Models\HakAksesMahasiswa;
 use App\Models\Mahasiswa;
@@ -9,6 +11,7 @@ use App\Models\RegisterRuangan;
 use App\Models\Ruangan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class PendaftaranJadwalController extends Controller
 {
@@ -32,6 +35,23 @@ class PendaftaranJadwalController extends Controller
 
     public function multiApprove(Request $request)
     {
+        $customerIds = collect($request->selectedCustomers)->pluck('mahasiswa_id');
+
+        // Ambil semua data mahasiswa beserta user terkait dalam satu query
+        $mahasiswaList = Mahasiswa::with('user')
+            ->whereIn('id', $customerIds)
+            ->get();
+
+        foreach ($mahasiswaList as $mahasiswa) {
+            if ($mahasiswa->user->email_notifikasi) {
+                // Cari data customer berdasarkan mahasiswa_id
+                $customer = collect($request->selectedCustomers)
+                    ->firstWhere('mahasiswa_id', $mahasiswa->id);
+
+                SendEmailToMahasiswa::dispatch($mahasiswa, $customer);
+            }
+        }
+
         $this->updateHakAksesStatus($request->selectedCustomers, 1);
     }
 

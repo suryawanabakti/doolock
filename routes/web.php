@@ -4,6 +4,7 @@ use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoorLockController;
 use App\Http\Controllers\DosenController;
+use App\Http\Controllers\KehilanganKartuController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\MahasiswaRegisterRuanganController;
 use App\Http\Controllers\PendaftaranJadwalController;
@@ -66,6 +67,9 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/mahasiswa/register/{hakAkses}', [MahasiswaRegisterRuanganController::class, 'destroy'])->name('mahasiswa.register.destroy');
 
         Route::get('/mahasiswa/register-approve', [MahasiswaRegisterRuanganController::class, 'index2'])->name('mahasiswa.register-approve.index');
+
+        Route::get('/mahasiswa-kehilangan-kartu', [KehilanganKartuController::class, 'index'])->name('mahasiswa.kehilangan-kartu.index');
+        Route::patch('/mahasiswa-kehilangan-kartu', [KehilanganKartuController::class, 'update'])->name('mahasiswa.kehilangan-kartu.update');
     });
 
     Route::middleware(['role:admin'])->group(function () {

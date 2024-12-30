@@ -93,6 +93,11 @@ const AppMenu = () => {
                         icon: "pi pi-check",
                         to: route("mahasiswa.register-approve.index"),
                     },
+                    {
+                        label: "Kehilangan Kartu",
+                        icon: "pi pi-times",
+                        to: route("mahasiswa.kehilangan-kartu.index"),
+                    },
                 ],
             },
         ],

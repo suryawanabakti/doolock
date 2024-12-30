@@ -25,7 +25,12 @@ class User extends Authenticatable
         'ruangan_id',
         'image'
     ];
-
+    public function updateProfilePhoto($image)
+    {
+        $this->update([
+            'image' => $image->store('profile-photos', 'public'),
+        ]);
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

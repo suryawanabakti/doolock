@@ -17,6 +17,7 @@ import { useRef } from "react";
 import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { Checkbox } from "primereact/checkbox";
+import { InputTextarea } from "primereact/inputtextarea";
 
 export default function Index({ jadwals, ruangans }) {
     const [dataRuangans, setDataRuangans] = useState(ruangans);
@@ -26,7 +27,10 @@ export default function Index({ jadwals, ruangans }) {
         tanggal: "",
         jam_masuk: "",
         jam_keluar: "",
+        skill: "",
+        additional_participant: "",
     });
+
     const reject = () => {
         toast.current.show({
             severity: "warn",
@@ -59,14 +63,19 @@ export default function Index({ jadwals, ruangans }) {
         e.preventDefault();
         setDialogNew(true);
     };
+    const [processing, setProcessing] = useState(false);
+
     const handleSave = async (e) => {
         e.preventDefault();
+        setProcessing(true);
         try {
             const res = await axios.post(route("mahasiswa.register.store"), {
                 ruangan_id: data.ruangan_id,
                 tanggal: data.tanggal,
                 jam_masuk: data.jam_masuk,
                 jam_keluar: data.jam_keluar,
+                skill: data.skill,
+                additional_participant: data.additional_participant,
             });
             console.log("RESPON", res);
 
@@ -77,6 +86,7 @@ export default function Index({ jadwals, ruangans }) {
             console.log(error);
             alert("Error");
         }
+        setProcessing(false);
     };
     const toast = useRef(null);
     const handleDayChange = (e) => {
@@ -186,6 +196,7 @@ export default function Index({ jadwals, ruangans }) {
                         <small className="p-error">{errors.tanggal}</small>
                     )}
                 </div>
+
                 <div class="grid">
                     <div class="col">
                         <div className="field ">
@@ -244,10 +255,58 @@ export default function Index({ jadwals, ruangans }) {
                         </div>
                     </div>
                 </div>
-
+                <div className="field">
+                    <label htmlFor="skill" className="font-bold">
+                        Skill
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
+                    </label>
+                    <br />
+                    <InputTextarea
+                        autoResize
+                        value={data.skill}
+                        onChange={(e) => {
+                            console.log(e.target.value);
+                            setData("skill", e.target.value);
+                        }}
+                        rows={3}
+                        cols={40}
+                    />
+                    {errors.skill && (
+                        <small className="p-error">{errors.skill}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label
+                        htmlFor="additional_participant"
+                        className="font-bold"
+                    >
+                        Additional Participant
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
+                    </label>
+                    <br />
+                    <InputTextarea
+                        autoResize
+                        value={data.additional_participant}
+                        onChange={(e) =>
+                            setData("additional_participant", e.target.value)
+                        }
+                        rows={3}
+                        cols={40}
+                    />
+                    {errors.additional_participant && (
+                        <small className="p-error">
+                            {errors.additional_participant}
+                        </small>
+                    )}
+                </div>
                 <Button
                     label={`Simpan jadwal`}
                     icon="pi pi-save"
+                    disabled={processing}
                     onClick={handleSave}
                     severity="primary"
                 />
@@ -326,7 +385,20 @@ export default function Index({ jadwals, ruangans }) {
                             filterPlaceholder="Search by keluar"
                             headerStyle={{ width: "20rem" }}
                         />
-
+                        <Column
+                            headerClassName="fw-bold"
+                            field="hak_akses.skill"
+                            header="Skill"
+                            filterPlaceholder="Search by keluar"
+                            headerStyle={{ width: "20rem" }}
+                        />
+                        <Column
+                            headerClassName="fw-bold"
+                            field="hak_akses.additional_participant"
+                            header="Additional Participant"
+                            filterPlaceholder="Search by additional_participant"
+                            headerStyle={{ width: "20rem" }}
+                        />
                         <Column
                             headerClassName="fw-bold"
                             field="action"

@@ -3,6 +3,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import { Link, useForm, usePage } from "@inertiajs/react";
 import { Transition } from "@headlessui/react";
 import { useState } from "react";
+import { InputText } from "primereact/inputtext";
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -14,9 +15,10 @@ export default function UpdateProfileInformation({
     const { data, setData, post, errors, processing, recentlySuccessful } =
         useForm({
             name: user.name,
-            email: user.email,
+            email_notifikasi: user.email_notifikasi,
             image: null,
         });
+
     const [preview, setPreview] = useState(
         user.image ? `/storage/${user.image}` : null
     );
@@ -43,19 +45,44 @@ export default function UpdateProfileInformation({
     };
 
     return (
-        <section className={className}>
+        <section>
             <header>
                 <h2 className="text-lg font-medium">Profile Information</h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Hi 👋 . {user.name} <br />
+                    Hi 👋 . {user.name} . Harap lengkapi data anda di bawah ini.
                 </p>
             </header>
 
-            <form onSubmit={submit} className="mt-4 space-y-6">
+            <form onSubmit={submit} className="mt-4">
+                <Transition
+                    show={recentlySuccessful}
+                    enter="transition ease-in-out"
+                    enterFrom="opacity-0"
+                    leave="transition ease-in-out"
+                    leaveTo="opacity-0"
+                >
+                    <p className="text-sm font-bold text-green-500">
+                        Berhasil update profile 🎉🎉.
+                    </p>
+                </Transition>
+                <div className="field">
+                    <label className="block text-sm font-medium">
+                        Email <span className="text-red-500">*</span>
+                    </label>
+                    <InputText
+                        type="text"
+                        className="block w-full text-sm "
+                        value={data.email_notifikasi}
+                        onChange={(e) =>
+                            setData("email_notifikasi", e.target.value)
+                        }
+                        placeholder="Masukkan Email Untuk Notifikasi...."
+                    />
+                </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Profile Picture
+                    <label className="block text-sm font-medium">
+                        Foto <span className="text-red-500">*</span>
                     </label>
                     <div className="mt-2 flex items-center gap-4">
                         {preview && (
@@ -77,16 +104,6 @@ export default function UpdateProfileInformation({
 
                 <div className="flex items-center gap-4 mt-3">
                     <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600">Saved.</p>
-                    </Transition>
                 </div>
             </form>
         </section>

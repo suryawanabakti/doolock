@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('email_notifikasi')->unique()->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'super', 'penjaga', 'mahasiswa']);
             $table->string('image')->nullable();

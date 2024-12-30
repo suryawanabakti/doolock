@@ -20,6 +20,9 @@ return new class extends Migration
             $table->time('jam_keluar');
             $table->boolean('is_approve')->default(true);
             $table->boolean('is_by_admin')->default(true);
+            $table->text('tujuan')->nullable();
+            $table->text('skill')->nullable();
+            $table->text('additional_participant')->nullable();
             $table->timestamps();
         });
     }

@@ -192,14 +192,6 @@ export default function Index({ jadwals, ruangan }) {
                             filterPlaceholder="Search by mahasiswa"
                             headerStyle={{ width: "20rem" }}
                         />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.ruangan.nama_ruangan"
-                            header="Ruangan"
-                            sortable
-                            filterPlaceholder="Search by ruangan_id"
-                            headerStyle={{ width: "20rem" }}
-                        />
 
                         <Column
                             headerClassName="fw-bold"
@@ -226,7 +218,22 @@ export default function Index({ jadwals, ruangan }) {
                             filterPlaceholder="Search by keluar"
                             headerStyle={{ width: "20rem" }}
                         />
-
+                        <Column
+                            headerClassName="fw-bold"
+                            field="hak_akses.skill"
+                            header="Skill"
+                            sortable
+                            filterPlaceholder="Search by skill"
+                            headerStyle={{ width: "10rem" }}
+                        />
+                        <Column
+                            headerClassName="fw-bold"
+                            field="hak_akses.additional_participant"
+                            header="Participant"
+                            sortable
+                            filterPlaceholder="Search by skill"
+                            headerStyle={{ width: "10rem" }}
+                        />
                         <Column
                             headerClassName="fw-bold"
                             field="action"

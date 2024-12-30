@@ -25,6 +25,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
         window.Echo.private(`management.1`).listen(
             "StoreHistoryEvent",
             (event) => {
+                console.log(event);
                 const statusLabels = [
                     "Blok",
                     "Terbuka",

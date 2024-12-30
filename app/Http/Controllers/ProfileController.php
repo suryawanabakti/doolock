@@ -32,9 +32,11 @@ class ProfileController extends Controller
     {
         User::where('id', $request->user()->id)
             ->update([
-                'image' => $request->file('image') ? $request->file('image')->store('profile-photos') : null,
+                'email_notifikasi' => $request->email_notifikasi,
             ]);
-
+        if ($request->image) {
+            $request->user()->updateProfilePhoto($request->image);
+        }
         return Redirect::route('profile.edit');
     }
 

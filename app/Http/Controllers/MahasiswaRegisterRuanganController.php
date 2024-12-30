@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NotificationRegisterToAdmin;
 use App\Models\HakAkses;
 use App\Models\HakAksesMahasiswa;
+use App\Models\PenjagaRuangan;
 use App\Models\RegisterRuangan;
 use App\Models\Ruangan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class MahasiswaRegisterRuanganController extends Controller
@@ -21,6 +24,7 @@ class MahasiswaRegisterRuanganController extends Controller
             ->get()
             ->map(fn($data) => ["name" => $data->nama_ruangan, "code" => $data->id]);
 
+
         return Inertia::render("Mahasiswa/Register/Index", [
             "jadwals" => $jadwals,
             "ruangans" => $ruangans,
@@ -29,14 +33,18 @@ class MahasiswaRegisterRuanganController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'ruangan_id' => ['required'],
             'tanggal' => ['required', 'date', 'after_or_equal:today'],
             "jam_keluar" => ['required', 'after_or_equal:jam_keluar'],
             "jam_masuk" => ['required', 'before_or_equal:jam_keluar'],
+            'skill' => ['required'],
+            'additional_participant' => ['required'],
         ]);
 
         return  DB::transaction(function () use ($request) {
+
             $hakAkses = HakAkses::create([
                 'ruangan_id' => $request->ruangan_id,
                 'tanggal' => $request->tanggal,
@@ -44,13 +52,25 @@ class MahasiswaRegisterRuanganController extends Controller
                 'jam_keluar' => $request->jam_keluar,
                 'is_approve' => 0,
                 'is_by_admin' => 0,
+                'skill' => $request->skill,
+                'additional_participant' => $request->additional_participant,
             ]);
 
             $hakAksesMahasiswa =  HakAksesMahasiswa::create([
                 'hak_akses_id' => $hakAkses->id,
                 'mahasiswa_id' => $request->user()->mahasiswa->id,
             ]);
+            // KIRIM EMAIL 
+            $penjagaRuangan = PenjagaRuangan::with(['user:id,email_notifikasi', 'ruangan'])
+                ->where('ruangan_id', $request->ruangan_id)
+                ->get();
 
+            $penjagaRuangan->filter(fn($data) => $data->user && $data->user->email_notifikasi)
+                ->each(fn($data) => Mail::to($data->user->email_notifikasi)->send(
+                    new NotificationRegisterToAdmin(
+                        $hakAksesMahasiswa->load('hakAkses.ruangan', 'mahasiswa')
+                    )
+                ));
 
             return $hakAksesMahasiswa->load('hakAkses.ruangan');
         });

@@ -10,7 +10,7 @@ class RuanganController extends Controller
 {
     public function index()
     {
-        $ruangans = Ruangan::with('first_scanner', 'parent')->whereNot('type', 'kelas')->orderBy('created_at', 'desc')->get()->map(function ($data) {
+        $ruangans = Ruangan::with('first_scanner', 'parent')->whereNot('type', 'kelas')->orderBy('nama_ruangan', 'asc')->get()->map(function ($data) {
             $data['code'] = $data->id;
             return $data;
         });

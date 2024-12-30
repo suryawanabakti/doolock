@@ -73,11 +73,6 @@ class PenjagaSeeder extends Seeder
             'ruangan_id' => 6
         ]);
 
-        PenjagaRuangan::create([
-            'user_id' => $csllt2->id,
-            'ruangan_id' => 11
-        ]);
-
         $cslinventaris = \App\Models\User::factory()->create([
             'name' => 'CSL Inventaris',
             'role' => 'penjaga',
