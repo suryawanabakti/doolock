@@ -89,6 +89,9 @@ class DoorLockController extends Controller
 
             if ($mahasiswa->status == 1) {
                 $this->handleAbsensi($mahasiswa, $ruangan, $request->id, $request->kode, $now);
+                if (env("APP_REALTIME") == "true") {
+                    broadcast(new StoreHistoryEvent($histori->load('user', 'scanner.ruangan'), $ruangan));
+                }
                 echo json_encode([$mahasiswa->id_tag], JSON_UNESCAPED_UNICODE);
                 return;
             }
@@ -242,7 +245,7 @@ class DoorLockController extends Controller
 
             if ($mahasiswa->status == 1) {
                 $this->handleAbsensi($mahasiswa, $ruangan, $request->id, $request->kode, $now);
-                $this->createHistoriAndBroadcast($mahasiswa, $request->id, $request->kode, 1, $ruangan);
+
                 echo json_encode([$mahasiswa->pin], JSON_UNESCAPED_UNICODE);
                 return;
             }
