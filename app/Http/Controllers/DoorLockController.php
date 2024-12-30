@@ -242,6 +242,7 @@ class DoorLockController extends Controller
 
             if ($mahasiswa->status == 1) {
                 $this->handleAbsensi($mahasiswa, $ruangan, $request->id, $request->kode, $now);
+                $this->createHistoriAndBroadcast($mahasiswa, $request->id, $request->kode, 1, $ruangan);
                 echo json_encode([$mahasiswa->pin], JSON_UNESCAPED_UNICODE);
                 return;
             }
