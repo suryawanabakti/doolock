@@ -42,6 +42,7 @@ class PendaftaranJadwalController extends Controller
             ->whereIn('id', $customerIds)
             ->get();
 
+        // KIRIM NOTIFIKASI EMAIL KE MAHASISWA
         foreach ($mahasiswaList as $mahasiswa) {
             if ($mahasiswa->user->email_notifikasi) {
                 // Cari data customer berdasarkan mahasiswa_id

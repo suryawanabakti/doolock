@@ -11,6 +11,7 @@ use App\Models\Ruangan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
@@ -65,12 +66,25 @@ class MahasiswaRegisterRuanganController extends Controller
                 ->where('ruangan_id', $request->ruangan_id)
                 ->get();
 
-            $penjagaRuangan->filter(fn($data) => $data->user && $data->user->email_notifikasi)
-                ->each(fn($data) => Mail::to($data->user->email_notifikasi)->send(
-                    new NotificationRegisterToAdmin(
-                        $hakAksesMahasiswa->load('hakAkses.ruangan', 'mahasiswa')
-                    )
-                ));
+            // KIRIM NOTIFIKASI EMAIL KE PENJAGA RUANGAN
+            // $penjagaRuangan->filter(fn($data) => $data->user && $data->user->email_notifikasi)
+            //     ->each(function ($data) use ($hakAksesMahasiswa) {
+            //         try {
+            //             Mail::to($data->user->email_notifikasi)->send(
+            //                 new NotificationRegisterToAdmin(
+            //                     $hakAksesMahasiswa->load('hakAkses.ruangan', 'mahasiswa')
+            //                 )
+            //             );
+            //         } catch (\Throwable $e) {
+            //             // Log error for debugging
+            //             Log::error('Failed to send email', [
+            //                 'email' => $data->user->email_notifikasi,
+            //                 'error' => $e->getMessage(),
+            //             ]);
+
+            //             // Optionally, skip and continue processing
+            //         }
+            //     });
 
             return $hakAksesMahasiswa->load('hakAkses.ruangan');
         });
