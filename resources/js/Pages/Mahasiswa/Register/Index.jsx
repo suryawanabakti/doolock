@@ -22,23 +22,17 @@ import { InputTextarea } from "primereact/inputtextarea";
 export default function Index({ jadwals, ruangans }) {
     const [dataRuangans, setDataRuangans] = useState(ruangans);
     const [dataJadwals, setDataJadwals] = useState(jadwals);
-    const { data, setData, errors } = useForm({
+    const { data, setData } = useForm({
         ruangan_id: "",
         tanggal: "",
         jam_masuk: "",
         jam_keluar: "",
         skill: "",
         additional_participant: "",
+        tujuan: "",
     });
 
-    const reject = () => {
-        toast.current.show({
-            severity: "warn",
-            summary: "Rejected",
-            detail: "You have rejected",
-            life: 3000,
-        });
-    };
+    const reject = () => {};
     const [dialogNew, setDialogNew] = useState(false);
     const selectedCountryTemplate = (option, props) => {
         if (option) {
@@ -64,7 +58,7 @@ export default function Index({ jadwals, ruangans }) {
         setDialogNew(true);
     };
     const [processing, setProcessing] = useState(false);
-
+    const [errors, setErrors] = useState([]);
     const handleSave = async (e) => {
         e.preventDefault();
         setProcessing(true);
@@ -76,6 +70,7 @@ export default function Index({ jadwals, ruangans }) {
                 jam_keluar: data.jam_keluar,
                 skill: data.skill,
                 additional_participant: data.additional_participant,
+                tujuan: data.tujuan,
             });
             console.log("RESPON", res);
 
@@ -84,7 +79,8 @@ export default function Index({ jadwals, ruangans }) {
             setDialogNew(false);
         } catch (error) {
             console.log(error);
-            alert("Error");
+            alert(error?.response?.data?.message || "Something went wrong!");
+            setErrors(error?.response?.data?.errors);
         }
         setProcessing(false);
     };
@@ -96,6 +92,7 @@ export default function Index({ jadwals, ruangans }) {
             : [...data.day, selectedDay];
         setData("day", updatedDays);
     };
+
     const confirm2 = (event, rowData) => {
         confirmPopup({
             target: event.currentTarget,
@@ -143,7 +140,7 @@ export default function Index({ jadwals, ruangans }) {
             <Dialog
                 header="Tambah Jadwal"
                 visible={dialogNew}
-                style={{ width: "30vw" }}
+                style={{ width: "85%" }}
                 onHide={() => {
                     if (!dialogNew) return;
                     setDialogNew(false);
@@ -242,6 +239,7 @@ export default function Index({ jadwals, ruangans }) {
                                 id="jam_keluar"
                                 type="time"
                                 required
+                                step={0}
                                 onChange={(e) =>
                                     setData("jam_keluar", e.target.value)
                                 }
@@ -254,6 +252,28 @@ export default function Index({ jadwals, ruangans }) {
                             )}
                         </div>
                     </div>
+                </div>
+                <div className="field">
+                    <label htmlFor="tujuan" className="font-bold">
+                        Tujuan
+                        <span className="text-danger" style={{ color: "red" }}>
+                            *
+                        </span>
+                    </label>
+                    <br />
+                    <InputTextarea
+                        autoResize
+                        value={data.tujuan}
+                        onChange={(e) => {
+                            console.log(e.target.value);
+                            setData("tujuan", e.target.value);
+                        }}
+                        rows={3}
+                        cols={40}
+                    />
+                    {errors.tujuan && (
+                        <small className="p-error">{errors.tujuan}</small>
+                    )}
                 </div>
                 <div className="field">
                     <label htmlFor="skill" className="font-bold">
@@ -357,7 +377,7 @@ export default function Index({ jadwals, ruangans }) {
                             header="Ruangan"
                             sortable
                             filterPlaceholder="Search by ruangan_id"
-                            headerStyle={{ width: "20rem" }}
+                            headerStyle={{ width: "15rem" }}
                         />
 
                         <Column
@@ -375,7 +395,7 @@ export default function Index({ jadwals, ruangans }) {
                             header="Jam Masuk"
                             sortable
                             filterPlaceholder="Search by Masuk"
-                            headerStyle={{ width: "20rem" }}
+                            headerStyle={{ width: "15rem" }}
                         />
                         <Column
                             headerClassName="fw-bold"
@@ -383,21 +403,28 @@ export default function Index({ jadwals, ruangans }) {
                             header="Jam Keluar"
                             sortable
                             filterPlaceholder="Search by keluar"
-                            headerStyle={{ width: "20rem" }}
+                            headerStyle={{ width: "15rem" }}
                         />
                         <Column
                             headerClassName="fw-bold"
                             field="hak_akses.skill"
                             header="Skill"
-                            filterPlaceholder="Search by keluar"
-                            headerStyle={{ width: "20rem" }}
+                            filterPlaceholder="Search by skill"
+                            headerStyle={{ width: "25rem" }}
+                        />
+                        <Column
+                            headerClassName="fw-bold"
+                            field="hak_akses.tujuan"
+                            header="Tujuan"
+                            filterPlaceholder="Search by tujuan"
+                            headerStyle={{ width: "25rem" }}
                         />
                         <Column
                             headerClassName="fw-bold"
                             field="hak_akses.additional_participant"
                             header="Additional Participant"
                             filterPlaceholder="Search by additional_participant"
-                            headerStyle={{ width: "20rem" }}
+                            headerStyle={{ width: "25rem" }}
                         />
                         <Column
                             headerClassName="fw-bold"

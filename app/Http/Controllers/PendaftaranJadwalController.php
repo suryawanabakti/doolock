@@ -55,10 +55,16 @@ class PendaftaranJadwalController extends Controller
 
                 $waktuJamPulang = "$tanggal $jamPulang";
 
-                $jamPulang = Carbon::createFromFormat('Y-m-d H:i:s', $waktuJamPulang, 'Asia/Makassar');
-                $delay = $jamPulang->diffInSeconds(now('Asia/Makassar'));
+                $jamPulangCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $waktuJamPulang, 'Asia/Makassar');
+
+                $delay = now('Asia/Makassar')->diffInSeconds($jamPulangCarbon);
+
                 SendEmailToMahasiswa::dispatch($mahasiswa, $customer);
-                SendEmailJamPulangToMahasiswa::dispatch($mahasiswa, $customer)->delay(now()->addSeconds($delay));
+
+                if ($delay > 0) {
+                    SendEmailJamPulangToMahasiswa::dispatch($mahasiswa, $customer)
+                        ->delay(now('Asia/Makassar')->addSeconds($delay)->addMinutes(-10));
+                }
             }
         }
 

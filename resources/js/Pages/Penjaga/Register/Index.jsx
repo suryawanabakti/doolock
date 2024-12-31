@@ -102,7 +102,7 @@ export default function Index({ jadwals, ruangan }) {
                             ruangan_id: ruangan_id,
                         }
                     );
-                    console.log(res.data);
+                    console.log("RES", res.data);
                     toast.current.show({
                         severity: "success",
                         summary: "Confirmed",
@@ -220,11 +220,19 @@ export default function Index({ jadwals, ruangan }) {
                         />
                         <Column
                             headerClassName="fw-bold"
+                            field="hak_akses.tujuan"
+                            header="Tujuan"
+                            sortable
+                            filterPlaceholder="Search by Tujuan"
+                            headerStyle={{ width: "15rem" }}
+                        />
+                        <Column
+                            headerClassName="fw-bold"
                             field="hak_akses.skill"
                             header="Skill"
                             sortable
                             filterPlaceholder="Search by skill"
-                            headerStyle={{ width: "10rem" }}
+                            headerStyle={{ width: "15rem" }}
                         />
                         <Column
                             headerClassName="fw-bold"
@@ -232,9 +240,9 @@ export default function Index({ jadwals, ruangan }) {
                             header="Participant"
                             sortable
                             filterPlaceholder="Search by skill"
-                            headerStyle={{ width: "10rem" }}
+                            headerStyle={{ width: "15rem" }}
                         />
-                        <Column
+                        {/* <Column
                             headerClassName="fw-bold"
                             field="action"
                             header="Approve"
@@ -252,7 +260,7 @@ export default function Index({ jadwals, ruangan }) {
                                 );
                             }}
                             headerStyle={{ width: "15rem" }}
-                        />
+                        /> */}
                     </DataTable>
                 </div>
             </div>

@@ -41,6 +41,7 @@ class MahasiswaRegisterRuanganController extends Controller
             "jam_keluar" => ['required', 'after_or_equal:jam_keluar'],
             "jam_masuk" => ['required', 'before_or_equal:jam_keluar'],
             'skill' => ['required'],
+            'tujuan' => ['required'],
             'additional_participant' => ['required'],
         ]);
 
@@ -53,6 +54,7 @@ class MahasiswaRegisterRuanganController extends Controller
                 'jam_keluar' => $request->jam_keluar,
                 'is_approve' => 0,
                 'is_by_admin' => 0,
+                'tujuan' => $request->tujuan,
                 'skill' => $request->skill,
                 'additional_participant' => $request->additional_participant,
             ]);
