@@ -9,6 +9,7 @@ use App\Models\HakAksesMahasiswa;
 use App\Models\Mahasiswa;
 use App\Models\RegisterRuangan;
 use App\Models\Ruangan;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -48,10 +49,9 @@ class PendaftaranJadwalController extends Controller
                 // Cari data customer berdasarkan mahasiswa_id
                 $customer = collect($request->selectedCustomers)
                     ->firstWhere('mahasiswa_id', $mahasiswa->id);
-
-                $jamKeluar = now()->setHour(2)->setMinute(34)->setSecond(0);
-                $delay = $jamKeluar->diffInSeconds(now());
-
+                $waktuJamPulang = "2024-12-31 15:00";
+                $jamPulang = Carbon::createFromFormat('Y-m-d H:i', $waktuJamPulang, 'Asia/Makassar');
+                $delay = $jamPulang->diffInSeconds(now('Asia/Makassar'));
                 SendEmailToMahasiswa::dispatch($mahasiswa, $customer)->delay(now()->addSeconds($delay));
             }
         }
