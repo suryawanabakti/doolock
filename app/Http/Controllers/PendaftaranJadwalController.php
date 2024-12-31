@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmailJamPulangToMahasiswa;
 use App\Jobs\SendEmailToMahasiswa;
 use App\Mail\NotificationRegisterToMahasiswa;
 use App\Models\HakAkses;
@@ -49,10 +50,15 @@ class PendaftaranJadwalController extends Controller
                 // Cari data customer berdasarkan mahasiswa_id
                 $customer = collect($request->selectedCustomers)
                     ->firstWhere('mahasiswa_id', $mahasiswa->id);
-                $waktuJamPulang = "2024-12-31 15:00";
+                $tanggal = $customer['hak_akses']['tanggal'];
+                $jamPulang = $customer['hak_akses']['jam_keluar'];
+
+                $waktuJamPulang = "$tanggal $jamPulang";
+
                 $jamPulang = Carbon::createFromFormat('Y-m-d H:i', $waktuJamPulang, 'Asia/Makassar');
                 $delay = $jamPulang->diffInSeconds(now('Asia/Makassar'));
-                SendEmailToMahasiswa::dispatch($mahasiswa, $customer)->delay(now()->addSeconds($delay));
+                SendEmailToMahasiswa::dispatch($mahasiswa, $customer);
+                SendEmailJamPulangToMahasiswa::dispatch($mahasiswa, $customer)->delay(now()->addSeconds($delay));
             }
         }
 
