@@ -49,7 +49,10 @@ class PendaftaranJadwalController extends Controller
                 $customer = collect($request->selectedCustomers)
                     ->firstWhere('mahasiswa_id', $mahasiswa->id);
 
-                SendEmailToMahasiswa::dispatch($mahasiswa, $customer);
+                $jamKeluar = now()->setHour(2)->setMinute(34)->setSecond(0);
+                $delay = $jamKeluar->diffInSeconds(now());
+
+                SendEmailToMahasiswa::dispatch($mahasiswa, $customer)->delay(now()->addSeconds($delay));
             }
         }
 
