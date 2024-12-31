@@ -67,24 +67,24 @@ class MahasiswaRegisterRuanganController extends Controller
                 ->get();
 
             // KIRIM NOTIFIKASI EMAIL KE PENJAGA RUANGAN
-            // $penjagaRuangan->filter(fn($data) => $data->user && $data->user->email_notifikasi)
-            //     ->each(function ($data) use ($hakAksesMahasiswa) {
-            //         try {
-            //             Mail::to($data->user->email_notifikasi)->send(
-            //                 new NotificationRegisterToAdmin(
-            //                     $hakAksesMahasiswa->load('hakAkses.ruangan', 'mahasiswa')
-            //                 )
-            //             );
-            //         } catch (\Throwable $e) {
-            //             // Log error for debugging
-            //             Log::error('Failed to send email', [
-            //                 'email' => $data->user->email_notifikasi,
-            //                 'error' => $e->getMessage(),
-            //             ]);
+            $penjagaRuangan->filter(fn($data) => $data->user && $data->user->email_notifikasi)
+                ->each(function ($data) use ($hakAksesMahasiswa) {
+                    try {
+                        Mail::to($data->user->email_notifikasi)->send(
+                            new NotificationRegisterToAdmin(
+                                $hakAksesMahasiswa->load('hakAkses.ruangan', 'mahasiswa')
+                            )
+                        );
+                    } catch (\Throwable $e) {
+                        // Log error for debugging
+                        Log::error('Failed to send email', [
+                            'email' => $data->user->email_notifikasi,
+                            'error' => $e->getMessage(),
+                        ]);
 
-            //             // Optionally, skip and continue processing
-            //         }
-            //     });
+                        // Optionally, skip and continue processing
+                    }
+                });
 
             return $hakAksesMahasiswa->load('hakAkses.ruangan');
         });

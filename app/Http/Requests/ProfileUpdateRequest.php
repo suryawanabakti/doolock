@@ -16,6 +16,7 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'email_notifikasi' => ['required', 'email'],
             'image' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
         ];
     }
