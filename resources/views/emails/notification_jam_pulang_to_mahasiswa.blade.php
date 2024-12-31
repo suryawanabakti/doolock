@@ -1,8 +1,8 @@
 @php
-    $nama = $data['customer']['nama'];
-    $namaRuangan = $data['customer']['hak_akses']['ruangan']['nama_ruangan'];
+    $nama = $data['nama'] ?? null;
+    $namaRuangan = $data['hak_akses']['ruangan']['nama_ruangan'] ?? null;
 @endphp
 
-<h1>Hi {{ $nama }} , Akses Ke Ruangan
-    {{ $namaRuangan }} Mau Habis . Mohon maaf harap segera keluar dari ruangan</h1>
+<h1>Hi {{ $nama ?? null }} , Akses Ke Ruangan
+    {{ $namaRuangan ?? null }} Mau Habis . Mohon maaf harap segera keluar dari ruangan</h1>
 <p>Terima Kasih.</p>
