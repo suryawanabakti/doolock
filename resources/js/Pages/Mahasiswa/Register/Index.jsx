@@ -3,21 +3,17 @@ import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Toolbar } from "primereact/toolbar";
-import React from "react";
 import { useState } from "react";
 
-import { Dialog } from "primereact/dialog";
-import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
 import { Link, useForm } from "@inertiajs/react";
-import { RadioButton } from "primereact/radiobutton";
 import axios from "axios";
-import { Badge } from "primereact/badge";
-import { useRef } from "react";
-import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
-import { Checkbox } from "primereact/checkbox";
+import { Dialog } from "primereact/dialog";
+import { Dropdown } from "primereact/dropdown";
+import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+import { Toast } from "primereact/toast";
+import { useRef } from "react";
 
 export default function Index({ jadwals, ruangans }) {
     const [dataRuangans, setDataRuangans] = useState(ruangans);
