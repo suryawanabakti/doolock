@@ -9,3 +9,7 @@
     <strong>Tanggal:</strong> {{ $data['hak_akses']['tanggal'] }}<br>
     <strong>Jadwal:</strong> {{ $data['hak_akses']['jam_masuk'] }} ~ {{ $data['hak_akses']['jam_keluar'] }} <br>
 </p>
+
+<p>
+    Terima kasih.
+</p>

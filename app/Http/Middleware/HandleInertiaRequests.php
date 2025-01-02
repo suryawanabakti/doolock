@@ -54,9 +54,17 @@ class HandleInertiaRequests extends Middleware
                         ],
                         [
                             "label" => "Daftar jadwal sudah di approve",
-                            "icon" => "pi pi-clock",
+                            "icon" => "pi pi-check",
                             "route" => "penjaga.pendaftaran-approve.index",
                             "to" => route("penjaga.pendaftaran-approve.index",  [
+                                "id" => $data->ruangan_id
+                            ])
+                        ],
+                        [
+                            "label" => "Daftar jadwal sudah di tolak",
+                            "icon" => "pi pi-times",
+                            "route" => "penjaga.pendaftaran-disapprove.index",
+                            "to" => route("penjaga.pendaftaran-disapprove.index",  [
                                 "id" => $data->ruangan_id
                             ])
                         ],

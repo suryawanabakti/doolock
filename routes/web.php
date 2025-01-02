@@ -136,13 +136,20 @@ Route::middleware(['auth'])->group(function () {
 
 
     // PENJAGA
+    Route::patch('/penjaga/pendaftaran/{hakAkses}/unapprove', [PendaftaranJadwalController::class, 'unapprove'])->name('penjaga.pendaftaran.unapprove');
+
     Route::middleware(['role:penjaga', 'penjagaruangan'])->group(function () {
+
+
         Route::get('/penjaga/pendaftaran', [PendaftaranJadwalController::class, 'index'])->name('penjaga.pendaftaran.index');
         Route::patch('/penjaga/pendaftaran/{hakAksesMahasiswa}', [PendaftaranJadwalController::class, 'approve'])->name('penjaga.pendaftaran.approve');
+
         Route::post('/penjaga/pendaftaran/multi-approve', [PendaftaranJadwalController::class, 'multiApprove'])->name('penjaga.pendaftaran.multi-approve');
-        Route::patch('/penjaga/pendaftaran/{hakAksesMahasiswa}/unapprove', [PendaftaranJadwalController::class, 'unapprove'])->name('penjaga.pendaftaran.unapprove');
+        Route::post('/penjaga/pendaftaran/multi-disapprove', [PendaftaranJadwalController::class, 'multiDisapprove'])->name('penjaga.pendaftaran.multi-disapprove');
+
 
         Route::get('/penjaga/pendaftaran-approve', [PendaftaranJadwalController::class, 'index2'])->name('penjaga.pendaftaran-approve.index');
+        Route::get('/penjaga/pendaftaran-disapprove', [PendaftaranJadwalController::class, 'index3'])->name('penjaga.pendaftaran-disapprove.index');
 
         Route::get('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('penjaga.ruangan-hak-akses.index');
         Route::post('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'store'])->name('penjaga.ruangan-hak-akses.store');

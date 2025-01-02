@@ -29,6 +29,12 @@ class PendaftaranJadwalController extends Controller
     {
         return $hakAksesMahasiswa->hakAkses->update(['is_approve' => true]);
     }
+
+    public function unapprove(HakAkses $hakAkses)
+    {
+        return $hakAkses->update(['is_approve' => false]);
+    }
+
     private function updateHakAksesStatus(array $selectedCustomers, int $status)
     {
         $dataKey = array_column($selectedCustomers, 'hak_akses_id');
@@ -59,7 +65,7 @@ class PendaftaranJadwalController extends Controller
 
                 $delay = now('Asia/Makassar')->diffInSeconds($jamPulangCarbon);
 
-                SendEmailToMahasiswa::dispatch($mahasiswa, $customer);
+                SendEmailToMahasiswa::dispatch($mahasiswa, $customer, "approve");
 
                 if ($delay > 0) {
                     SendEmailJamPulangToMahasiswa::dispatch($mahasiswa, $customer)
@@ -71,15 +77,45 @@ class PendaftaranJadwalController extends Controller
         $this->updateHakAksesStatus($request->selectedCustomers, 1);
     }
 
-    public function unapprove(HakAksesMahasiswa $hakAksesMahasiswa)
+    public function multiDisapprove(Request $request)
     {
-        return $hakAksesMahasiswa->hakAkses->update(['is_approve' => false]);
+        $customerIds = collect($request->selectedCustomers)->pluck('mahasiswa_id');
+
+        // Ambil semua data mahasiswa beserta user terkait dalam satu query
+        $mahasiswaList = Mahasiswa::with('user')
+            ->whereIn('id', $customerIds)
+            ->get();
+
+        // KIRIM NOTIFIKASI EMAIL KE MAHASISWA
+        foreach ($mahasiswaList as $mahasiswa) {
+            if ($mahasiswa->user->email_notifikasi) {
+                // Cari data customer berdasarkan mahasiswa_id
+                $customer = collect($request->selectedCustomers)
+                    ->firstWhere('mahasiswa_id', $mahasiswa->id);
+
+
+                SendEmailToMahasiswa::dispatch($mahasiswa, $customer, "disapprove");
+            }
+        }
+
+        $this->updateHakAksesStatus($request->selectedCustomers, 2);
     }
+
+
+
     public function index2(Request $request)
     {
         $jadwals = HakAksesMahasiswa::with('mahasiswa', 'hakAkses.ruangan')->orderBy('created_at', 'DESC')
             ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 1)->where('ruangan_id', $request->id)->where('is_by_admin', 0))->get();
         $ruangan = Ruangan::find($request->id);
         return inertia("Penjaga/Register/Index2", ["jadwals" => $jadwals, "ruangan" => $ruangan]);
+    }
+
+    public function index3(Request $request)
+    {
+        $jadwals = HakAksesMahasiswa::with('mahasiswa', 'hakAkses.ruangan')->orderBy('created_at', 'DESC')
+            ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 2)->where('ruangan_id', $request->id)->where('is_by_admin', 0))->get();
+        $ruangan = Ruangan::find($request->id);
+        return inertia("Penjaga/Register/Index3", ["jadwals" => $jadwals, "ruangan" => $ruangan]);
     }
 }

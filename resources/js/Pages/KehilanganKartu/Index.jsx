@@ -37,7 +37,13 @@ const KehilanganKartu = ({ mahasiswa }) => {
                             Status ID Card :{" "}
                             {mahasiswa.status == 1 ? "Aktif" : "Tidak Aktif"}
                         </p>
-                        <Button onClick={handleUpdate} size="sm">
+                        <Button
+                            onClick={handleUpdate}
+                            size="sm"
+                            severity={
+                                mahasiswa.status == 1 ? "danger" : "success"
+                            }
+                        >
                             {mahasiswa.status == 1
                                 ? "Nonaktifkan ID Card"
                                 : "Aktfikan ID Card"}

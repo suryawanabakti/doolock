@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class NotificationJamPulangToMahasiswa extends Mailable
+class NotificationDisapproveToMahasiswa extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -26,9 +26,8 @@ class NotificationJamPulangToMahasiswa extends Mailable
      */
     public function envelope(): Envelope
     {
-        $namaRuangan = $this->customer['hak_akses']['ruangan']['nama_ruangan'] ?? null;
         return new Envelope(
-            subject: "Jam pulang $namaRuangan sisa 10 menit lagi",
+            subject: 'Notifikasi Pemberitahuan Pendaftaran Ruangan',
         );
     }
 
@@ -38,7 +37,7 @@ class NotificationJamPulangToMahasiswa extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.notification_jam_pulang_to_mahasiswa',
+            view: 'emails.notification_disapprove_to_mahasiswa',
             with: [
                 'data' => $this->customer,
             ]

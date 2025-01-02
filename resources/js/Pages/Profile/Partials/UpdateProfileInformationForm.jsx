@@ -81,9 +81,7 @@ export default function UpdateProfileInformation({
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium">
-                        Foto <span className="text-red-500">*</span>
-                    </label>
+                    <label className="block text-sm font-medium">Foto</label>
                     <div className="mt-2 flex items-center gap-4">
                         {preview && (
                             <img

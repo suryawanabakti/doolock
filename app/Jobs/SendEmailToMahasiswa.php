@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Mail\NotificationDisapproveToMahasiswa;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -16,17 +17,18 @@ class SendEmailToMahasiswa implements ShouldQueue
 
     public $mahasiswa;
     public $customer;
-
+    public $status;
     /**
      * Create a new job instance.
      *
      * @param $mahasiswa
      * @param $customer
      */
-    public function __construct($mahasiswa, $customer)
+    public function __construct($mahasiswa, $customer, $status)
     {
         $this->mahasiswa = $mahasiswa;
         $this->customer = $customer;
+        $this->status = $status;
     }
 
     /**
@@ -37,8 +39,13 @@ class SendEmailToMahasiswa implements ShouldQueue
     public function handle()
     {
         if ($this->mahasiswa->user->email_notifikasi) {
-            Mail::to($this->mahasiswa->user->email_notifikasi)
-                ->send(new NotificationRegisterToMahasiswa($this->customer));
+            if ($this->status == "approve") {
+                Mail::to($this->mahasiswa->user->email_notifikasi)
+                    ->send(new NotificationRegisterToMahasiswa($this->customer));
+            } else {
+                Mail::to($this->mahasiswa->user->email_notifikasi)
+                    ->send(new NotificationDisapproveToMahasiswa($this->customer));
+            }
         }
     }
 }

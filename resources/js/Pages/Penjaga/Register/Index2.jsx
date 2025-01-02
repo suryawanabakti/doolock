@@ -165,11 +165,11 @@ export default function Index2({ jadwals, ruangan }) {
                         <Column
                             headerClassName="fw-bold"
                             field="action"
-                            header="Unapprove"
+                            header="Aksi"
                             body={(rowData) => {
                                 return (
                                     <Button
-                                        icon="pi pi-times"
+                                        icon="pi pi-undo"
                                         rounded
                                         outlined
                                         severity="warning"

@@ -18,10 +18,7 @@ import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { FilterMatchMode } from "primereact/api";
 
-export default function Index({ jadwals, ruangan }) {
-    const searchParams = new URLSearchParams(window.location.search);
-    const ruangan_id = searchParams.get("id");
-
+export default function Index3({ jadwals, ruangan }) {
     const [filters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
@@ -31,32 +28,34 @@ export default function Index({ jadwals, ruangan }) {
         setGlobalFilter(value);
     };
     const [dataJadwals, setDataJadwals] = useState(jadwals);
-    const [selectedCustomers, setSelectedCustomers] = useState([]);
 
-    const reject = () => {};
+    const reject = () => {
+        toast.current.show({
+            severity: "warn",
+            summary: "Rejected",
+            detail: "You have rejected",
+            life: 3000,
+        });
+    };
 
     const toast = useRef(null);
-
     const confirm2 = (event, rowData) => {
         confirmPopup({
             target: event.currentTarget,
-            message: "Apakah anda yakin menyutujui pendaftaran jadwal ini?",
+            message: "Apakah anda yakin membatalkan pendaftaran jadwal ini?",
             icon: "pi pi-info-circle",
             defaultFocus: "reject",
-            acceptClassName: "p-button-success",
+            acceptClassName: "p-button-warning",
             accept: async () => {
                 try {
                     const res = await axios.patch(
-                        route("penjaga.pendaftaran.approve", rowData.id),
-                        {
-                            ruangan_id: ruangan_id,
-                        }
+                        route("penjaga.pendaftaran.unapprove", rowData.id)
                     );
                     console.log(res);
                     toast.current.show({
                         severity: "success",
                         summary: "Confirmed",
-                        detail: "You have approve ",
+                        detail: "You have Un Approve ",
                         life: 3000,
                     });
 
@@ -78,75 +77,7 @@ export default function Index({ jadwals, ruangan }) {
             reject,
         });
     };
-    const multiApprove = (e) => {
-        e.preventDefault();
-        confirmPopup({
-            target: event.currentTarget,
-            message: "Apakah anda yakin menyutujui pendaftaran jadwal ini?",
-            icon: "pi pi-info-circle",
-            defaultFocus: "reject",
-            acceptClassName: "p-button-success",
-            accept: async () => {
-                try {
-                    const res = await axios.post(
-                        route("penjaga.pendaftaran.multi-approve"),
-                        {
-                            selectedCustomers: selectedCustomers,
-                            ruangan_id: ruangan_id,
-                        }
-                    );
-                    console.log("RES", res.data);
-                    toast.current.show({
-                        severity: "success",
-                        summary: "Confirmed",
-                        detail: "You have approve ",
-                        life: 3000,
-                    });
-                    alert("Berhasil multi approve");
-                    location.reload();
-                } catch (e) {
-                    alert("error");
-                    console.log("ERROR", e);
-                }
-            },
-            reject,
-        });
-    };
 
-    const multiDisapprove = (e) => {
-        e.preventDefault();
-        confirmPopup({
-            target: event.currentTarget,
-            message: "Apakah anda yakin menolak pendaftaran jadwal ini?",
-            icon: "pi pi-info-circle",
-            defaultFocus: "reject",
-            acceptClassName: "p-button-danger",
-            accept: async () => {
-                try {
-                    const res = await axios.post(
-                        route("penjaga.pendaftaran.multi-disapprove"),
-                        {
-                            selectedCustomers: selectedCustomers,
-                            ruangan_id: ruangan_id,
-                        }
-                    );
-                    console.log("RES", res.data);
-                    toast.current.show({
-                        severity: "success",
-                        summary: "Confirmed",
-                        detail: "You have disapprove ",
-                        life: 3000,
-                    });
-                    alert("Berhasil menolak pendaftaran jadwal");
-                    location.reload();
-                } catch (e) {
-                    alert("error");
-                    console.log("ERROR", e);
-                }
-            },
-            reject,
-        });
-    };
     return (
         <Layout>
             <Toast ref={toast} />
@@ -154,38 +85,8 @@ export default function Index({ jadwals, ruangan }) {
 
             <div className="grid">
                 <div className="col-12">
-                    <div className="flex justify-between">
-                        <h4> {ruangan.nama_ruangan}</h4>
-                    </div>
-                    <Toolbar
-                        className="mb-2"
-                        left={() => (
-                            <div className="flex gap-2">
-                                <Button
-                                    label={`Terima`}
-                                    icon="pi pi-check"
-                                    severity="success"
-                                    disabled={selectedCustomers.length <= 0}
-                                    onClick={multiApprove}
-                                    className="mb-2"
-                                />
-                                <Button
-                                    label={`Tolak`}
-                                    icon="pi pi-times"
-                                    severity="danger"
-                                    disabled={selectedCustomers.length <= 0}
-                                    onClick={multiDisapprove}
-                                    className="mb-2"
-                                />
-                            </div>
-                        )}
-                    />
+                    <h4>{ruangan.nama_ruangan}</h4>
                     <DataTable
-                        dataKey="hak_akses_id"
-                        selection={selectedCustomers}
-                        onSelectionChange={(e) => {
-                            setSelectedCustomers(e.value);
-                        }}
                         value={dataJadwals}
                         rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -195,9 +96,8 @@ export default function Index({ jadwals, ruangan }) {
                         header={() => (
                             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
                                 <h5 className="mt-3">
-                                    Pendaftaran Jadwal{" "}
-                                    <b className="text-yellow-500">Belum</b> di
-                                    approve
+                                    Pendaftaran Jadwal di{" "}
+                                    <b className="text-red-500">Tolak</b>
                                 </h5>
                                 <span className="p-input-icon-left">
                                     <i className="pi pi-search" />
@@ -210,10 +110,6 @@ export default function Index({ jadwals, ruangan }) {
                             </div>
                         )}
                     >
-                        <Column
-                            selectionMode="multiple"
-                            headerStyle={{ width: "3rem" }}
-                        ></Column>
                         <Column
                             headerClassName="fw-bold"
                             field="mahasiswa.nim"
@@ -228,6 +124,14 @@ export default function Index({ jadwals, ruangan }) {
                             header="Nama"
                             sortable
                             filterPlaceholder="Search by mahasiswa"
+                            headerStyle={{ width: "20rem" }}
+                        />
+                        <Column
+                            headerClassName="fw-bold"
+                            field="hak_akses.ruangan.nama_ruangan"
+                            header="Ruangan"
+                            sortable
+                            filterPlaceholder="Search by ruangan_id"
                             headerStyle={{ width: "20rem" }}
                         />
 
@@ -256,41 +160,18 @@ export default function Index({ jadwals, ruangan }) {
                             filterPlaceholder="Search by keluar"
                             headerStyle={{ width: "20rem" }}
                         />
+
                         <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.tujuan"
-                            header="Tujuan"
-                            sortable
-                            filterPlaceholder="Search by Tujuan"
-                            headerStyle={{ width: "15rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.skill"
-                            header="Skill"
-                            sortable
-                            filterPlaceholder="Search by skill"
-                            headerStyle={{ width: "15rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.additional_participant"
-                            header="Participant"
-                            sortable
-                            filterPlaceholder="Search by skill"
-                            headerStyle={{ width: "15rem" }}
-                        />
-                        {/* <Column
                             headerClassName="fw-bold"
                             field="action"
-                            header="Approve"
+                            header="Aksi"
                             body={(rowData) => {
                                 return (
                                     <Button
-                                        icon="pi pi-check"
+                                        icon="pi pi-undo"
                                         rounded
                                         outlined
-                                        severity="success"
+                                        severity="warning"
                                         onClick={(event) =>
                                             confirm2(event, rowData)
                                         }
@@ -298,7 +179,7 @@ export default function Index({ jadwals, ruangan }) {
                                 );
                             }}
                             headerStyle={{ width: "15rem" }}
-                        /> */}
+                        />
                     </DataTable>
                 </div>
             </div>
