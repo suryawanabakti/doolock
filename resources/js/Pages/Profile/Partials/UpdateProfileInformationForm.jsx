@@ -79,6 +79,10 @@ export default function UpdateProfileInformation({
                         }
                         placeholder="Masukkan Email Untuk Notifikasi...."
                     />
+                    <InputError
+                        message={errors.email_notifikasi}
+                        className="mt-2"
+                    />
                 </div>
                 <div>
                     <label className="block text-sm font-medium">Foto</label>

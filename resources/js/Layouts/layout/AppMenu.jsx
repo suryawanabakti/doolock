@@ -94,6 +94,11 @@ const AppMenu = () => {
                         to: route("mahasiswa.register-approve.index"),
                     },
                     {
+                        label: "Profile",
+                        icon: "pi pi-user",
+                        to: route("profile.edit"),
+                    },
+                    {
                         label: "Kehilangan Kartu",
                         icon: "pi pi-times",
                         to: route("mahasiswa.kehilangan-kartu.index"),

@@ -5,7 +5,7 @@ import { DataTable } from "primereact/datatable";
 import { Toolbar } from "primereact/toolbar";
 import { useState } from "react";
 
-import { Link, useForm } from "@inertiajs/react";
+import { Link, useForm, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { Dialog } from "primereact/dialog";
@@ -28,6 +28,8 @@ export default function Index({ jadwals, ruangans }) {
         tujuan: "",
     });
 
+    const user = usePage().props.auth.user;
+    console.log(user.email_notifikasi);
     const reject = () => {};
     const [dialogNew, setDialogNew] = useState(false);
     const selectedCountryTemplate = (option, props) => {
@@ -265,7 +267,7 @@ export default function Index({ jadwals, ruangans }) {
                             setData("tujuan", e.target.value);
                         }}
                         rows={3}
-                        cols={40}
+                        cols={100}
                     />
                     {errors.tujuan && (
                         <small className="p-error">{errors.tujuan}</small>
@@ -287,7 +289,7 @@ export default function Index({ jadwals, ruangans }) {
                             setData("skill", e.target.value);
                         }}
                         rows={3}
-                        cols={40}
+                        cols={50}
                     />
                     {errors.skill && (
                         <small className="p-error">{errors.skill}</small>
@@ -311,7 +313,7 @@ export default function Index({ jadwals, ruangans }) {
                             setData("additional_participant", e.target.value)
                         }
                         rows={3}
-                        cols={40}
+                        cols={50}
                     />
                     {errors.additional_participant && (
                         <small className="p-error">
@@ -327,6 +329,7 @@ export default function Index({ jadwals, ruangans }) {
                     severity="primary"
                 />
             </Dialog>
+
             <div className="grid">
                 <div className="col-12">
                     <div className="card">
@@ -343,6 +346,18 @@ export default function Index({ jadwals, ruangans }) {
                             )}
                         />
                     </div>
+                    {!user.email_notifikasi && (
+                        <p href="/profile" className="text-sm">
+                            Mohon lengkapi email Anda untuk menerima notifikasi
+                            penting, seperti peringatan saat keluar ruangan,
+                            persetujuan permohonan, dan informasi lainnya.
+                            Terima kasih! 😊{" "}
+                            <Link href="/profile" className="text-sm">
+                                Klik disini
+                            </Link>
+                        </p>
+                    )}
+
                     <DataTable
                         header={() => (
                             <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
@@ -361,7 +376,7 @@ export default function Index({ jadwals, ruangans }) {
                                 </span>
                             </div>
                         )}
-                        className="mb-3"
+                        className="mb-3 mt-2"
                         value={dataJadwals}
                         rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"

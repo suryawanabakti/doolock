@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\IDTagResource;
-use App\Models\HakAksesMahasiswa;
 use App\Models\Mahasiswa;
 use App\Models\Ruangan;
 use App\Models\ScanerStatus;
