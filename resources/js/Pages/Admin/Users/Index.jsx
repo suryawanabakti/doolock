@@ -85,7 +85,9 @@ export default function Index({ users }) {
                 nama_ruangan: data.ruangan.nama_ruangan,
             };
         });
-        console.log(transform);
+
+        console.log("transform", transform);
+
         setSelectedCities(transform);
         setDialogEdit(true);
     };
@@ -285,11 +287,15 @@ export default function Index({ users }) {
                     </label>
                     <MultiSelect
                         value={selectedCities}
+                        filter
                         onChange={(e) => {
+                            console.log(e.value);
+
                             setUser((prevUser) => ({
                                 ...prevUser,
                                 ruangan_id: e.value,
                             }));
+
                             setSelectedCities(e.value);
                         }}
                         options={cities}

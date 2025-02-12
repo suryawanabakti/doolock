@@ -4,6 +4,7 @@ import React, { useEffect, useContext } from "react";
 import { CSSTransition } from "react-transition-group";
 import { MenuContext } from "./context/menucontext";
 import { Link } from "@inertiajs/react";
+import { Badge } from "primereact/badge";
 
 const AppMenuitem = (props) => {
     const pathname = window.location.href;
@@ -77,7 +78,9 @@ const AppMenuitem = (props) => {
             })}
         >
             {props.root && item.visible !== false && (
-                <div className="layout-menuitem-root-text">{item.label}</div>
+                <div className="layout-menuitem-root-text">
+                    <span className="flex justify-between"> {item.label}</span>{" "}
+                </div>
             )}
             {(!item.to || item.items) && item.visible !== false ? (
                 <a
@@ -111,6 +114,8 @@ const AppMenuitem = (props) => {
                         "active-route": isActiveRoute,
                     })}
                     tabIndex={0}
+                    preserveScroll={true}
+                    preserveState={true}
                 >
                     <i
                         className={classNames(
@@ -118,7 +123,17 @@ const AppMenuitem = (props) => {
                             item.icon
                         )}
                     ></i>
-                    <span className="layout-menuitem-text">{item.label}</span>
+                    <span className="layout-menuitem-text flex">
+                        {item.label}
+                        {item.total !== undefined ? (
+                            <Badge
+                                severity="warning"
+                                value={item.total}
+                            ></Badge>
+                        ) : (
+                            ""
+                        )}
+                    </span>
                     {item.items && (
                         <i className="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
                     )}

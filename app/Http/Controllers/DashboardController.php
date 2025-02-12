@@ -20,7 +20,7 @@ class DashboardController extends Controller
     protected function thisAdmin() {}
     public function __invoke(Request $request)
     {
-        if ($request->user()->role == 'admin') {
+        if ($request->user()->role == 'admin' || $request->user()->role == 'super') {
             $mahasiswaCount = Mahasiswa::where('ket', 'mhs')->count();
             $dosenCount = Mahasiswa::where('ket', 'dsn')->count();
             $ruanganCount = Ruangan::count();

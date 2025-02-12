@@ -11,6 +11,73 @@ const AppMenu = () => {
     const daftarRuangan = auth.daftarRuangan;
 
     const menuItems = {
+        super: [
+            {
+                label: "Admin Menu",
+                items: [
+                    {
+                        label: "Dashboard",
+                        icon: "pi pi-home",
+                        to: route("dashboard"),
+                    },
+                ],
+            },
+            {
+                label: "Master Data",
+                items: [
+                    {
+                        label: "Admin",
+                        icon: "pi pi-users",
+                        to: route("admin.users.index"),
+                    },
+                    {
+                        label: "Mahasiswa",
+                        icon: "pi pi-users",
+                        to: route("admin.mahasiswa.index"),
+                    },
+                    {
+                        label: "Dosen / Staff",
+                        icon: "pi pi-users",
+                        to: route("admin.dosen.index"),
+                    },
+                    {
+                        label: "Ruangan",
+                        icon: "pi pi-home",
+                        to: route("admin.ruangan.index"),
+                    },
+                    {
+                        label: "Kelas",
+                        icon: "pi pi-home",
+                        to: route("admin.ruangan-kelas.index"),
+                    },
+                    {
+                        label: "Scanner",
+                        icon: "pi pi-qrcode",
+                        to: route("admin.scaner.index"),
+                    },
+                ],
+            },
+            {
+                label: "Laporan",
+                items: [
+                    {
+                        label: "Riwayat ",
+                        icon: "pi pi-history",
+                        to: route("admin.riwayat.index"),
+                    },
+                    {
+                        label: "Riwayat Per Ruangan",
+                        icon: "pi pi-history",
+                        to: route("admin.riwayat-by-ruangan.index"),
+                    },
+                    {
+                        label: "Absensi",
+                        icon: "pi pi-history",
+                        to: route("admin.absensi.index"),
+                    },
+                ],
+            },
+        ],
         admin: [
             {
                 label: "Admin Menu",

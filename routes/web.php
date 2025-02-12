@@ -59,6 +59,9 @@ Route::get('/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
 
+Route::get('/penjaga/dashboard', DashboardController::class)
+    ->middleware('auth')
+    ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:mahasiswa'])->group(function () {
@@ -72,7 +75,7 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/mahasiswa-kehilangan-kartu', [KehilanganKartuController::class, 'update'])->name('mahasiswa.kehilangan-kartu.update');
     });
 
-    Route::middleware(['role:admin'])->group(function () {
+    Route::middleware(['role:admin,super'])->group(function () {
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
         Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
         Route::patch('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');

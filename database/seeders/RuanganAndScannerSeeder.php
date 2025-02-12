@@ -75,6 +75,11 @@ class RuanganAndScannerSeeder extends Seeder
         ]);
 
 
+        ScanerStatus::create([
+            'kode' => 'R13A',
+            'ruangan_id' => $perpustakaan->id,
+            'type' => 'dalam',
+        ]);
 
         ScanerStatus::create([
             'kode' => 'R13B',
