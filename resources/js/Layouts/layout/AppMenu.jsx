@@ -3,6 +3,7 @@ import AppMenuitem from "./AppMenuitem";
 import { LayoutContext } from "./context/layoutcontext";
 import { MenuProvider } from "./context/menucontext";
 import { usePage } from "@inertiajs/react";
+import { useState } from "react";
 
 const AppMenu = () => {
     const { layoutConfig } = useContext(LayoutContext);
@@ -192,7 +193,11 @@ const AppMenu = () => {
 
     return (
         <MenuProvider>
-            <ul className="layout-menu">{renderMenuItems(user.role)}</ul>
+            <ul className="layout-menu">
+                {/* <input type="search" onKeyDown={handleChange} /> */}
+
+                {renderMenuItems(user.role)}
+            </ul>
         </MenuProvider>
     );
 };

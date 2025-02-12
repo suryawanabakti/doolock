@@ -34,10 +34,12 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         if ($request->user() && $request->user()->role == 'penjaga') {
-            $daftarRuangan = PenjagaRuangan::with('ruangan')->whereHas('ruangan', fn($q) => $q->whereNot('type', 'umum'))->where('user_id', $request->user()->id)->get()->map(function ($data) {
+            $search = request('search_menu');
+            $daftarRuangan = PenjagaRuangan::with('ruangan')->whereHas('ruangan', fn($q) => $q->whereNot('type', 'umum')->where('nama_ruangan', 'LIKE', "%{$search}%"))->where('user_id', $request->user()->id)->get()->map(function ($data) {
                 $belumDiApproveCount = HakAksesMahasiswa::whereHas('hakAkses', function ($q) use ($data) {
                     $q->where('ruangan_id', $data->ruangan_id)->where('is_approve', 0)->where('is_by_admin', 0);
                 })->count();
+
                 return [
                     "label" => "Ruangan " . $data->ruangan->nama_ruangan,
                     "items" => [
