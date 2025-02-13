@@ -11,30 +11,30 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 
 class MahasiswaImport implements ToModel, WithValidation, WithHeadingRow
 {
-
+    public function __construct(public $kelas, public $tahun_masuk) {}
     public function model(array $row)
     {
-        return new Mahasiswa([
-            'id_tag' => $row['id_tag'],
-            'nama' => $row['nama'],
-            'nim' => $row['nim'],
-            'pin' => $row['pin'],
-            'ket' => 'mhs',
-            'ruangan_id' => Ruangan::where('nama_ruangan', $row['kelas'])->first()->id,
-            'tahun_masuk' => $row['tahun_masuk'],
-            'status' => 1
-        ]);
+        if ($row['id_tag'] && $row['nama'] && $row['nim']) {
+            return new Mahasiswa([
+                'id_tag' => $row['id_tag'],
+                'nama' => $row['nama'],
+                'nim' => $row['nim'],
+                'pin' => $row['pin'] ?? null,
+                'ket' => 'mhs',
+                'ruangan_id' => Ruangan::where('nama_ruangan', $this->kelas)->first()->id,
+                'tahun_masuk' => $this->tahun_masuk,
+                'status' => 1
+            ]);
+        }
     }
 
     public function rules(): array
     {
         return [
-            'id_tag' => ['required', Rule::unique(Mahasiswa::class, 'id_tag')],
+            'id_tag' => ['nullable', Rule::unique(Mahasiswa::class, 'id_tag')],
             'nama' => ['required'],
             'nim' => ['required', Rule::unique(Mahasiswa::class, 'nim')],
             'pin' => ['nullable', Rule::unique(Mahasiswa::class, 'pin')],
-            'kelas' => ['nullable', Rule::exists(Ruangan::class, 'nama_ruangan')],
-            'tahun_masuk' => ['required']
         ];
     }
 }

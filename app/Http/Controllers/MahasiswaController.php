@@ -16,8 +16,12 @@ class MahasiswaController extends Controller
     {
         $request->validate([
             'file_import' => ['required', 'file'],
+            'kelas' => ['required'],
+            'tahun_masuk' => ['required']
         ]);
-        Excel::import(new MahasiswaImport, $request->file('file_import')->store('temp'));
+
+        Excel::import(new MahasiswaImport($request->kelas, $request->tahun_masuk), $request->file('file_import')->store('temp'));
+
         return response()->json(['message' => 'Import berhasil']);
     }
 

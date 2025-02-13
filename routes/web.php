@@ -95,7 +95,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/admin/ruangan/{ruangan}', [RuanganController::class, 'destroy'])->name('admin.ruangan.destroy');
 
         Route::get('/admin/mahasiswa', [MahasiswaController::class, 'index'])->name('admin.mahasiswa.index');
-        Route::post('/admin/mahasiswa.import', [MahasiswaController::class, 'import'])->name('admin.mahasiswa.import');
+        Route::post('/admin/mahasiswa/import', [MahasiswaController::class, 'import'])->name('admin.mahasiswa.import');
         Route::post('/admin/mahasiswa', [MahasiswaController::class, 'store'])->name('admin.mahasiswa.store');
         Route::post('/admin/mahasiswa/active', [MahasiswaController::class, 'active'])->name('admin.mahasiswa.active');
         Route::post('/admin/mahasiswa/block', [MahasiswaController::class, 'block'])->name('admin.mahasiswa.block');

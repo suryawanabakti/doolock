@@ -43,6 +43,7 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
         nama: "",
         status: 1,
         ruangan_id: "",
+        kelas: "",
         tahun_masuk: 2024,
         file_import: null,
     });
@@ -520,6 +521,40 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                     </a>
                 </p>
                 <div className="field">
+                    <label htmlFor="Kelas" className="font-bold">
+                        Kelas
+                    </label>
+                    <InputText
+                        placeholder="Kelas A"
+                        id="kelas"
+                        required
+                        type="text"
+                        value={data.kelas}
+                        autoFocus
+                        onChange={(e) => setData("kelas", e.target.value)}
+                    />
+                    {errors.kelas && (
+                        <small className="p-error">{errors.kelas}</small>
+                    )}
+                </div>
+                <div className="field">
+                    <label htmlFor="tahun_masuk" className="font-bold">
+                        Tahun Masuk
+                    </label>
+                    <InputText
+                        value={data.tahun_masuk}
+                        placeholder="2025"
+                        id="tahun_masuk"
+                        required
+                        type="text"
+                        autoFocus
+                        onChange={(e) => setData("tahun_masuk", e.target.value)}
+                    />
+                    {errors.tahun_masuk && (
+                        <small className="p-error">{errors.tahun_masuk}</small>
+                    )}
+                </div>
+                <div className="field">
                     <label htmlFor="file" className="font-bold">
                         File Excel
                     </label>
@@ -544,6 +579,8 @@ const Mahasiswa = ({ mahasiswa, kelas }) => {
                         router.post(
                             route("admin.mahasiswa.import"),
                             {
+                                kelas: data.kelas,
+                                tahun_masuk: data.tahun_masuk,
                                 file_import: data.file_import,
                             },
                             {

@@ -49,7 +49,8 @@ class DoorLockController extends Controller
         $scanner = ScanerStatus::where('kode', $request->kode)->first();
 
         // Validasi akses mahasiswa
-        if ($mahasiswa && $mahasiswa->ket === 'mhs' && $scanner->type == 'luar' && $ruangan->type !== 'umum') {
+        // $scanner->type == 'luar' &&
+        if ($mahasiswa && $mahasiswa->ket === 'mhs' &&  $ruangan->type !== 'umum') {
             if (!$this->hasAccess($mahasiswa, $ruangan, $currentTime, $currentDate)) {
                 $this->createHistoriAndBroadcast($mahasiswa, $request->id, $request->kode, 3, $ruangan);
                 echo json_encode(["noid"], JSON_UNESCAPED_UNICODE);
@@ -58,7 +59,7 @@ class DoorLockController extends Controller
         }
 
         // Validasi akses dosen
-        if ($mahasiswa && $mahasiswa->ket === 'dsn' && $scanner->type == 'luar' && $ruangan->type !== 'umum') {
+        if ($mahasiswa && $mahasiswa->ket === 'dsn' && $ruangan->type !== 'umum') {
             // $ruanganAkses = DosenRuangan::where('mahasiswa_id', $mahasiswa->id)->where('ruangan_id', $ruangan->id)->latest()->first();
 
             // if (!$ruanganAkses) {
