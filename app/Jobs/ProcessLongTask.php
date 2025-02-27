@@ -39,9 +39,13 @@ class ProcessLongTask implements ShouldQueue
                     'password' => bcrypt($mhs->nim),
                     'status' => 1
                 ]);
-
                 $mhs->update([
                     'user_id' => $mhs->user_id,
+                    'status' => 1
+                ]);
+            } else {
+                $mhs->update([
+                    'user_id' => $user->id,
                     'status' => 1
                 ]);
             }

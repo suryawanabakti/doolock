@@ -22,6 +22,7 @@ use App\Models\Mahasiswa;
 use App\Models\RuanganAkses;
 use App\Models\User;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -66,28 +67,8 @@ Route::get('/penjaga/dashboard', DashboardController::class)
     ->name('dashboard');
 
 Route::get('/admin/update-mahasiswa', function () {
-    $mahasiswa = Mahasiswa::all();
-    foreach ($mahasiswa as $mhs) {
-        $user = User::where('email', $mhs->nim)->first();
-        if (empty($user)) {
-            $user =   User::create([
-                'name' => $mhs->nama,
-                'email' => $mhs->nim,
-                'role' => 'mahasiswa',
-                'password' => bcrypt($mhs->nim),
-                'status' => 1
-            ]);
-            $mhs->update([
-                'user_id' => $mhs->user_id,
-                'status' => 1
-            ]);
-        } else {
-            $mhs->update([
-                'user_id' => $user->id,
-                'status' => 1
-            ]);
-        }
-    }
+    ProcessLongTask::dispatch();
+    return 'ok';
 });
 
 Route::get('/admin/get-mahasiswa-all', function () {
