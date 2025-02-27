@@ -67,6 +67,10 @@ Route::get('/penjaga/dashboard', DashboardController::class)
 Route::get('/admin/mahasiswa-all', function () {
     ProcessLongTask::dispatch();
 });
+
+Route::get('/admin/get-mahasiswa-all', function () {
+    return User::where('role', 'mahasiswa')->get();
+});
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:mahasiswa'])->group(function () {
         Route::get('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'index'])->name('mahasiswa.register.index');
