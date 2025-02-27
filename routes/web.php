@@ -62,18 +62,28 @@ Route::get('/dashboard', DashboardController::class)
 Route::get('/penjaga/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
+
 Route::get('/admin/mahasiswa-all', function () {
     $mahasiswa = Mahasiswa::all();
+    $existingEmails = User::whereIn('email', $mahasiswa->pluck('nim'))->pluck('email')->toArray();
+
+    $data = [];
     foreach ($mahasiswa as $mhs) {
-        if (!User::where('email', $mhs->nim)->first()) {
-            User::create([
+        if (!in_array($mhs->nim, $existingEmails)) {
+            $data[] = [
                 'name' => $mhs->nama,
                 'email' => $mhs->nim,
                 'role' => 'mahasiswa',
                 'password' => bcrypt($mhs->nim),
-                'status' => 1
-            ]);
+                'status' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
         }
+    }
+
+    if (!empty($data)) {
+        User::insert($data); // Insert batch untuk efisiensi
     }
 });
 Route::middleware(['auth'])->group(function () {
