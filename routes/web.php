@@ -17,6 +17,7 @@ use App\Http\Controllers\RuanganKelasController;
 use App\Http\Controllers\ScanerController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
+use App\Jobs\ProcessLongTask;
 use App\Models\Mahasiswa;
 use App\Models\User;
 use Illuminate\Foundation\Application;
@@ -64,27 +65,7 @@ Route::get('/penjaga/dashboard', DashboardController::class)
     ->name('dashboard');
 
 Route::get('/admin/mahasiswa-all', function () {
-    $mahasiswa = Mahasiswa::all();
-    $existingEmails = User::whereIn('email', $mahasiswa->pluck('nim'))->pluck('email')->toArray();
-
-    $data = [];
-    foreach ($mahasiswa as $mhs) {
-        if (!in_array($mhs->nim, $existingEmails)) {
-            $data[] = [
-                'name' => $mhs->nama,
-                'email' => $mhs->nim,
-                'role' => 'mahasiswa',
-                'password' => bcrypt($mhs->nim),
-                'status' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-    }
-
-    if (!empty($data)) {
-        User::insert($data); // Insert batch untuk efisiensi
-    }
+    ProcessLongTask::dispatch();
 });
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:mahasiswa'])->group(function () {
