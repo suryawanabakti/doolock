@@ -19,6 +19,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use App\Jobs\ProcessLongTask;
 use App\Models\Mahasiswa;
+use App\Models\RuanganAkses;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -64,13 +65,35 @@ Route::get('/penjaga/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
 
-Route::get('/admin/mahasiswa-all', function () {
-    ProcessLongTask::dispatch();
+Route::get('/admin/update-mahasiswa', function () {
+    $mahasiswa = Mahasiswa::all();
+    foreach ($mahasiswa as $mhs) {
+        $user = User::where('email', $mhs->nim)->first();
+        if (empty($user)) {
+            $user =   User::create([
+                'name' => $mhs->nama,
+                'email' => $mhs->nim,
+                'role' => 'mahasiswa',
+                'password' => bcrypt($mhs->nim),
+                'status' => 1
+            ]);
+            $mhs->update([
+                'user_id' => $mhs->user_id,
+                'status' => 1
+            ]);
+        } else {
+            $mhs->update([
+                'user_id' => $user->id,
+                'status' => 1
+            ]);
+        }
+    }
 });
 
 Route::get('/admin/get-mahasiswa-all', function () {
-    return User::where('role', 'mahasiswa')->get();
+    return Mahasiswa::all();
 });
+
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:mahasiswa'])->group(function () {
         Route::get('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'index'])->name('mahasiswa.register.index');

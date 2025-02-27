@@ -16,7 +16,16 @@ class MahasiswaImport implements ToModel, WithValidation, WithHeadingRow
     public function model(array $row)
     {
         if ($row['id_tag'] && $row['nama'] && $row['nim']) {
+            $user = User::create([
+                'name' => $row['nama'],
+                'email' => $row['nim'],
+                'role' => 'mahasiswa',
+                'password' => bcrypt($row['nim']),
+                'status' => 1
+            ]);
+
             $mhs = Mahasiswa::create([
+                'user_id' => $user->id,
                 'id_tag' => $row['id_tag'],
                 'nama' => $row['nama'],
                 'nim' => $row['nim'],
@@ -24,14 +33,6 @@ class MahasiswaImport implements ToModel, WithValidation, WithHeadingRow
                 'ket' => 'mhs',
                 'ruangan_id' => Ruangan::where('nama_ruangan', $this->kelas)->first()->id,
                 'tahun_masuk' => $this->tahun_masuk,
-                'status' => 1
-            ]);
-
-            User::create([
-                'name' => $mhs->nama,
-                'email' => $mhs->nim,
-                'role' => 'mahasiswa',
-                'password' => bcrypt($mhs->nim),
                 'status' => 1
             ]);
 

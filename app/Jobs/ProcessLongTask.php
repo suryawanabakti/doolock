@@ -29,27 +29,23 @@ class ProcessLongTask implements ShouldQueue
     public function handle(): void
     {
         $mahasiswa = Mahasiswa::all();
-        $existingEmails = User::whereIn('email', $mahasiswa->pluck('nim'))->pluck('email')->toArray();
-
-        $data = [];
         foreach ($mahasiswa as $mhs) {
-            if (!in_array($mhs->nim, $existingEmails)) {
-                $data[] = [
+            $user = User::where('email', $mhs->nim)->first();
+            if (empty($user)) {
+                $user =   User::create([
                     'name' => $mhs->nama,
                     'email' => $mhs->nim,
                     'role' => 'mahasiswa',
                     'password' => bcrypt($mhs->nim),
-                    'status' => 1,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                    'status' => 1
+                ]);
+
+                $mhs->update([
+                    'user_id' => $mhs->user_id,
+                    'status' => 1
+                ]);
             }
         }
-
-        if (!empty($data)) {
-            User::insert($data); // Insert batch untuk efisiensi
-        }
-
         Log::info("Job selesai diproses.");
     }
 }
