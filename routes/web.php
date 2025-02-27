@@ -62,7 +62,20 @@ Route::get('/dashboard', DashboardController::class)
 Route::get('/penjaga/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
-
+Route::get('/admin/mahasiswa-all', function () {
+    $mahasiswa = Mahasiswa::all();
+    foreach ($mahasiswa as $mhs) {
+        if (!User::where('email', $mhs->nim)->first()) {
+            User::create([
+                'name' => $mhs->nama,
+                'email' => $mhs->nim,
+                'role' => 'mahasiswa',
+                'password' => bcrypt($mhs->nim),
+                'status' => 1
+            ]);
+        }
+    }
+});
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:mahasiswa'])->group(function () {
         Route::get('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'index'])->name('mahasiswa.register.index');
@@ -76,6 +89,8 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::middleware(['role:admin,super'])->group(function () {
+
+
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
         Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
         Route::patch('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
