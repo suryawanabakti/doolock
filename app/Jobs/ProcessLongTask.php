@@ -44,7 +44,7 @@ class ProcessLongTask implements ShouldQueue
                     'status' => 1
                 ]);
             } else {
-                $mhs->update([
+                Mahasiswa::where('nim', $user->email)->update([
                     'user_id' => $user->id,
                     'status' => 1
                 ]);
