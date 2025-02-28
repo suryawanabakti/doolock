@@ -22,6 +22,7 @@ use App\Models\Mahasiswa;
 use App\Models\RuanganAkses;
 use App\Models\User;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -72,7 +73,14 @@ Route::get('/admin/update-mahasiswa', function () {
 });
 
 Route::get('/admin/get-mahasiswa-all', function () {
-    return Mahasiswa::all();
+    return User::with('mahasiswa')->get();
+});
+
+Route::get('/dataku', function (Request $request) {
+    return [
+        "jumlahUser" => User::where('role', 'mahasiswa')->count(),
+        "jumlahMahasiswa" => Mahasiswa::count(),
+    ];
 });
 
 Route::middleware(['auth'])->group(function () {
