@@ -14,11 +14,18 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
+import AsyncSelect from "react-select/async";
+import Select from "react-select";
 
 export default function Index({ jadwals, ruangans }) {
     const [dataRuangans, setDataRuangans] = useState(ruangans);
     const [dataJadwals, setDataJadwals] = useState(jadwals);
-    const { data, setData } = useForm({
+    const options = Array.from({ length: 24 }, (_, i) => ({
+        value: i,
+        label: `${i}:00`,
+    }));
+
+    const { data, setData, post, errors } = useForm({
         ruangan_id: "",
         tanggal: "",
         jam_masuk: "",
@@ -27,6 +34,22 @@ export default function Index({ jadwals, ruangans }) {
         additional_participant: "",
         tujuan: "",
     });
+
+    const handleChangeJamMasuk = (selectedOption) => {
+        const formattedTime = `${String(selectedOption.value).padStart(
+            2,
+            "0"
+        )}:00:00`;
+        setData("jam_masuk", formattedTime);
+    };
+
+    const handleChangeJamKeluar = (selectedOption) => {
+        const formattedTime = `${String(selectedOption.value).padStart(
+            2,
+            "0"
+        )}:00:00`;
+        setData("jam_keluar", formattedTime);
+    };
 
     const user = usePage().props.auth.user;
     console.log(user.email_notifikasi);
@@ -56,31 +79,31 @@ export default function Index({ jadwals, ruangans }) {
         setDialogNew(true);
     };
     const [processing, setProcessing] = useState(false);
-    const [errors, setErrors] = useState([]);
+
     const handleSave = async (e) => {
         e.preventDefault();
-        setProcessing(true);
-        try {
-            const res = await axios.post(route("mahasiswa.register.store"), {
-                ruangan_id: data.ruangan_id,
-                tanggal: data.tanggal,
-                jam_masuk: data.jam_masuk,
-                jam_keluar: data.jam_keluar,
-                skill: data.skill,
-                additional_participant: data.additional_participant,
-                tujuan: data.tujuan,
-            });
-            console.log("RESPON", res);
 
-            const updatedData = [res.data, ...dataJadwals];
-            setDataJadwals(updatedData);
-            setDialogNew(false);
-        } catch (error) {
-            console.log(error);
-            alert(error?.response?.data?.message || "Something went wrong!");
-            setErrors(error?.response?.data?.errors);
-        }
-        setProcessing(false);
+        setProcessing(true);
+
+        post(route("mahasiswa.register.store"), {
+            onSuccess: () => {
+                alert("Berhasil tambah jadwal");
+                location.reload();
+                setDialogNew(false);
+            },
+            onFinish: () => {
+                setProcessing(false);
+            },
+            onError: (err) => {
+                console.log(err);
+
+                alert(
+                    err.message ||
+                        Object.values(err)[0] ||
+                        "Something went wrong"
+                );
+            },
+        });
     };
     const toast = useRef(null);
     const handleDayChange = (e) => {
@@ -129,6 +152,28 @@ export default function Index({ jadwals, ruangans }) {
             },
             reject,
         });
+    };
+    const [selectedMahasiswa, setSelectedMahasiswa] = useState(null);
+
+    const handleChangeParticipant = (selectedOption) => {
+        setData("additional_participant", selectedOption);
+        setSelectedMahasiswa(selectedOption);
+        console.log("Mahasiswa Terpilih:", selectedOption);
+    };
+
+    const loadOptions = async (inputValue) => {
+        if (!inputValue) return [];
+
+        const response = await fetch(
+            `/api/v1/search-mahasiswa?search=${inputValue}`
+        );
+
+        const data = await response.json();
+
+        return data.map((user) => ({
+            label: user.name,
+            value: user.id,
+        }));
     };
 
     return (
@@ -204,15 +249,13 @@ export default function Index({ jadwals, ruangans }) {
                                     *
                                 </span>
                             </label>
-                            <InputText
+
+                            <Select
                                 className="w-full"
-                                id="jam_masuk"
-                                type="time"
-                                required
-                                onChange={(e) =>
-                                    setData("jam_masuk", e.target.value)
-                                }
-                                autoFocus
+                                options={options}
+                                onChange={handleChangeJamMasuk}
+                                placeholder="Pilih Jam"
+                                isSearchable // Bisa dicari
                             />
                             {errors.jam_masuk && (
                                 <small className="p-error">
@@ -232,16 +275,12 @@ export default function Index({ jadwals, ruangans }) {
                                     *
                                 </span>
                             </label>
-                            <InputText
+                            <Select
                                 className="w-full"
-                                id="jam_keluar"
-                                type="time"
-                                required
-                                step={0}
-                                onChange={(e) =>
-                                    setData("jam_keluar", e.target.value)
-                                }
-                                autoFocus
+                                options={options}
+                                onChange={handleChangeJamKeluar}
+                                placeholder="Pilih Jam"
+                                isSearchable // Bisa dicari
                             />
                             {errors.jam_keluar && (
                                 <small className="p-error">
@@ -301,19 +340,15 @@ export default function Index({ jadwals, ruangans }) {
                         className="font-bold"
                     >
                         Additional Participant
-                        <span className="text-danger" style={{ color: "red" }}>
-                            *
-                        </span>
                     </label>
                     <br />
-                    <InputTextarea
-                        autoResize
-                        value={data.additional_participant}
-                        onChange={(e) =>
-                            setData("additional_participant", e.target.value)
-                        }
-                        rows={3}
-                        cols={50}
+                    <AsyncSelect
+                        isMulti
+                        cacheOptions
+                        loadOptions={loadOptions}
+                        defaultOptions
+                        onChange={handleChangeParticipant}
+                        placeholder="Cari Mahasiswa..."
                     />
                     {errors.additional_participant && (
                         <small className="p-error">
@@ -436,6 +471,17 @@ export default function Index({ jadwals, ruangans }) {
                             header="Additional Participant"
                             filterPlaceholder="Search by additional_participant"
                             headerStyle={{ width: "25rem" }}
+                            body={(rowData) => {
+                                const data =
+                                    rowData.hak_akses.additional_participant ||
+                                    [];
+
+                                const result = data
+                                    .map((item) => item.label.toLowerCase())
+                                    .join(", ");
+
+                                return result;
+                            }}
                         />
                         <Column
                             headerClassName="fw-bold"

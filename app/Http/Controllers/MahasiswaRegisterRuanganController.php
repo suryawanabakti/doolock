@@ -43,10 +43,18 @@ class MahasiswaRegisterRuanganController extends Controller
             "jam_masuk" => ['required', 'before_or_equal:jam_keluar'],
             'skill' => ['required'],
             'tujuan' => ['required'],
-            'additional_participant' => ['required'],
+            'additional_participant' => ['nullable'],
         ]);
 
-        return  DB::transaction(function () use ($request) {
+        $hakAkses = HakAkses::where('ruangan_id', $request->ruangan_id)->whereHas('hakAksesMahasiswa', fn($q) => $q->where('mahasiswa_id', auth()->user()->mahasiswa->id))->where('is_approve', 0)->where('tanggal', $request->tanggal)->exists();
+
+        if ($hakAkses) {
+            return back()->withErrors([
+                "message" => "Kamu sudah mendaftar di ruangan ini untuk tanggal $request->tanggal . Harap Tunggu konfirmasi admin atau batalkan ",
+            ]);
+        }
+
+        return DB::transaction(function () use ($request) {
 
             $hakAkses = HakAkses::create([
                 'ruangan_id' => $request->ruangan_id,
@@ -73,8 +81,7 @@ class MahasiswaRegisterRuanganController extends Controller
                     SendEmailToAdminJob::dispatch($data->user->email_notifikasi, $hakAksesMahasiswa->load('hakAkses.ruangan', 'mahasiswa'));
                 });
             // KIRIM NOTIFIKASI EMAIL KE PENJAGA RUANGAN
-
-            return $hakAksesMahasiswa->load('hakAkses.ruangan');
+            return back();
         });
     }
 

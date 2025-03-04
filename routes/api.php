@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DoorLockController;
 use App\Http\Controllers\ReferenceController;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,3 +28,14 @@ Route::get('/v1/ambilpostpin', [DoorLockController::class, 'index2']);
 
 Route::get('/v1/get-data-mahasiswa-by-scanner', [ReferenceController::class, 'getMahasiswaByScanner']);
 Route::get('/v1/get-data-users', [ReferenceController::class, 'getUsers']);
+
+Route::get('/v1/search-mahasiswa', function (Request $request) {
+    return User::where('role', 'mahasiswa')
+        ->when($request->search, function ($q) use ($request) {
+            $q->where(function ($query) use ($request) {
+                $query->where('name', 'LIKE', "%{$request->search}%")
+                    ->orWhere('email', 'LIKE', "%{$request->search}%");
+            });
+        })
+        ->get();
+});

@@ -9,6 +9,11 @@ class HakAkses extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'additional_participant' => 'array', // Pastikan ini ada
+    ];
+
     public function hakAksesMahasiswa()
     {
         return $this->hasMany(HakAksesMahasiswa::class);
