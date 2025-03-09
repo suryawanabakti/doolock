@@ -46,13 +46,26 @@ class MahasiswaRegisterRuanganController extends Controller
             'additional_participant' => ['nullable'],
         ]);
 
-        $hakAkses = HakAkses::where('ruangan_id', $request->ruangan_id)->whereHas('hakAksesMahasiswa', fn($q) => $q->where('mahasiswa_id', auth()->user()->mahasiswa->id))->where('is_approve', 0)->where('tanggal', $request->tanggal)->exists();
+        $hakAkses = HakAkses::where('ruangan_id', $request->ruangan_id)->whereHas('hakAksesMahasiswa', fn($q) => $q->where('mahasiswa_id', auth()->user()->mahasiswa->id))->where('tanggal', $request->tanggal)->exists();
 
         if ($hakAkses) {
             return back()->withErrors([
                 "message" => "Kamu sudah mendaftar di ruangan ini untuk tanggal $request->tanggal . Harap Tunggu konfirmasi admin atau batalkan ",
             ]);
         }
+
+        $ruangan = Ruangan::find($request->ruangan_id);
+        $count = HakAkses::where('ruangan_id', $ruangan->id)->where('tanggal', $request->tanggal)->where('is_approve', 1)
+            ->count();
+
+        if ($count > $ruangan->max_register) {
+            return back()->withErrors([
+                "message" => "Ruangan penuh 🥲. Maximal Register Di Ruangan ini " . $ruangan->max_register,
+            ]);
+        }
+
+
+
 
         return DB::transaction(function () use ($request) {
 

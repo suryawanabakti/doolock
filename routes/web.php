@@ -19,6 +19,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use App\Jobs\ProcessLongTask;
 use App\Models\Mahasiswa;
+use App\Models\PenjagaRuangan;
+use App\Models\Ruangan;
 use App\Models\RuanganAkses;
 use App\Models\User;
 use Illuminate\Foundation\Application;
@@ -40,13 +42,9 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return redirect('/login');
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
 });
+
+
 
 
 Route::get('/show-ip', function () {
@@ -84,6 +82,30 @@ Route::get('/dataku', function (Request $request) {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/penjaga/ruangan', function (Request $request) {
+        $ruangan = Ruangan::find($request->id);
+        if (PenjagaRuangan::where('user_id', auth()->id())
+            ->where('ruangan_id', $ruangan->id)
+            ->exists()
+        ) {
+            $mahasiswas = Mahasiswa::where('ket', 'dsn')->get();
+            return Inertia::render("Penjaga/Ruangan/Index", ["ruangan" => $ruangan, "mahasiswas" => $mahasiswas]);
+        }
+        return abort(403);
+    })->name('penjaga.ruangan.show');
+
+    Route::put('/penjaga/ruangan/{ruangan}', function (Ruangan $ruangan, Request $request) {
+
+        if (PenjagaRuangan::where('user_id', auth()->id())
+            ->where('ruangan_id', $ruangan->id)
+            ->exists()
+        ) {
+            $ruangan->update($request->all());
+            return back();
+        }
+        return abort(403);
+    })->name('penjaga.ruangan.update');
+
     Route::middleware(['role:mahasiswa'])->group(function () {
         Route::get('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'index'])->name('mahasiswa.register.index');
         Route::post('/mahasiswa/register', [MahasiswaRegisterRuanganController::class, 'store'])->name('mahasiswa.register.store');
@@ -144,34 +166,27 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/riwayat', [RiwayatController::class, 'index'])->name('admin.riwayat.index');
         Route::get('/admin/riwayat/mahasiswa', [RiwayatController::class, 'mahasiswa'])->name('admin.riwayat.mahasiswa');
         Route::get('/admin/riwayat/ruangan', [RiwayatController::class, 'ruangan'])->name('admin.riwayat.ruangan');
-
         Route::get('/admin/riwayat-by-ruangan', [RiwayatByRuanganController::class, 'index'])->name('admin.riwayat-by-ruangan.index');
-
         Route::get('/admin/absensi', [AbsensiController::class, 'index'])->name('admin.absensi.index');
     });
 
-
     Route::get('/admin/riwayat/export', [RiwayatController::class, 'export'])->name('admin.riwayat.export');
-
 
     Route::post('/admin/ruangan-hak-akses', [RuanganHakAksesController::class, 'store'])->name('admin.ruangan-hak-akses.store');
     Route::get('/admin/riwayat-by-ruangan/export', [RiwayatByRuanganController::class, 'export'])->name('admin.riwayat-by-ruangan.export');
     Route::get('/admin/ruangan-hak-akses/get-mahasiswa', [RuanganHakAksesController::class, 'getMahasiswa'])->name('admin.ruangan-hak-akses.getMahasiswa');
     Route::delete('/admin/ruangan-hak-akses/{hakAkses}', [RuanganHakAksesController::class, 'destroy'])->name('admin.ruangan-hak-akses.destroy');
 
-
     // PENJAGA
     Route::patch('/penjaga/pendaftaran/{hakAkses}/unapprove', [PendaftaranJadwalController::class, 'unapprove'])->name('penjaga.pendaftaran.unapprove');
 
     Route::middleware(['role:penjaga', 'penjagaruangan'])->group(function () {
-
 
         Route::get('/penjaga/pendaftaran', [PendaftaranJadwalController::class, 'index'])->name('penjaga.pendaftaran.index');
         Route::patch('/penjaga/pendaftaran/{hakAksesMahasiswa}', [PendaftaranJadwalController::class, 'approve'])->name('penjaga.pendaftaran.approve');
 
         Route::post('/penjaga/pendaftaran/multi-approve', [PendaftaranJadwalController::class, 'multiApprove'])->name('penjaga.pendaftaran.multi-approve');
         Route::post('/penjaga/pendaftaran/multi-disapprove', [PendaftaranJadwalController::class, 'multiDisapprove'])->name('penjaga.pendaftaran.multi-disapprove');
-
 
         Route::get('/penjaga/pendaftaran-approve', [PendaftaranJadwalController::class, 'index2'])->name('penjaga.pendaftaran-approve.index');
         Route::get('/penjaga/pendaftaran-disapprove', [PendaftaranJadwalController::class, 'index3'])->name('penjaga.pendaftaran-disapprove.index');
@@ -181,7 +196,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/penjaga/riwayat', [RiwayatController::class, 'indexPenjaga'])->name('penjaga.riwayat.index');
         Route::get('/penjaga/riwayat/mahasiswa', [RiwayatController::class, 'mahasiswaPenjaga'])->name('penjaga.riwayat.mahasiswa');
         Route::get('/penjaga/riwayat/ruangan', [RiwayatController::class, 'ruanganPenjaga'])->name('penjaga.riwayat.ruangan');
-
         Route::get('/penjaga/absensi', [AbsensiController::class, 'indexPenjaga'])->name('penjaga.absensi.index');
     });
 
@@ -194,13 +208,8 @@ Route::get('/ambilpost', [DoorLockController::class, 'index']);
 Route::get('/ambilpostpin', [DoorLockController::class, 'index2']);
 Route::get('/ambilpin', [DoorLockController::class, 'index2']);
 
-
 Route::get('/uikit/button', function () {
     return Inertia::render('main/uikit/button/page');
 })->name('button');
-
-
-
-
 
 require __DIR__ . '/auth.php';

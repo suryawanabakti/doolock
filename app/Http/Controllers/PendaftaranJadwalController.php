@@ -44,6 +44,29 @@ class PendaftaranJadwalController extends Controller
     public function multiApprove(Request $request)
     {
         $customerIds = collect($request->selectedCustomers)->pluck('mahasiswa_id');
+        $selectedCustomers = $request->selectedCustomers[0];
+        $maxRegister = $selectedCustomers["hak_akses"]["ruangan"]["max_register"];
+
+        foreach ($request->selectedCustomers as $cs) {
+            $tanggal = $cs["hak_akses"]["tanggal"];
+            $sisaKuota = $maxRegister - HakAkses::where('ruangan_id', $cs["hak_akses"]["ruangan_id"])->where('tanggal', $cs["hak_akses"]["tanggal"])
+                ->where("is_approve", 1)
+                ->count();
+
+            $validasi = $sisaKuota - count($request->selectedCustomers);
+
+            if ($validasi < 0) {
+                return response()->json([
+                    "message" => "Ruangan Penuh pada tanggal " . $tanggal,
+                ], 422);
+            }
+        }
+
+
+
+
+
+
 
         // Ambil semua data mahasiswa beserta user terkait dalam satu query
         $mahasiswaList = Mahasiswa::with('user')

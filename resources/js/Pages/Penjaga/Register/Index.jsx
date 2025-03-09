@@ -105,8 +105,8 @@ export default function Index({ jadwals, ruangan }) {
                     alert("Berhasil multi approve");
                     location.reload();
                 } catch (e) {
-                    alert("error");
-                    console.log("ERROR", e);
+                    alert(e.response?.data?.message || e.message);
+                    console.log(e.response?.data?.message);
                 }
             },
             reject,

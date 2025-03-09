@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('hak_akses', function (Blueprint $table) {
+        Schema::table('ruangans', function (Blueprint $table) {
             $table->integer('max_register')->default(10);
+            $table->foreignId('mahasiswa_id')->nullable()->constrained('mahasiswa')->cascadeOnDelete(); // Penanggung Jawab Dosen
         });
     }
 
@@ -21,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('hak_akses', function (Blueprint $table) {
+        Schema::table('ruangans', function (Blueprint $table) {
             //
         });
     }

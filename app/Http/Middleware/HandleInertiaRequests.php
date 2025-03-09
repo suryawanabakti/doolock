@@ -90,6 +90,13 @@ class HandleInertiaRequests extends Middleware
                                 "id" => $data->ruangan_id
                             ])
                         ],
+                        [
+                            "label" => "Ruangan",
+                            "icon" => "pi pi-home",
+                            "to" => route("penjaga.ruangan.show",  [
+                                "id" => $data->ruangan_id
+                            ])
+                        ],
                     ]
                 ];
             });
