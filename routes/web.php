@@ -40,6 +40,11 @@ use Inertia\Inertia;
 |
 */
 
+
+Route::get('/test', function () {
+    return "TESTER";
+});
+
 Route::get('/', function () {
     return redirect('/login');
 });
