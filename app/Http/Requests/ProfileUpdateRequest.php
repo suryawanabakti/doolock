@@ -16,6 +16,7 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'nowa' => ['required',  Rule::unique('users')->ignore(auth()->id())],
             'email_notifikasi' => ['required', 'email', Rule::unique('users')->ignore(auth()->id())],
             'image' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
         ];

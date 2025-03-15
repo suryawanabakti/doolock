@@ -32,11 +32,14 @@ class ProfileController extends Controller
     {
         User::where('id', $request->user()->id)
             ->update([
+                'nowa' => $request->nowa,
                 'email_notifikasi' => $request->email_notifikasi,
             ]);
+
         if ($request->image) {
             $request->user()->updateProfilePhoto($request->image);
         }
+
         return Redirect::route('profile.edit');
     }
 

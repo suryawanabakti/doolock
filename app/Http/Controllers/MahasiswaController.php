@@ -7,6 +7,7 @@ use App\Http\Requests\MahasiswaUpdateRequest;
 use App\Imports\MahasiswaImport;
 use App\Models\Mahasiswa;
 use App\Models\Ruangan;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -86,6 +87,14 @@ class MahasiswaController extends Controller
         $data = $request->validated();
         $data['ket'] = 'mhs';
 
+        $user = User::create([
+            'name' => $request->nama,
+            'email' => $request->nim,
+            'password' => bcrypt($request->nim),
+            'role' => 'mahasiswa'
+        ]);
+
+        $data['user_id'] = $user->id;
         $mahasiswa = Mahasiswa::create($data);
 
         return $this->formatMahasiswaResponse($mahasiswa);

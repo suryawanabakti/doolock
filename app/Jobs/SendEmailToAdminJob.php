@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotificationRegisterToMahasiswa;
+use App\Services\Fonnte;
 
 class SendEmailToAdminJob implements ShouldQueue
 {
@@ -25,7 +26,7 @@ class SendEmailToAdminJob implements ShouldQueue
      * @param $mahasiswa
      * @param $customer
      */
-    public function __construct(public $email, public $hakAksesMahasiswa) {}
+    public function __construct(public $user, public $hakAksesMahasiswa) {}
 
     /**
      * Execute the job.
@@ -34,7 +35,18 @@ class SendEmailToAdminJob implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to($this->email)->send(
+        //         <H1>Halo Admin Ruangan {{ $data->hakAkses->ruangan->nama_ruangan }}</H1>
+        // <p>Ada mahasiswa yang mendaftar di ruangan anda</p>
+
+        // <p>Nama : {{ $data->mahasiswa->nama }}</p>
+        // <p>NIM : {{ $data->mahasiswa->nim }}</p>
+        // <p>Ruangan : {{ $data->hakAkses->ruangan->nama_ruangan ?? null }} </p>
+        // <p>Jam Masuk : {{ $data->hakAkses->jam_masuk }}</p>
+        // <p>Jam Keluar : {{ $data->hakAkses->jam_keluar }} </p>
+
+        Fonnte::sendWa($this->user->nowa, "Halo Admin " . $this->hakAksesMahasiswa->hakAkses->ruangan->nama_ruangan . " Mahasiswa baru saja mendaftar" . "\n\nNama: " . $this->hakAksesMahasiswa->mahasiswa->nama . "\nNim: " . $this->hakAksesMahasiswa->mahasiswa->nim);
+
+        Mail::to($this->user->email_notifikasi)->send(
             new NotificationRegisterToAdmin(
                 $this->hakAksesMahasiswa
             )

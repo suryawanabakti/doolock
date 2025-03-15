@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotificationRegisterToMahasiswa;
+use App\Services\Fonnte;
 
 class SendEmailToMahasiswa implements ShouldQueue
 {
@@ -40,6 +41,11 @@ class SendEmailToMahasiswa implements ShouldQueue
     {
         if ($this->mahasiswa->user->email_notifikasi) {
             if ($this->status == "approve") {
+
+                // Fonnte::sendWa("081244067445", "TESTTTER");
+
+                Fonnte::sendWa($this->mahasiswa->user->nowa, "Halo " . $this->mahasiswa->user->name . " Terima kasih telah mendaftar di ruangan" . $this->customer["hak_akses"]["ruangan"]["nama_ruangan"] . "\n\nTanggal: " . $this->customer["hak_akses"]["tanggal"] . "\nJadwal : " . $this->customer["hak_akses"]["jam_masuk"] .  "~" . $this->customer["hak_akses"]["jam_keluar"]);
+
                 Mail::to($this->mahasiswa->user->email_notifikasi)
                     ->send(new NotificationRegisterToMahasiswa($this->customer));
             } else {

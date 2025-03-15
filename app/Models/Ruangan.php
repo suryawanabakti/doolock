@@ -9,7 +9,9 @@ class Ruangan extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
-
+    protected $casts = [
+        'penanggung_jawab' => 'array',
+    ];
     public function hakAksesOne()
     {
         return $this->hasOne(HakAkses::class);

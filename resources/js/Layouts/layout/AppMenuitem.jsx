@@ -115,7 +115,6 @@ const AppMenuitem = (props) => {
                     })}
                     tabIndex={0}
                     preserveScroll={true}
-                 
                 >
                     <i
                         className={classNames(

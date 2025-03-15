@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotificationRegisterToMahasiswa;
+use App\Services\Fonnte;
 
 class SendEmailJamPulangToMahasiswa implements ShouldQueue
 {
@@ -38,6 +39,8 @@ class SendEmailJamPulangToMahasiswa implements ShouldQueue
     public function handle()
     {
         if ($this->mahasiswa->user->email_notifikasi) {
+            $namaRuangan = $this->customer['hak_akses']['ruangan']['nama_ruangan'] ?? null;
+            Fonnte::sendWa($this->mahasiswa->user->nowa, "Jam pulang $namaRuangan  sisa 10 menit lagi\nHarap keluar sebelum pintu terkunci");
             Mail::to($this->mahasiswa->user->email_notifikasi)
                 ->send(new NotificationJamPulangToMahasiswa($this->customer));
         }

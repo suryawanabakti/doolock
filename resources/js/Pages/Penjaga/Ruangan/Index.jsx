@@ -4,14 +4,40 @@ import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { useForm } from "@inertiajs/react";
+import AsyncSelect from "react-select/async";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const RuanganUpdate = ({ ruangan, mahasiswas }) => {
+    const loadOptions = async (inputValue) => {
+        if (!inputValue) return [];
+
+        const response = await fetch(
+            `/api/v1/search-dosen?search=${inputValue}`
+        );
+
+        const data = await response.json();
+
+        return data.map((user) => ({
+            label: user.name,
+            value: user.id,
+        }));
+    };
+
+    const [selectedDosen, setSelectedDosen] = useState(null);
+
     const { data, setData, put, processing, errors } = useForm({
         max_register: ruangan.max_register || 10,
         jam_buka: ruangan.jam_buka || "00:01",
         jam_tutup: ruangan.jam_tutup || "23:59",
         mahasiswa_id: ruangan.mahasiswa_id || null,
+        penanggung_jawab: ruangan.penanggung_jawab || null,
     });
+
+    const handleChangeParticipant = (selectedOption) => {
+        setData("penanggung_jawab", selectedOption);
+        setSelectedDosen(selectedOption);
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -21,6 +47,9 @@ const RuanganUpdate = ({ ruangan, mahasiswas }) => {
         });
     };
 
+    useEffect(() => {
+        setSelectedDosen(ruangan.penanggung_jawab);
+    }, []);
     return (
         <Layout>
             <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -112,27 +141,28 @@ const RuanganUpdate = ({ ruangan, mahasiswas }) => {
                                     className="w-full p-2 border rounded-md"
                                 />
                             </div>
-
                             <div className="field">
                                 <label
-                                    htmlFor="mahasiswa_id"
-                                    className="font-semibold"
+                                    htmlFor="additional_participant"
+                                    className="font-bold"
                                 >
-                                    Pilih Dosen Penanggung Jawab
+                                    Dosen Penanggung Jawab
                                 </label>
-                                <Dropdown
-                                    id="mahasiswa_id"
-                                    value={data.mahasiswa_id}
-                                    options={mahasiswas.map((m) => ({
-                                        label: m.nama,
-                                        value: m.id,
-                                    }))}
-                                    onChange={(e) =>
-                                        setData("mahasiswa_id", e.value)
-                                    }
-                                    placeholder="Pilih Mahasiswa"
-                                    className="w-full  border rounded-md"
+                                <AsyncSelect
+                                    isMulti
+                                    cacheOptions
+                                    loadOptions={loadOptions}
+                                    defaultOptions
+                                    value={selectedDosen}
+                                    onChange={handleChangeParticipant}
+                                    placeholder="Cari Dosen Penanggung jawab..."
+                                    className="w-full"
                                 />
+                                {errors.additional_participant && (
+                                    <small className="p-error">
+                                        {errors.additional_participant}
+                                    </small>
+                                )}
                             </div>
 
                             <Button

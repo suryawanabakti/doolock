@@ -1,125 +1,89 @@
+"use client";
+
 import Layout from "@/Layouts/layout/layout";
-import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Toolbar } from "primereact/toolbar";
-import React from "react";
-import { useState } from "react";
-
-import { Dialog } from "primereact/dialog";
+import { useState, useRef } from "react";
+import { Link } from "@inertiajs/react";
 import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
-import { Link, useForm } from "@inertiajs/react";
-import { RadioButton } from "primereact/radiobutton";
-import axios from "axios";
-import { Badge } from "primereact/badge";
-import { useRef } from "react";
 import { Toast } from "primereact/toast";
-import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
-import { Checkbox } from "primereact/checkbox";
+import { Tag } from "primereact/tag";
+import { Card } from "primereact/card";
+import { Badge } from "primereact/badge";
+import { FilterMatchMode } from "primereact/api";
 
 export default function Index2({ jadwals }) {
-    const [dataJadwals, setDataJadwals] = useState(jadwals);
-    const { data, setData, errors } = useForm({
-        ruangan_id: "",
-        tanggal: "",
-        jam_masuk: "",
-        jam_keluar: "",
+    // State management
+    const [dataJadwals] = useState(jadwals);
+    const [filters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
-    const reject = () => {
-        toast.current.show({
-            severity: "warn",
-            summary: "Rejected",
-            detail: "You have rejected",
-            life: 3000,
-        });
-    };
-    const [dialogNew, setDialogNew] = useState(false);
-    const selectedCountryTemplate = (option, props) => {
-        if (option) {
-            return (
-                <div className="flex align-items-center">
-                    <div>{option.name}</div>
-                </div>
-            );
-        }
+    const [globalFilter, setGlobalFilter] = useState("");
 
-        return <span>{props.placeholder}</span>;
+    // Refs
+    const toast = useRef(null);
+
+    // Handlers
+    const onInputSearch = (e) => {
+        setGlobalFilter(e.target.value);
     };
-    const countryOptionTemplate = (option) => {
+
+    // Render schedule information template
+    const scheduleTemplate = (rowData) => {
         return (
-            <div className="flex align-items-center">
-                <div>{option.name}</div>
+            <div className="flex flex-column">
+                <span className="mb-1">
+                    <i className="pi pi-calendar mr-2"></i>
+                    {rowData.hak_akses.tanggal}
+                </span>
+                <span className="mb-1">
+                    <i className="pi pi-clock mr-2"></i>
+                    {rowData.hak_akses.jam_masuk} -{" "}
+                    {rowData.hak_akses.jam_keluar}
+                </span>
             </div>
         );
     };
-    const [selectedCountry, setSelectedCountry] = useState(null);
-    const openNewDialog = (e) => {
-        e.preventDefault();
-        setDialogNew(true);
-    };
-    const handleSave = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await axios.post(route("mahasiswa.register.store"), {
-                ruangan_id: data.ruangan_id,
-                day: data.day,
-                jam_masuk: data.jam_masuk,
-                jam_keluar: data.jam_keluar,
-            });
-            console.log("RESPON", res);
 
-            const updatedData = [res.data, ...dataJadwals];
-            setDataJadwals(updatedData);
-            setDialogNew(false);
-        } catch (error) {
-            console.log(error);
-            alert("Error");
+    // Render participants template with improved styling
+    const participantsTemplate = (rowData) => {
+        const participants = rowData.hak_akses.additional_participant || [];
+
+        if (participants.length === 0) {
+            return <span className="text-color-secondary">Tidak ada</span>;
         }
+
+        return (
+            <div className="flex flex-wrap gap-1">
+                {participants.map((participant, index) => (
+                    <Tag
+                        key={index}
+                        value={participant.label}
+                        severity="info"
+                        className="mr-1 mb-1"
+                    />
+                ))}
+            </div>
+        );
     };
-    const toast = useRef(null);
-    const handleDayChange = (e) => {
-        const selectedDay = e.value;
-        const updatedDays = data.day.includes(selectedDay)
-            ? data.day.filter((day) => day !== selectedDay)
-            : [...data.day, selectedDay];
-        setData("day", updatedDays);
-    };
-    const confirm2 = (event, rowData) => {
-        confirmPopup({
-            target: event.currentTarget,
-            message: "Do you want to delete this record?",
-            icon: "pi pi-info-circle",
-            defaultFocus: "reject",
-            acceptClassName: "p-button-danger",
-            accept: async () => {
-                try {
-                    await axios.delete(
-                        route("mahasiswa.register.destroy", rowData.id)
-                    );
-                    toast.current.show({
-                        severity: "info",
-                        summary: "Confirmed",
-                        detail: "You have deleted " + rowData.nama,
-                        life: 3000,
-                    });
-                    const updatedUsers = dataJadwals.filter(
-                        (user) => user.id !== rowData.id
-                    );
-                    // Update the state with the new array
-                    setDataJadwals(updatedUsers);
-                } catch (e) {
-                    toast.current.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: "You have error deleted " + e.message,
-                        life: 3000,
-                    });
-                }
-            },
-            reject,
-        });
-    };
+
+    // Header template for the DataTable
+    const headerTemplate = () => (
+        <div className="flex flex-wrap justify-content-between align-items-center gap-2">
+            <h5 className="m-0">
+                Pendaftaran Jadwal{" "}
+                <Badge value="Disetujui" severity="success" />
+            </h5>
+            <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText
+                    value={globalFilter}
+                    onChange={onInputSearch}
+                    placeholder="Cari..."
+                />
+            </span>
+        </div>
+    );
 
     return (
         <Layout>
@@ -127,69 +91,67 @@ export default function Index2({ jadwals }) {
 
             <div className="grid">
                 <div className="col-12">
-                    <DataTable
-                        className="mb-3"
-                        header={() => (
-                            <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
-                                <h5 className="mt-3">
-                                    Pendaftaran Jadwal{" "}
-                                    <b className="text-green-500">Sudah</b> di
-                                    approve
-                                </h5>
-                                <span className="p-input-icon-left">
-                                    <i className="pi pi-search" />
-                                    <InputText
-                                        type="search"
-                                        onInput={(e) => onInputSearch(e)}
-                                        placeholder="Global Search"
-                                    />
-                                </span>
-                            </div>
-                        )}
-                        value={dataJadwals}
-                        rowsPerPageOptions={[5, 10, 25]}
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                    >
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.ruangan.nama_ruangan"
-                            header="Ruangan"
-                            sortable
-                            filterPlaceholder="Search by ruangan_id"
-                            headerStyle={{ width: "20rem" }}
-                        />
+                    <Card>
+                        <DataTable
+                            value={dataJadwals}
+                            paginator
+                            rows={10}
+                            filters={filters}
+                            globalFilter={globalFilter}
+                            header={headerTemplate}
+                            emptyMessage="Tidak ada jadwal yang disetujui"
+                            rowsPerPageOptions={[5, 10, 25]}
+                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                            currentPageReportTemplate="Menampilkan {first} sampai {last} dari {totalRecords} jadwal"
+                            responsiveLayout="scroll"
+                            className="p-datatable-gridlines"
+                            stripedRows
+                        >
+                            <Column
+                                field="hak_akses.ruangan.nama_ruangan"
+                                header="Ruangan"
+                                sortable
+                                style={{ minWidth: "12rem" }}
+                            />
+                            <Column
+                                header="Jadwal"
+                                body={scheduleTemplate}
+                                sortable
+                                sortField="hak_akses.tanggal"
+                                style={{ minWidth: "14rem" }}
+                            />
+                            <Column
+                                field="hak_akses.skill"
+                                header="Skill"
+                                sortable
+                                style={{ minWidth: "15rem" }}
+                            />
+                            <Column
+                                field="hak_akses.tujuan"
+                                header="Tujuan"
+                                sortable
+                                style={{ minWidth: "15rem" }}
+                            />
+                            <Column
+                                header="Peserta Tambahan"
+                                body={participantsTemplate}
+                                style={{ minWidth: "15rem" }}
+                            />
+                        </DataTable>
 
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.tanggal"
-                            header="Tanggal"
-                            sortable
-                            filterPlaceholder="Search by hari"
-                            headerStyle={{ width: "10rem" }}
-                        />
-
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.jam_masuk"
-                            header="Jam Masuk"
-                            sortable
-                            filterPlaceholder="Search by Masuk"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.jam_keluar"
-                            header="Jam Keluar"
-                            sortable
-                            filterPlaceholder="Search by keluar"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                    </DataTable>
-
-                    <Link href={route("mahasiswa.register.index")}>
-                        Lihat Jadwal yang <b>belum</b> di approve
-                    </Link>
+                        <div className="mt-4">
+                            <Link
+                                href={route("mahasiswa.register.index")}
+                                className="flex align-items-center text-primary"
+                            >
+                                <i className="pi pi-clock mr-2"></i>
+                                Lihat Jadwal yang <b className="ml-1">
+                                    belum
+                                </b>{" "}
+                                di approve
+                            </Link>
+                        </div>
+                    </Card>
                 </div>
             </div>
         </Layout>

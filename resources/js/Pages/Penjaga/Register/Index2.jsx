@@ -1,45 +1,45 @@
+"use client";
+
 import Layout from "@/Layouts/layout/layout";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Toolbar } from "primereact/toolbar";
-import React from "react";
-import { useState } from "react";
-
-import { Dialog } from "primereact/dialog";
+import { useState, useRef } from "react";
 import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
-import { useForm } from "@inertiajs/react";
-import { RadioButton } from "primereact/radiobutton";
 import axios from "axios";
 import { Badge } from "primereact/badge";
-import { useRef } from "react";
 import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { FilterMatchMode } from "primereact/api";
+import { Card } from "primereact/card";
 
 export default function Index2({ jadwals, ruangan }) {
+    // State management
     const [filters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
     const [globalFilter, setGlobalFilter] = useState("");
-    const onInputSearch = (e) => {
-        var value = e.target.value;
-        setGlobalFilter(value);
-    };
     const [dataJadwals, setDataJadwals] = useState(jadwals);
+
+    // Refs
+    const toast = useRef(null);
+
+    // Handlers
+    const onInputSearch = (e) => {
+        setGlobalFilter(e.target.value);
+    };
 
     const reject = () => {
         toast.current.show({
             severity: "warn",
-            summary: "Rejected",
-            detail: "You have rejected",
+            summary: "Dibatalkan",
+            detail: "Operasi dibatalkan",
             life: 3000,
         });
     };
 
-    const toast = useRef(null);
-    const confirm2 = (event, rowData) => {
+    // Unapprove a schedule
+    const handleUnapprove = (event, rowData) => {
         confirmPopup({
             target: event.currentTarget,
             message: "Apakah anda yakin membatalkan pendaftaran jadwal ini?",
@@ -48,28 +48,26 @@ export default function Index2({ jadwals, ruangan }) {
             acceptClassName: "p-button-warning",
             accept: async () => {
                 try {
-                    const res = await axios.patch(
+                    await axios.patch(
                         route("penjaga.pendaftaran.unapprove", rowData.id)
                     );
-                    console.log(res);
+
                     toast.current.show({
                         severity: "success",
-                        summary: "Confirmed",
-                        detail: "You have Un Approve ",
+                        summary: "Berhasil",
+                        detail: "Jadwal berhasil dibatalkan",
                         life: 3000,
                     });
 
+                    // Remove the unapproved item from the table
                     setDataJadwals((prevData) =>
                         prevData.filter((user) => user.id !== rowData.id)
                     );
                 } catch (e) {
-                    console.log("ERROR", e);
                     toast.current.show({
                         severity: "error",
                         summary: "Error",
-                        detail:
-                            "You have error deleted " +
-                                e.response?.data?.message || e.message,
+                        detail: e.response?.data?.message || e.message,
                         life: 3000,
                     });
                 }
@@ -78,6 +76,66 @@ export default function Index2({ jadwals, ruangan }) {
         });
     };
 
+    // Action button template - keeping the original as requested
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <Button
+                icon="pi pi-undo"
+                rounded
+                outlined
+                severity="warning"
+                onClick={(event) => handleUnapprove(event, rowData)}
+                tooltip="Batalkan Persetujuan"
+                tooltipOptions={{ position: "top" }}
+            />
+        );
+    };
+
+    // Header template for the DataTable
+    const headerTemplate = () => (
+        <div className="flex flex-wrap justify-content-between align-items-center gap-2">
+            <h5 className="m-0">
+                Pendaftaran Jadwal{" "}
+                <Badge value="Disetujui" severity="success" />
+            </h5>
+            <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText
+                    value={globalFilter}
+                    onChange={onInputSearch}
+                    placeholder="Cari..."
+                />
+            </span>
+        </div>
+    );
+    // Render mahasiswa information template
+    const mahasiswaTemplate = (rowData) => {
+        return (
+            <div className="flex flex-column">
+                <span className="font-bold mb-1">{rowData.mahasiswa.nama}</span>
+                <span className="text-sm text-color-secondary">
+                    NIM: {rowData.mahasiswa.nim}
+                </span>
+            </div>
+        );
+    };
+
+    // Render schedule information template
+    const scheduleTemplate = (rowData) => {
+        return (
+            <div className="flex flex-column">
+                <span className="mb-1">
+                    <i className="pi pi-calendar mr-2"></i>
+                    {rowData.hak_akses.tanggal}
+                </span>
+                <span className="mb-1">
+                    <i className="pi pi-clock mr-2"></i>
+                    {rowData.hak_akses.jam_masuk} -{" "}
+                    {rowData.hak_akses.jam_keluar}
+                </span>
+            </div>
+        );
+    };
     return (
         <Layout>
             <Toast ref={toast} />
@@ -85,103 +143,63 @@ export default function Index2({ jadwals, ruangan }) {
 
             <div className="grid">
                 <div className="col-12">
-                    <h4>{ruangan.nama_ruangan}</h4>
-                    <DataTable
-                        value={dataJadwals}
-                        rowsPerPageOptions={[5, 10, 25]}
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                        globalFilter={globalFilter}
-                        filters={filters}
-                        header={() => (
-                            <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
-                                <h5 className="mt-3">
-                                    Pendaftaran Jadwal{" "}
-                                    <b className="text-green-500">Sudah</b> di
-                                    approve
-                                </h5>
-                                <span className="p-input-icon-left">
-                                    <i className="pi pi-search" />
-                                    <InputText
-                                        type="search"
-                                        onInput={(e) => onInputSearch(e)}
-                                        placeholder="Global Search"
-                                    />
-                                </span>
-                            </div>
-                        )}
-                    >
-                        <Column
-                            headerClassName="fw-bold"
-                            field="mahasiswa.nim"
-                            header="NIM"
-                            sortable
-                            filterPlaceholder="Search by  nim"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="mahasiswa.nama"
-                            header="Nama"
-                            sortable
-                            filterPlaceholder="Search by mahasiswa"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.ruangan.nama_ruangan"
-                            header="Ruangan"
-                            sortable
-                            filterPlaceholder="Search by ruangan_id"
-                            headerStyle={{ width: "20rem" }}
-                        />
+                    <Card title={ruangan.nama_ruangan} className="mb-4">
+                        <DataTable
+                            value={dataJadwals}
+                            paginator
+                            rows={10}
+                            filters={filters}
+                            globalFilter={globalFilter}
+                            header={headerTemplate}
+                            emptyMessage="Tidak ada jadwal yang disetujui"
+                            rowsPerPageOptions={[5, 10, 25]}
+                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                            currentPageReportTemplate="Menampilkan {first} sampai {last} dari {totalRecords} jadwal"
+                            responsiveLayout="scroll"
+                            className="p-datatable-gridlines"
+                            stripedRows
+                        >
+                            <Column
+                                header="Mahasiswa"
+                                body={mahasiswaTemplate}
+                                sortable
+                                sortField="mahasiswa.nama"
+                                style={{ minWidth: "14rem" }}
+                            />
+                            <Column
+                                header="Jadwal"
+                                body={scheduleTemplate}
+                                sortable
+                                sortField="hak_akses.tanggal"
+                                style={{ minWidth: "14rem" }}
+                            />
+                            <Column
+                                field="hak_akses.tujuan"
+                                header="Tujuan"
+                                sortable
+                                style={{ minWidth: "12rem" }}
+                            />
+                            <Column
+                                field="hak_akses.skill"
+                                header="Skill"
+                                sortable
+                                style={{ minWidth: "10rem" }}
+                            />
+                            {/* <Column
+                                field="hak_akses.additional_participant"
+                                header="Participant"
+                                sortable
 
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.tanggal"
-                            header="Tanggal"
-                            sortable
-                            filterPlaceholder="Search by tanggal"
-                            headerStyle={{ width: "10rem" }}
-                        />
-
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.jam_masuk"
-                            header="Jam Masuk"
-                            sortable
-                            filterPlaceholder="Search by Masuk"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.jam_keluar"
-                            header="Jam Keluar"
-                            sortable
-                            filterPlaceholder="Search by keluar"
-                            headerStyle={{ width: "20rem" }}
-                        />
-
-                        <Column
-                            headerClassName="fw-bold"
-                            field="action"
-                            header="Aksi"
-                            body={(rowData) => {
-                                return (
-                                    <Button
-                                        icon="pi pi-undo"
-                                        rounded
-                                        outlined
-                                        severity="warning"
-                                        onClick={(event) =>
-                                            confirm2(event, rowData)
-                                        }
-                                    />
-                                );
-                            }}
-                            headerStyle={{ width: "15rem" }}
-                        />
-                    </DataTable>
+                                style={{ minWidth: "10rem" }}
+                            /> */}
+                            <Column
+                                body={actionBodyTemplate}
+                                header="Aksi"
+                                style={{ minWidth: "8rem" }}
+                                exportable={false}
+                            />
+                        </DataTable>
+                    </Card>
                 </div>
             </div>
         </Layout>

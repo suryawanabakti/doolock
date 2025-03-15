@@ -16,6 +16,7 @@ export default function UpdateProfileInformation({
         useForm({
             name: user.name,
             email_notifikasi: user.email_notifikasi,
+            nowa: user.nowa,
             image: null,
         });
 
@@ -66,6 +67,20 @@ export default function UpdateProfileInformation({
                         Berhasil update profile 🎉🎉.
                     </p>
                 </Transition>
+                <div className="field">
+                    <label className="block text-sm font-medium">
+                        Nomor Whatsapp Aktif{" "}
+                        <span className="text-red-500">*</span>
+                    </label>
+                    <InputText
+                        type="text"
+                        className="block w-full text-sm "
+                        value={data.nowa}
+                        onChange={(e) => setData("nowa", e.target.value)}
+                        placeholder="Masukkan WA Untuk Notifikasi...."
+                    />
+                    <InputError message={errors.nowa} className="mt-2" />
+                </div>
                 <div className="field">
                     <label className="block text-sm font-medium">
                         Email <span className="text-red-500">*</span>

@@ -1,15 +1,30 @@
+"use client";
+
 import { useContext } from "react";
 import AppMenuitem from "./AppMenuitem";
 import { LayoutContext } from "./context/layoutcontext";
 import { MenuProvider } from "./context/menucontext";
 import { usePage } from "@inertiajs/react";
 import { useState } from "react";
+import { InputText } from "primereact/inputtext";
 
 const AppMenu = () => {
     const { layoutConfig } = useContext(LayoutContext);
     const { auth } = usePage().props;
     const user = auth.user;
     const daftarRuangan = auth.daftarRuangan;
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const filteredRuangan =
+        searchTerm.trim() === ""
+            ? daftarRuangan
+            : daftarRuangan.filter(
+                  (item) =>
+                      item.label &&
+                      item.label
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase())
+              );
 
     const menuItems = {
         super: [
@@ -177,7 +192,9 @@ const AppMenu = () => {
     };
 
     const renderMenuItems = (role) => {
-        return menuItems[role]?.map((item, i) =>
+        const itemsToRender =
+            role === "penjaga" ? filteredRuangan : menuItems[role];
+        return itemsToRender?.map((item, i) =>
             !item?.separator ? (
                 <AppMenuitem
                     item={item}
@@ -193,11 +210,17 @@ const AppMenu = () => {
 
     return (
         <MenuProvider>
-            <ul className="layout-menu">
-                {/* <input type="search" onKeyDown={handleChange} /> */}
+            {user.role === "penjaga" && (
+                <InputText
+                    type="search"
+                    placeholder="Cari Nama Ruangan..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full"
+                />
+            )}
 
-                {renderMenuItems(user.role)}
-            </ul>
+            <ul className="layout-menu">{renderMenuItems(user.role)}</ul>
         </MenuProvider>
     );
 };

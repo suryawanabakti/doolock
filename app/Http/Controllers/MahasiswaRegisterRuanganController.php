@@ -91,7 +91,7 @@ class MahasiswaRegisterRuanganController extends Controller
                 ->get();
             $penjagaRuangan->filter(fn($data) => $data->user && $data->user->email_notifikasi)
                 ->each(function ($data) use ($hakAksesMahasiswa) {
-                    SendEmailToAdminJob::dispatch($data->user->email_notifikasi, $hakAksesMahasiswa->load('hakAkses.ruangan', 'mahasiswa'));
+                    SendEmailToAdminJob::dispatch($data->user, $hakAksesMahasiswa->load('hakAkses.ruangan', 'mahasiswa'));
                 });
             // KIRIM NOTIFIKASI EMAIL KE PENJAGA RUANGAN
             return back();

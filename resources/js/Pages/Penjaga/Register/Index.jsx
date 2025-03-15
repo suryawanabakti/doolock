@@ -1,43 +1,67 @@
+"use client";
+
 import Layout from "@/Layouts/layout/layout";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Toolbar } from "primereact/toolbar";
-import React from "react";
-import { useState } from "react";
-
-import { Dialog } from "primereact/dialog";
+import { useState, useRef } from "react";
 import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
-import { useForm } from "@inertiajs/react";
-import { RadioButton } from "primereact/radiobutton";
 import axios from "axios";
 import { Badge } from "primereact/badge";
-import { useRef } from "react";
 import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { FilterMatchMode } from "primereact/api";
+import { Card } from "primereact/card";
+import { Tag } from "primereact/tag";
 
 export default function Index({ jadwals, ruangan }) {
+    const participantsTemplate = (rowData) => {
+        const participants = rowData.hak_akses.additional_participant || [];
+        console.log("PARTIICPANT", participants);
+        if (participants.length === 0) {
+            return <span className="text-color-secondary">Tidak ada</span>;
+        }
+
+        return (
+            <div className="flex flex-wrap gap-1">
+                {participants.map((participant, index) => (
+                    <Tag
+                        key={index}
+                        value={participant.label}
+                        severity="info"
+                        className="mr-1 mb-1"
+                    />
+                ))}
+            </div>
+        );
+    };
+    // Get ruangan_id from URL params
     const searchParams = new URLSearchParams(window.location.search);
     const ruangan_id = searchParams.get("id");
 
+    // State management
     const [filters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
     const [globalFilter, setGlobalFilter] = useState("");
-    const onInputSearch = (e) => {
-        var value = e.target.value;
-        setGlobalFilter(value);
-    };
     const [dataJadwals, setDataJadwals] = useState(jadwals);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
 
-    const reject = () => {};
-
+    // Refs
     const toast = useRef(null);
 
-    const confirm2 = (event, rowData) => {
+    // Handlers
+    const onInputSearch = (e) => {
+        setGlobalFilter(e.target.value);
+    };
+
+    const reject = () => {
+        // Empty reject function for confirmPopup
+    };
+
+    // Approve a single schedule
+    const handleApprove = (event, rowData) => {
         confirmPopup({
             target: event.currentTarget,
             message: "Apakah anda yakin menyutujui pendaftaran jadwal ini?",
@@ -52,25 +76,23 @@ export default function Index({ jadwals, ruangan }) {
                             ruangan_id: ruangan_id,
                         }
                     );
-                    console.log(res);
+
                     toast.current.show({
                         severity: "success",
-                        summary: "Confirmed",
-                        detail: "You have approve ",
+                        summary: "Berhasil",
+                        detail: "Jadwal berhasil disetujui",
                         life: 3000,
                     });
 
+                    // Remove the approved item from the table
                     setDataJadwals((prevData) =>
                         prevData.filter((user) => user.id !== rowData.id)
                     );
                 } catch (e) {
-                    console.log("ERROR", e);
                     toast.current.show({
                         severity: "error",
                         summary: "Error",
-                        detail:
-                            "You have error deleted " +
-                                e.response?.data?.message || e.message,
+                        detail: e.response?.data?.message || e.message,
                         life: 3000,
                     });
                 }
@@ -78,75 +100,152 @@ export default function Index({ jadwals, ruangan }) {
             reject,
         });
     };
+
+    // Approve multiple schedules
     const multiApprove = (e) => {
         e.preventDefault();
         confirmPopup({
-            target: event.currentTarget,
+            target: e.currentTarget,
             message: "Apakah anda yakin menyutujui pendaftaran jadwal ini?",
             icon: "pi pi-info-circle",
             defaultFocus: "reject",
             acceptClassName: "p-button-success",
             accept: async () => {
                 try {
-                    const res = await axios.post(
+                    await axios.post(
                         route("penjaga.pendaftaran.multi-approve"),
                         {
                             selectedCustomers: selectedCustomers,
                             ruangan_id: ruangan_id,
                         }
                     );
-                    console.log("RES", res.data);
+
                     toast.current.show({
                         severity: "success",
-                        summary: "Confirmed",
-                        detail: "You have approve ",
+                        summary: "Berhasil",
+                        detail: `${selectedCustomers.length} jadwal berhasil disetujui`,
                         life: 3000,
                     });
-                    alert("Berhasil multi approve");
+
+                    // Reload the page to refresh data
                     location.reload();
                 } catch (e) {
-                    alert(e.response?.data?.message || e.message);
-                    console.log(e.response?.data?.message);
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: e.response?.data?.message || e.message,
+                        life: 3000,
+                    });
                 }
             },
             reject,
         });
     };
 
+    // Disapprove multiple schedules
     const multiDisapprove = (e) => {
         e.preventDefault();
         confirmPopup({
-            target: event.currentTarget,
+            target: e.currentTarget,
             message: "Apakah anda yakin menolak pendaftaran jadwal ini?",
             icon: "pi pi-info-circle",
             defaultFocus: "reject",
             acceptClassName: "p-button-danger",
             accept: async () => {
                 try {
-                    const res = await axios.post(
+                    await axios.post(
                         route("penjaga.pendaftaran.multi-disapprove"),
                         {
                             selectedCustomers: selectedCustomers,
                             ruangan_id: ruangan_id,
                         }
                     );
-                    console.log("RES", res.data);
+
                     toast.current.show({
                         severity: "success",
-                        summary: "Confirmed",
-                        detail: "You have disapprove ",
+                        summary: "Berhasil",
+                        detail: `${selectedCustomers.length} jadwal berhasil ditolak`,
                         life: 3000,
                     });
-                    alert("Berhasil menolak pendaftaran jadwal");
+
+                    // Reload the page to refresh data
                     location.reload();
                 } catch (e) {
-                    alert("error");
-                    console.log("ERROR", e);
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: e.response?.data?.message || e.message,
+                        life: 3000,
+                    });
                 }
             },
             reject,
         });
     };
+
+    // Action button template
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <div className="flex gap-2 justify-content-center">
+                <Button
+                    icon="pi pi-check"
+                    rounded
+                    outlined
+                    severity="success"
+                    onClick={(e) => handleApprove(e, rowData)}
+                    tooltip="Approve"
+                    tooltipOptions={{ position: "top" }}
+                />
+            </div>
+        );
+    };
+
+    // Render mahasiswa information template
+    const mahasiswaTemplate = (rowData) => {
+        return (
+            <div className="flex flex-column">
+                <span className="font-bold mb-1">{rowData.mahasiswa.nama}</span>
+                <span className="text-sm text-color-secondary">
+                    NIM: {rowData.mahasiswa.nim}
+                </span>
+            </div>
+        );
+    };
+
+    // Render schedule information template
+    const scheduleTemplate = (rowData) => {
+        return (
+            <div className="flex flex-column">
+                <span className="mb-1">
+                    <i className="pi pi-calendar mr-2"></i>
+                    {rowData.hak_akses.tanggal}
+                </span>
+                <span className="mb-1">
+                    <i className="pi pi-clock mr-2"></i>
+                    {rowData.hak_akses.jam_masuk} -{" "}
+                    {rowData.hak_akses.jam_keluar}
+                </span>
+            </div>
+        );
+    };
+
+    // Header template for the DataTable
+    const headerTemplate = () => (
+        <div className="flex flex-wrap justify-content-between align-items-center gap-2">
+            <h5 className="m-0">
+                Pendaftaran Jadwal <Badge value="Menunggu" severity="warning" />
+            </h5>
+            <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText
+                    value={globalFilter}
+                    onChange={onInputSearch}
+                    placeholder="Cari..."
+                />
+            </span>
+        </div>
+    );
+
     return (
         <Layout>
             <Toast ref={toast} />
@@ -154,152 +253,96 @@ export default function Index({ jadwals, ruangan }) {
 
             <div className="grid">
                 <div className="col-12">
-                    <div className="flex justify-between">
-                        <h4> {ruangan.nama_ruangan}</h4>
-                    </div>
-                    <Toolbar
-                        className="mb-2"
-                        left={() => (
-                            <div className="flex gap-2">
-                                <Button
-                                    label={`Terima`}
-                                    icon="pi pi-check"
-                                    severity="success"
-                                    disabled={selectedCustomers.length <= 0}
-                                    onClick={multiApprove}
-                                    className="mb-2"
-                                />
-                                <Button
-                                    label={`Tolak`}
-                                    icon="pi pi-times"
-                                    severity="danger"
-                                    disabled={selectedCustomers.length <= 0}
-                                    onClick={multiDisapprove}
-                                    className="mb-2"
-                                />
-                            </div>
-                        )}
-                    />
-                    <DataTable
-                        dataKey="hak_akses_id"
-                        selection={selectedCustomers}
-                        onSelectionChange={(e) => {
-                            setSelectedCustomers(e.value);
-                        }}
-                        value={dataJadwals}
-                        rowsPerPageOptions={[5, 10, 25]}
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                        globalFilter={globalFilter}
-                        filters={filters}
-                        header={() => (
-                            <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
-                                <h5 className="mt-3">
-                                    Pendaftaran Jadwal{" "}
-                                    <b className="text-yellow-500">Belum</b> di
-                                    approve
-                                </h5>
-                                <span className="p-input-icon-left">
-                                    <i className="pi pi-search" />
-                                    <InputText
-                                        type="search"
-                                        onInput={(e) => onInputSearch(e)}
-                                        placeholder="Global Search"
-                                    />
-                                </span>
-                            </div>
-                        )}
-                    >
-                        <Column
-                            selectionMode="multiple"
-                            headerStyle={{ width: "3rem" }}
-                        ></Column>
-                        <Column
-                            headerClassName="fw-bold"
-                            field="mahasiswa.nim"
-                            header="NIM"
-                            sortable
-                            filterPlaceholder="Search by  nim"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="mahasiswa.nama"
-                            header="Nama"
-                            sortable
-                            filterPlaceholder="Search by mahasiswa"
-                            headerStyle={{ width: "20rem" }}
-                        />
-
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.tanggal"
-                            header="Tanggal"
-                            sortable
-                            filterPlaceholder="Search by tanggal"
-                            headerStyle={{ width: "10rem" }}
-                        />
-
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.jam_masuk"
-                            header="Jam Masuk"
-                            sortable
-                            filterPlaceholder="Search by Masuk"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.jam_keluar"
-                            header="Jam Keluar"
-                            sortable
-                            filterPlaceholder="Search by keluar"
-                            headerStyle={{ width: "20rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.tujuan"
-                            header="Tujuan"
-                            sortable
-                            filterPlaceholder="Search by Tujuan"
-                            headerStyle={{ width: "15rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.skill"
-                            header="Skill"
-                            sortable
-                            filterPlaceholder="Search by skill"
-                            headerStyle={{ width: "15rem" }}
-                        />
-                        <Column
-                            headerClassName="fw-bold"
-                            field="hak_akses.additional_participant"
-                            header="Participant"
-                            sortable
-                            filterPlaceholder="Search by skill"
-                            headerStyle={{ width: "15rem" }}
-                        />
-                        {/* <Column
-                            headerClassName="fw-bold"
-                            field="action"
-                            header="Approve"
-                            body={(rowData) => {
-                                return (
+                    <Card title={ruangan.nama_ruangan} className="mb-4">
+                        <Toolbar
+                            className="mb-4"
+                            left={() => (
+                                <div className="flex gap-2">
                                     <Button
+                                        label="Terima Semua"
                                         icon="pi pi-check"
-                                        rounded
-                                        outlined
                                         severity="success"
-                                        onClick={(event) =>
-                                            confirm2(event, rowData)
-                                        }
+                                        disabled={selectedCustomers.length <= 0}
+                                        onClick={multiApprove}
                                     />
-                                );
-                            }}
-                            headerStyle={{ width: "15rem" }}
-                        /> */}
-                    </DataTable>
+                                    <Button
+                                        label="Tolak Semua"
+                                        icon="pi pi-times"
+                                        severity="danger"
+                                        disabled={selectedCustomers.length <= 0}
+                                        onClick={multiDisapprove}
+                                    />
+                                </div>
+                            )}
+                            right={() => (
+                                <div>
+                                    <span className="text-sm text-color-secondary mr-2">
+                                        {selectedCustomers.length} item dipilih
+                                    </span>
+                                </div>
+                            )}
+                        />
+
+                        <DataTable
+                            value={dataJadwals}
+                            paginator
+                            rows={10}
+                            dataKey="hak_akses_id"
+                            selection={selectedCustomers}
+                            onSelectionChange={(e) =>
+                                setSelectedCustomers(e.value)
+                            }
+                            filters={filters}
+                            globalFilter={globalFilter}
+                            header={headerTemplate}
+                            emptyMessage="Tidak ada jadwal yang menunggu persetujuan"
+                            rowsPerPageOptions={[5, 10, 25]}
+                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                            currentPageReportTemplate="Menampilkan {first} sampai {last} dari {totalRecords} jadwal"
+                            responsiveLayout="scroll"
+                            className="p-datatable-gridlines"
+                            stripedRows
+                        >
+                            <Column
+                                selectionMode="multiple"
+                                headerStyle={{ width: "3rem" }}
+                                exportable={false}
+                            />
+                            <Column
+                                header="Mahasiswa"
+                                body={mahasiswaTemplate}
+                                sortable
+                                sortField="mahasiswa.nama"
+                                style={{ minWidth: "14rem" }}
+                            />
+                            <Column
+                                header="Jadwal"
+                                body={scheduleTemplate}
+                                sortable
+                                sortField="hak_akses.tanggal"
+                                style={{ minWidth: "12rem" }}
+                            />
+                            <Column
+                                field="hak_akses.tujuan"
+                                header="Tujuan"
+                                sortable
+                                style={{ minWidth: "12rem" }}
+                            />
+                            <Column
+                                field="hak_akses.skill"
+                                header="Skill"
+                                sortable
+                                style={{ minWidth: "10rem" }}
+                            />
+                            <Column
+                                field="hak_akses.additional_participant"
+                                header="Participant"
+                                body={participantsTemplate}
+                                sortable
+                                style={{ minWidth: "10rem" }}
+                            />
+                        </DataTable>
+                    </Card>
                 </div>
             </div>
         </Layout>

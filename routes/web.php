@@ -105,6 +105,7 @@ Route::middleware(['auth'])->group(function () {
             ->where('ruangan_id', $ruangan->id)
             ->exists()
         ) {
+
             $ruangan->update($request->all());
             return back();
         }

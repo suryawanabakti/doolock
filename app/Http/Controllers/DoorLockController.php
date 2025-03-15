@@ -46,10 +46,11 @@ class DoorLockController extends Controller
             return;
         }
 
-        $scanner = ScanerStatus::where('kode', $request->kode)->first();
 
         // Validasi akses mahasiswa
+        // $scanner = ScanerStatus::where('kode', $request->kode)->first();
         // $scanner->type == 'luar' &&
+
         if ($mahasiswa && $mahasiswa->ket === 'mhs' &&  $ruangan->type !== 'umum') {
             if (!$this->hasAccess($mahasiswa, $ruangan, $currentTime, $currentDate)) {
                 $this->createHistoriAndBroadcast($mahasiswa, $request->id, $request->kode, 3, $ruangan);

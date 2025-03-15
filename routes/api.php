@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DoorLockController;
 use App\Http\Controllers\ReferenceController;
+use App\Models\Mahasiswa;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,4 +39,14 @@ Route::get('/v1/search-mahasiswa', function (Request $request) {
             });
         })
         ->get();
+});
+
+Route::get('/v1/search-dosen', function (Request $request) {
+    return Mahasiswa::where('ket', 'dsn')->where('nama', 'LIKE', "%{$request->search}%")
+        ->get()->map(function ($data) {
+            return [
+                "name" => $data->nama,
+                "id" => $data->id,
+            ];
+        });
 });
