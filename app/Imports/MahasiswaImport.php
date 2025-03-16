@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 class MahasiswaImport implements ToModel, WithValidation, WithHeadingRow
 {
     public function __construct(public $kelas, public $tahun_masuk) {}
+
     public function model(array $row)
     {
         if ($row['id_tag'] && $row['nama'] && $row['nim']) {
@@ -31,8 +32,8 @@ class MahasiswaImport implements ToModel, WithValidation, WithHeadingRow
                 'nim' => $row['nim'],
                 'pin' => $row['pin'] ?? null,
                 'ket' => 'mhs',
-                'ruangan_id' => Ruangan::where('nama_ruangan', $this->kelas)->first()->id,
-                'tahun_masuk' => $this->tahun_masuk,
+                'ruangan_id' => 'Kelas ' .  $row['kelas'],
+                'tahun_masuk' => "20" . $row['angkatan'],
                 'status' => 1
             ]);
 
