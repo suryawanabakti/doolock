@@ -79,13 +79,6 @@ Route::get('/admin/get-mahasiswa-all', function () {
     return User::with('mahasiswa')->get();
 });
 
-Route::get('/dataku', function (Request $request) {
-    return [
-        "jumlahUser" => User::where('role', 'mahasiswa')->count(),
-        "jumlahMahasiswa" => Mahasiswa::count(),
-    ];
-});
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/penjaga/ruangan', function (Request $request) {
         $ruangan = Ruangan::find($request->id);
