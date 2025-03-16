@@ -122,7 +122,6 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
     };
 
     const nimBodyTemplate = (customer) => {
-        console.log(customer);
         return (
             <Link
                 href={"/penjaga/riwayat/mahasiswa/detail"}
