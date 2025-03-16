@@ -24,7 +24,7 @@ class MahasiswaImport implements ToModel, WithValidation, WithHeadingRow
                 'password' => bcrypt($row['nim']),
                 'status' => 1
             ]);
-
+            $kelas = 'Kelas ' .  $row['kelas'];
             $mhs = Mahasiswa::create([
                 'user_id' => $user->id,
                 'id_tag' => $row['id_tag'],
@@ -32,7 +32,7 @@ class MahasiswaImport implements ToModel, WithValidation, WithHeadingRow
                 'nim' => $row['nim'],
                 'pin' => $row['pin'] ?? null,
                 'ket' => 'mhs',
-                'ruangan_id' => 'Kelas ' .  $row['kelas'],
+                'ruangan_id' => Ruangan::where('nama_ruangan', $kelas)->first()->id,
                 'tahun_masuk' => "20" . $row['angkatan'],
                 'status' => 1
             ]);
