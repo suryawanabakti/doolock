@@ -96,7 +96,7 @@ const AppMenuitem = (props) => {
                             item.icon
                         )}
                     ></i>
-                    <span className="layout-menuitem-text">{item.label}</span>
+                    <span className="layout-menuitem-text">{item.label} </span>
                     {item.items && (
                         <i className="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
                     )}
@@ -112,6 +112,7 @@ const AppMenuitem = (props) => {
                     onClick={(e) => itemClick(e)}
                     className={classNames(item.class, "p-ripple", {
                         "active-route": isActiveRoute,
+                        hidden: item.hidden,
                     })}
                     tabIndex={0}
                     preserveScroll={true}

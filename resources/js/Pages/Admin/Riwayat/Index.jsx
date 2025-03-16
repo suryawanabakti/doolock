@@ -41,7 +41,10 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                     status,
                     scanner: event.histori.scanner,
                     kode: event.histori.kode,
-                    waktu: event.histori.waktu,
+                    waktu: moment
+                        .utc(event.histori.waktu)
+                        .local()
+                        .format("YYYY-MM-DD HH:mm:ss"),
                 };
 
                 setCustomers((prev) => [data, ...prev]);

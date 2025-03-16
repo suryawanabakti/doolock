@@ -35,9 +35,9 @@ export default function Index({ jadwals, ruangans }) {
     const [globalFilter, setGlobalFilter] = useState("");
 
     // Time options for dropdowns
-    const options = Array.from({ length: 24 }, (_, i) => ({
-        value: i,
-        label: `${i}:00`,
+    const options = Array.from({ length: 17 }, (_, i) => ({
+        value: i + 7,
+        label: `${i + 7}:00`,
     }));
 
     // Refs

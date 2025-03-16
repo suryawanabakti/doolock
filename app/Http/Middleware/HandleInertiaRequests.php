@@ -35,6 +35,7 @@ class HandleInertiaRequests extends Middleware
     {
         if ($request->user() && $request->user()->role == 'penjaga') {
             $search = request('search_menu');
+
             $daftarRuangan = PenjagaRuangan::with('ruangan')->whereHas('ruangan', fn($q) => $q->where('nama_ruangan', 'LIKE', "%{$search}%"))->where('user_id', $request->user()->id)->get()->map(function ($data) {
 
                 $belumDiApproveCount = HakAksesMahasiswa::whereHas('hakAkses', function ($q) use ($data) {
@@ -46,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                     "belumDiApproveCount" => $belumDiApproveCount,
                     "items" => [
                         [
+                            "hidden" => $data->ruangan->type === "umum",
                             "label" => "Hak Akses",
                             "icon" => "pi pi-key",
                             "route" => "penjaga.ruangan-hak-akses.index",
@@ -54,6 +56,7 @@ class HandleInertiaRequests extends Middleware
                             ]),
                         ],
                         [
+                            "hidden" => $data->ruangan->type === "umum",
                             "label" => "Daftar jadwal belum di approve",
                             "icon" => "pi pi-clock",
                             "route" => "penjaga.pendaftaran.index",
@@ -63,6 +66,7 @@ class HandleInertiaRequests extends Middleware
                             "total" => $belumDiApproveCount,
                         ],
                         [
+                            "hidden" => $data->ruangan->type === "umum",
                             "label" => "Daftar jadwal sudah di approve",
                             "icon" => "pi pi-check",
                             "route" => "penjaga.pendaftaran-approve.index",
@@ -71,6 +75,7 @@ class HandleInertiaRequests extends Middleware
                             ])
                         ],
                         [
+                            "hidden" => $data->ruangan->type === "umum",
                             "label" => "Daftar jadwal sudah di tolak",
                             "icon" => "pi pi-times",
                             "route" => "penjaga.pendaftaran-disapprove.index",
@@ -79,6 +84,7 @@ class HandleInertiaRequests extends Middleware
                             ])
                         ],
                         [
+
                             "label" => "Riwayat",
                             "icon" => "pi pi-history",
                             "to" => route("penjaga.riwayat.index",  [
@@ -101,7 +107,7 @@ class HandleInertiaRequests extends Middleware
                         ],
                     ]
                 ];
-            })->sortByDesc('belumDiApproveCount')->values();
+            })->sortByDesc('label')->sortByDesc('belumDiApproveCount')->values();
         }
 
         return [
