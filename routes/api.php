@@ -31,12 +31,10 @@ Route::get('/v1/get-data-mahasiswa-by-scanner', [ReferenceController::class, 'ge
 Route::get('/v1/get-data-users', [ReferenceController::class, 'getUsers']);
 
 Route::get('/v1/search-mahasiswa', function (Request $request) {
-    return User::where('role', 'mahasiswa')
-        ->when($request->search, function ($q) use ($request) {
-            $q->where(function ($query) use ($request) {
-                $query->where('name', 'LIKE', "%{$request->search}%")
-                    ->orWhere('email', 'LIKE', "%{$request->search}%");
-            });
+    return Mahasiswa::with('user')
+        ->where(function ($query) use ($request) {
+            $query->where('nama', 'LIKE', "%{$request->search}%")
+                ->orWhere('nim', 'LIKE', "%{$request->search}%");
         })
         ->get();
 });

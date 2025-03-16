@@ -200,10 +200,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'index'])->name('penjaga.ruangan-hak-akses.index');
         Route::post('/penjaga/ruangan-hak-akses', [RuanganHakAksesController::class, 'store'])->name('penjaga.ruangan-hak-akses.store');
         Route::get('/penjaga/riwayat', [RiwayatController::class, 'indexPenjaga'])->name('penjaga.riwayat.index');
-        Route::get('/penjaga/riwayat/mahasiswa', [RiwayatController::class, 'mahasiswaPenjaga'])->name('penjaga.riwayat.mahasiswa');
+
         Route::get('/penjaga/riwayat/ruangan', [RiwayatController::class, 'ruanganPenjaga'])->name('penjaga.riwayat.ruangan');
         Route::get('/penjaga/absensi', [AbsensiController::class, 'indexPenjaga'])->name('penjaga.absensi.index');
     });
+
+    Route::get('/penjaga/riwayat/mahasiswa/detail', [RiwayatController::class, 'mahasiswaPenjaga'])->name('penjaga.riwayat.mahasiswa');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');

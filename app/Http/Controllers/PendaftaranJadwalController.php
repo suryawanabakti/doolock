@@ -21,6 +21,7 @@ class PendaftaranJadwalController extends Controller
     {
         $jadwals = HakAksesMahasiswa::with('mahasiswa', 'hakAkses.ruangan')->orderBy('created_at', 'DESC')
             ->whereHas('hakAkses', fn($q) => $q->where('is_approve', 0)->where('ruangan_id', $request->id)->where('is_by_admin', 0))->get();
+
         $ruangan = Ruangan::find($request->id);
         return inertia("Penjaga/Register/Index", ["jadwals" => $jadwals, "ruangan" => $ruangan]);
     }
@@ -48,6 +49,16 @@ class PendaftaranJadwalController extends Controller
         $maxRegister = $selectedCustomers["hak_akses"]["ruangan"]["max_register"];
 
         foreach ($request->selectedCustomers as $cs) {
+            if (!empty($cs["hak_akses"]["additional_participant"])) {
+                $data = array_map(fn($add) => [
+                    "hak_akses_id" => $cs["hak_akses_id"],
+                    "mahasiswa_id" => $add["value"]
+                ], $cs["hak_akses"]["additional_participant"]);
+
+                HakAksesMahasiswa::insert($data);
+            }
+
+
             $tanggal = $cs["hak_akses"]["tanggal"];
             $sisaKuota = $maxRegister - HakAkses::where('ruangan_id', $cs["hak_akses"]["ruangan_id"])->where('tanggal', $cs["hak_akses"]["tanggal"])
                 ->where("is_approve", 1)
@@ -61,12 +72,6 @@ class PendaftaranJadwalController extends Controller
                 ], 422);
             }
         }
-
-
-
-
-
-
 
         // Ambil semua data mahasiswa beserta user terkait dalam satu query
         $mahasiswaList = Mahasiswa::with('user')
@@ -98,6 +103,7 @@ class PendaftaranJadwalController extends Controller
         }
 
         $this->updateHakAksesStatus($request->selectedCustomers, 1);
+        return back();
     }
 
     public function multiDisapprove(Request $request)

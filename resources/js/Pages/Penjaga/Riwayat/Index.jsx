@@ -125,7 +125,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
         console.log(customer);
         return (
             <Link
-                href={route("penjaga.riwayat.mahasiswa")}
+                href={"/penjaga/riwayat/mahasiswa/detail"}
                 data={{
                     id_tag: customer.id_tag,
                 }}
@@ -280,6 +280,7 @@ const Riwayat = ({ auth, riwayat, mulai, sampai }) => {
                             <Column
                                 headerClassName="fw-bold"
                                 field="id_tag"
+                                hidden
                                 header="ID TAG"
                                 sortable
                                 filter

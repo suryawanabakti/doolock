@@ -49,7 +49,10 @@ export default function Index2({ jadwals, ruangan }) {
             accept: async () => {
                 try {
                     await axios.patch(
-                        route("penjaga.pendaftaran.unapprove", rowData.id)
+                        route(
+                            "penjaga.pendaftaran.unapprove",
+                            rowData.hak_akses_id
+                        )
                     );
 
                     toast.current.show({

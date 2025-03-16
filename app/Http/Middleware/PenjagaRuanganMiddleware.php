@@ -17,6 +17,7 @@ class PenjagaRuanganMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $dapatkan = PenjagaRuangan::where('user_id', $request->user()->id)->where('ruangan_id', $request->id ?? $request->ruangan_id)->firstOrFail();
+
         if (!$dapatkan) {
             return abort(404);
         }

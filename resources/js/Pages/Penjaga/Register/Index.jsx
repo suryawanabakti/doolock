@@ -14,6 +14,7 @@ import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { FilterMatchMode } from "primereact/api";
 import { Card } from "primereact/card";
 import { Tag } from "primereact/tag";
+import { router } from "@inertiajs/react";
 
 export default function Index({ jadwals, ruangan }) {
     const participantsTemplate = (rowData) => {
@@ -111,32 +112,32 @@ export default function Index({ jadwals, ruangan }) {
             defaultFocus: "reject",
             acceptClassName: "p-button-success",
             accept: async () => {
-                try {
-                    await axios.post(
-                        route("penjaga.pendaftaran.multi-approve"),
-                        {
-                            selectedCustomers: selectedCustomers,
-                            ruangan_id: ruangan_id,
-                        }
-                    );
-
-                    toast.current.show({
-                        severity: "success",
-                        summary: "Berhasil",
-                        detail: `${selectedCustomers.length} jadwal berhasil disetujui`,
-                        life: 3000,
-                    });
-
-                    // Reload the page to refresh data
-                    location.reload();
-                } catch (e) {
-                    toast.current.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: e.response?.data?.message || e.message,
-                        life: 3000,
-                    });
-                }
+                router.post(
+                    route("penjaga.pendaftaran.multi-approve"),
+                    {
+                        selectedCustomers: selectedCustomers,
+                        ruangan_id: ruangan_id,
+                    },
+                    {
+                        onError: (e) => {
+                            toast.current.show({
+                                severity: "error",
+                                summary: "Error",
+                                detail: e.response?.data?.message || e.message,
+                                life: 3000,
+                            });
+                        },
+                        onSuccess: () => {
+                            toast.current.show({
+                                severity: "success",
+                                summary: "Berhasil",
+                                detail: `${selectedCustomers.length} jadwal berhasil disetujui`,
+                                life: 3000,
+                            });
+                            location.reload();
+                        },
+                    }
+                );
             },
             reject,
         });

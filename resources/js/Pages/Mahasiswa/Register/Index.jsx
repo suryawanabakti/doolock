@@ -172,11 +172,11 @@ export default function Index({ jadwals, ruangans }) {
             `/api/v1/search-mahasiswa?search=${inputValue}`
         );
         const data = await response.json();
-
-        return data.map((user) => ({
-            label: user.name,
-            value: user.id,
-            email: user.email,
+        console.log(data);
+        return data.map((mhs) => ({
+            label: `${mhs.nama} - ${mhs.nim}`,
+            value: mhs.id,
+            email: mhs.nim,
         }));
     };
 
@@ -230,7 +230,7 @@ export default function Index({ jadwals, ruangans }) {
                 {participants.map((participant, index) => (
                     <Tag
                         key={index}
-                        value={`${participant.label} - ${participant.email}`}
+                        value={`${participant.label}`}
                         severity="info"
                         className="mr-1 mb-1"
                     />

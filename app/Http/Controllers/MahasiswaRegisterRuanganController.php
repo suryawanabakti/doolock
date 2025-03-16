@@ -46,7 +46,7 @@ class MahasiswaRegisterRuanganController extends Controller
             'additional_participant' => ['nullable'],
         ]);
 
-        $hakAkses = HakAkses::where('ruangan_id', $request->ruangan_id)->whereHas('hakAksesMahasiswa', fn($q) => $q->where('mahasiswa_id', auth()->user()->mahasiswa->id))->where('tanggal', $request->tanggal)->exists();
+        $hakAkses = HakAkses::where('ruangan_id', $request->ruangan_id)->where('is_approve', false)->whereHas('hakAksesMahasiswa', fn($q) => $q->where('mahasiswa_id', auth()->user()->mahasiswa->id))->where('tanggal', $request->tanggal)->first();
 
         if ($hakAkses) {
             return back()->withErrors([
@@ -66,7 +66,6 @@ class MahasiswaRegisterRuanganController extends Controller
 
 
 
-
         return DB::transaction(function () use ($request) {
 
             $hakAkses = HakAkses::create([
@@ -81,10 +80,14 @@ class MahasiswaRegisterRuanganController extends Controller
                 'additional_participant' => $request->additional_participant,
             ]);
 
+
             $hakAksesMahasiswa =  HakAksesMahasiswa::create([
                 'hak_akses_id' => $hakAkses->id,
                 'mahasiswa_id' => $request->user()->mahasiswa->id,
             ]);
+
+
+
             // KIRIM EMAIL 
             $penjagaRuangan = PenjagaRuangan::with(['user:id,email_notifikasi', 'ruangan'])
                 ->where('ruangan_id', $request->ruangan_id)
