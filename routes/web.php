@@ -21,11 +21,9 @@ use App\Jobs\ProcessLongTask;
 use App\Models\Mahasiswa;
 use App\Models\PenjagaRuangan;
 use App\Models\Ruangan;
-use App\Models\RuanganAkses;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -40,20 +38,21 @@ use Inertia\Inertia;
 |
 */
 
-
 Route::get('/test', function () {
-    return "TESTER";
+    return 'TESTER';
 });
 
 Route::get('/', function () {
     return redirect('/login');
 });
 
-
-
+Route::get('/reset-api', function () {
+    return Ruangan::query()->update(['open_api' => 1]);
+});
 
 Route::get('/show-ip', function () {
     return request()->ip();
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -72,6 +71,7 @@ Route::get('/penjaga/dashboard', DashboardController::class)
 
 Route::get('/admin/update-mahasiswa', function () {
     ProcessLongTask::dispatch();
+
     return 'ok';
 });
 
@@ -87,8 +87,10 @@ Route::middleware(['auth'])->group(function () {
             ->exists()
         ) {
             $mahasiswas = Mahasiswa::where('ket', 'dsn')->get();
-            return Inertia::render("Penjaga/Ruangan/Index", ["ruangan" => $ruangan, "mahasiswas" => $mahasiswas]);
+
+            return Inertia::render('Penjaga/Ruangan/Index', ['ruangan' => $ruangan, 'mahasiswas' => $mahasiswas]);
         }
+
         return abort(403);
     })->name('penjaga.ruangan.show');
 
@@ -100,8 +102,10 @@ Route::middleware(['auth'])->group(function () {
         ) {
 
             $ruangan->update($request->all());
+
             return back();
         }
+
         return abort(403);
     })->name('penjaga.ruangan.update');
 
@@ -117,7 +121,6 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::middleware(['role:admin,super'])->group(function () {
-
 
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
         Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
@@ -153,7 +156,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/admin/dosen/block', [DosenController::class, 'block'])->name('admin.dosen.block');
         Route::patch('/admin/dosen/{mahasiswa}', [DosenController::class, 'update'])->name('admin.dosen.update');
         Route::delete('/admin/dosen/{mahasiswa}', [DosenController::class, 'destroy'])->name('admin.dosen.destroy');
-
 
         Route::get('/admin/scaner', [ScanerController::class, 'index'])->name('admin.scaner.index');
         Route::patch('/admin/scaner/{scanerStatus}', [ScanerController::class, 'update'])->name('admin.scanner.update');
@@ -213,4 +215,4 @@ Route::get('/uikit/button', function () {
     return Inertia::render('main/uikit/button/page');
 })->name('button');
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

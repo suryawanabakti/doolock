@@ -284,6 +284,19 @@ export default function Ruangan({ ruangans }) {
             </React.Fragment>
         );
     };
+    const resetApi =async () => {
+        if(confirm("apakah  anda yakin ?") ) {
+  try {
+            
+            await axios.get("/reset-api")
+            alert("Berhasil reset")
+            location.reload()
+        } catch (error) {
+            console.log(error)
+        }
+        }
+      
+    }
     // END EDIT
     const leftToolbarTemplate = () => {
         return (
@@ -293,6 +306,12 @@ export default function Ruangan({ ruangans }) {
                     icon="pi pi-plus"
                     severity="primary"
                     onClick={openNew}
+                />
+                  <Button
+                    label="Reset API"
+                    icon="pi pi-reload"
+                    severity="primary"
+                    onClick={resetApi}
                 />
             </div>
         );

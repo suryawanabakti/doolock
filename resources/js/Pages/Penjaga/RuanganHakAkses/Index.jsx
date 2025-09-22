@@ -213,14 +213,20 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
     const [dialogTambah, setDialogTambah] = useState(false);
     const [day, setDay] = useState(today);
     const openNew = async () => {
-        const res = await axios.get(
+        try {
+            const res = await axios.get(
             route("admin.ruangan-hak-akses.getMahasiswa", {
                 ruangan_id: ruangan.id,
                 day: day,
             })
         );
-        console.log(res);
-        setDataMahasiswa(res.data);
+          setDataMahasiswa(res.data);
+        } catch (error) {
+            console.log("error" , error)
+        }
+       
+       
+      
         setDialogTambah(true);
     };
     const leftToolbarTemplate3 = () => {
@@ -230,6 +236,7 @@ export default function Index({ ruangan, today, hakAkses, kelas }) {
                     label={`Tambah Hak Akses ${ruangan.nama_ruangan}`}
                     icon="pi pi-save"
                     severity="primary"
+                    loading={dialogTambah}
                     onClick={openNew}
                 />
             </div>
