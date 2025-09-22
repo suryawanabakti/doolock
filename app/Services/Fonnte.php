@@ -16,10 +16,10 @@ class Fonnte
 
     public static function sendWa($noWa, $message)
     {
-        Http::withHeader("Authorization", env("TOKENWA"))->post("https://api.fonnte.com/send", [
+        Http::withHeader('Authorization', config('fonnte.token'))->post('https://api.fonnte.com/send', [
             'target' => $noWa,
             'message' => $message,
-            'countryCode' => '62', //optional
+            'countryCode' => '62', // optional
         ]);
     }
 }
