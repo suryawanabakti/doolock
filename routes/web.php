@@ -67,7 +67,7 @@ Route::get('/dashboard', DashboardController::class)
 
 Route::get('/penjaga/dashboard', DashboardController::class)
     ->middleware('auth')
-    ->name('dashboard');
+    ->name('penjaga.dashboard');
 
 Route::get('/admin/update-mahasiswa', function () {
     ProcessLongTask::dispatch();
